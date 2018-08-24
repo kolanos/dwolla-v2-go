@@ -39,14 +39,16 @@ const (
 // FundingSource is a dwolla funding source
 type FundingSource struct {
 	Resource
-	ID       string              `json:"id"`
-	Status   FundingSourceStatus `json:"status"`
-	Type     FundingSourceType   `json:"type"`
-	Name     string              `json:"name"`
-	Created  string              `json:"created"`
-	Balance  Amount              `json:"balance"`
-	Removed  bool                `json:"removed"`
-	Channels []string            `json:"channels"`
+	ID              string                       `json:"id"`
+	Status          FundingSourceStatus          `json:"status"`
+	Type            FundingSourceType            `json:"type"`
+	BankAccountType FundingSourceBankAccountType `json:"bankAccountType"`
+	Name            string                       `json:"name"`
+	Created         string                       `json:"created"`
+	Balance         Amount                       `json:"balance"`
+	Removed         bool                         `json:"removed"`
+	Channels        []string                     `json:"channels"`
+	BankName        string                       `json:"bankName"`
 }
 
 // FundingSources is a collection of funding sources

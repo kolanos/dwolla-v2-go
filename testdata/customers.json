@@ -1,0 +1,33 @@
+
+{
+  "_links": {
+    "first": {
+      "href": "https://api-sandbox.dwolla.com/customers?limit=25&offset=0"
+    },
+    "last": {
+      "href": "https://api-sandbox.dwolla.com/customers?limit=25&offset=0"
+    },
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/customers?limit=25&offset=0"
+    }
+  },
+  "_embedded": {
+    "customers": [
+      {
+        "_links": {
+          "self": {
+            "href": "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"
+          }
+        },
+        "id": "FC451A7A-AE30-4404-AB95-E3553FCD733F",
+        "firstName": "Jane",
+        "lastName": "Doe",
+        "email": "janedoe@nomail.com",
+        "type": "unverified",
+        "status": "unverified",
+        "created": "2015-09-03T23:56:10.023Z"
+      }
+    ]
+  },
+  "total": 1
+}

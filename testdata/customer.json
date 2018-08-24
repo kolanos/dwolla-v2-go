@@ -1,0 +1,14 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"
+    }
+  },
+  "id": "FC451A7A-AE30-4404-AB95-E3553FCD733F",
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "janedoe@nomail.com",
+  "type": "unverified",
+  "status": "unverified",
+  "created": "2015-09-03T23:56:10.023Z"
+}

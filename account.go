@@ -2,7 +2,6 @@ package dwolla
 
 import (
 	"net/url"
-	"strconv"
 )
 
 // AccountService is the account service interface
@@ -59,11 +58,8 @@ func (a *Account) CreateFundingSource(body *FundingSourceCreate) (*FundingSource
 
 // ListFundingSources returns the account's funding sources
 // see: https://docsv2.dwolla.com/#list-funding-sources-for-an-account
-func (a *Account) ListFundingSources(removed bool) (*FundingSources, error) {
+func (a *Account) ListFundingSources(params *url.Values) (*FundingSources, error) {
 	var sources FundingSources
-
-	params := &url.Values{}
-	params.Add("removed", strconv.FormatBool(removed))
 
 	if err := a.client.Get(a.Links["funding-sources"].HREF, params, nil, &sources); err != nil {
 		return nil, err
@@ -80,10 +76,10 @@ func (a *Account) ListFundingSources(removed bool) (*FundingSources, error) {
 
 // ListMassPayments returns mass payments for the account
 // see: https://docsv2.dwolla.com/#list-mass-payments-for-an-account
-func (a *Account) ListMassPayments() (*MassPayments, error) {
+func (a *Account) ListMassPayments(params *url.Values) (*MassPayments, error) {
 	var payments MassPayments
 
-	if err := a.client.Get(a.Links["mass-payments"].HREF, nil, nil, &payments); err != nil {
+	if err := a.client.Get(a.Links["mass-payments"].HREF, params, nil, &payments); err != nil {
 		return nil, err
 	}
 
@@ -98,10 +94,10 @@ func (a *Account) ListMassPayments() (*MassPayments, error) {
 
 // ListTransfers returns the account's transfers
 // see: https://docsv2.dwolla.com/#list-and-search-transfers-for-an-account
-func (a *Account) ListTransfers() (*Transfers, error) {
+func (a *Account) ListTransfers(params *url.Values) (*Transfers, error) {
 	var transfers Transfers
 
-	if err := a.client.Get(a.Links["transfers"].HREF, nil, nil, &transfers); err != nil {
+	if err := a.client.Get(a.Links["transfers"].HREF, params, nil, &transfers); err != nil {
 		return nil, err
 	}
 

@@ -37,4 +37,5 @@ func TestBusinessClassificationList(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
+	assert.Equal(t, res.Total, 27)
 }
