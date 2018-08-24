@@ -1,0 +1,60 @@
+{
+    "_links": {
+        "self": {
+            "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b/funding-sources",
+            "resource-type": "funding-source"
+        }
+    },
+    "_embedded": {
+        "funding-sources": [
+            {
+                "_links": {
+                    "self": {
+                        "href": "https://api-sandbox.dwolla.com/funding-sources/04173e17-6398-4d36-a167-9d98c4b1f1c3",
+                        "type": "application/vnd.dwolla.v1.hal+json",
+                        "resource-type": "funding-source"
+                    },
+                    "account": {
+                        "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b",
+                        "type": "application/vnd.dwolla.v1.hal+json",
+                        "resource-type": "account"
+                    }
+                },
+                "id": "04173e17-6398-4d36-a167-9d98c4b1f1c3",
+                "status": "verified",
+                "type": "bank",
+                "bankAccountType": "checking",
+                "name": "My Account - Checking",
+                "created": "2017-09-25T20:03:41.000Z",
+                "removed": false,
+                "channels": [
+                    "ach"
+                ],
+                "bankName": "First Midwestern Bank"
+            },
+            {
+                "_links": {
+                    "self": {
+                        "href": "https://api-sandbox.dwolla.com/funding-sources/b268f6b9-db3b-4ecc-83a2-8823a53ec8b7",
+                    },
+                    "account": {
+                        "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b",
+                    },
+                    "with-available-balance": {
+                        "href": "https://api-sandbox.dwolla.com/funding-sources/b268f6b9-db3b-4ecc-83a2-8823a53ec8b7",
+                    },
+                    "balance": {
+                        "href": "https://api-sandbox.dwolla.com/funding-sources/b268f6b9-db3b-4ecc-83a2-8823a53ec8b7/balance",
+                    }
+                },
+                "id": "b268f6b9-db3b-4ecc-83a2-8823a53ec8b7",
+                "status": "verified",
+                "type": "balance",
+                "name": "Balance",
+                "created": "2017-08-22T18:21:51.000Z",
+                "removed": false,
+                "channels": []
+            }
+        ]
+    }
+}

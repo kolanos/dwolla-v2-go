@@ -1,0 +1,59 @@
+
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/accounts/a84222d5-31d2-4290-9a96-089813ef96b3/transfers"
+    },
+    "first": {
+      "href": "https://api-sandbox.dwolla.com/accounts/a84222d5-31d2-4290-9a96-089813ef96b3/transfers?limit=25&offset=0"
+    },
+    "last": {
+      "href": "https://api-sandbox.dwolla.com/accounts/a84222d5-31d2-4290-9a96-089813ef96b3/transfers?limit=25&offset=0"
+    }
+  },
+  "_embedded": {
+    "transfers": [
+      {
+        "_links": {
+          "self": {
+            "href": "https://api-sandbox.dwolla.com/transfers/DC68A3DC-3C61-E511-80DA-0AA34A9B2388"
+          },
+          "source": {
+            "href": "https://api-sandbox.dwolla.com/accounts/CA32853C-48FA-40BE-AE75-77B37504581B"
+          },
+          "destination": {
+            "href": "https://api-sandbox.dwolla.com/accounts/A84222D5-31D2-4290-9A96-089813EF96B3"
+          }
+        },
+        "id": "DC68A3DC-3C61-E511-80DA-0AA34A9B2388",
+        "status": "processed",
+        "amount": {
+          "value": "50.00",
+          "currency": "USD"
+        },
+        "created": "2015-09-22T15:16:14.180Z"
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "https://api-sandbox.dwolla.com/transfers/D36FD9AA-6E5C-E511-80DA-0AA34A9B2388"
+          },
+          "source": {
+            "href": "https://api-sandbox.dwolla.com/funding-sources/2BFF2631-4006-45D6-BBBD-A7BE4853E870"
+          },
+          "destination": {
+            "href": "https://api-sandbox.dwolla.com/accounts/A84222D5-31D2-4290-9A96-089813EF96B3"
+          }
+        },
+        "id": "D36FD9AA-6E5C-E511-80DA-0AA34A9B2388",
+        "status": "processed",
+        "amount": {
+          "value": "5000.00",
+          "currency": "USD"
+        },
+        "created": "2015-09-03T18:11:53.410Z"
+      }
+    ]
+  },
+  "total": 2
+}

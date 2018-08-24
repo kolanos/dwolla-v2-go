@@ -1,0 +1,23 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/business-classifications/9ed3a866-7d6f-11e3-a0ce-5404a6144203"
+    }
+  },
+  "_embedded": {
+    "industry-classifications": [
+      {
+        "id": "9ed3cf58-7d6f-11e3-81a4-5404a6144203",
+        "name": "Toys and games"
+      },
+      {
+        "id": "9ed3cf50-7d6f-11e3-8ae8-5404a6144203",
+        "name": "Music"
+      },
+      {
+      }
+    ]
+  },
+  "id": "9ed3a866-7d6f-11e3-a0ce-5404a6144203",
+  "name": "Entertainment and media"
+}

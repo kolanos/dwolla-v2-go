@@ -1,0 +1,40 @@
+
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b/mass-payments"
+    },
+    "first": {
+      "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b/mass-payments?limit=25&offset=0"
+    },
+    "last": {
+      "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b/mass-payments?limit=25&offset=0"
+    }
+  },
+  "_embedded": {
+    "mass-payments": [
+      {
+        "_links": {
+          "self": {
+            "href": "https://api-sandbox.dwolla.com/mass-payments/b4b5a699-5278-4727-9f81-a50800ea9abc"
+          },
+          "source": {
+            "href": "https://api-sandbox.dwolla.com/funding-sources/84c77e52-d1df-4a33-a444-51911a9623e9"
+          },
+          "items": {
+            "href": "https://api-sandbox.dwolla.com/mass-payments/b4b5a699-5278-4727-9f81-a50800ea9abc/items"
+          }
+        },
+        "id": "b4b5a699-5278-4727-9f81-a50800ea9abc",
+        "status": "complete",
+        "created": "2015-09-03T14:14:10.000Z",
+        "metadata": {
+          "UserJobId": "some ID"
+        },
+        "correlationId": "8a2cdc8d-629d-4a24-98ac-40b735229fe2"
+      }
+    ]
+  },
+  "total": 1
+}
+

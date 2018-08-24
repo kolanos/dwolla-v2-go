@@ -1,0 +1,24 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b"
+    },
+    "receive": {
+      "href": "https://api-sandbox.dwolla.com/transfers"
+    },
+    "funding-sources": {
+      "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b/funding-sources"
+    },
+    "transfers": {
+      "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b/transfers"
+    },
+    "customers": {
+      "href": "https://api-sandbox.dwolla.com/customers"
+    },
+    "send": {
+      "href": "https://api-sandbox.dwolla.com/transfers"
+    }
+  },
+  "id": "ca32853c-48fa-40be-ae75-77b37504581b",
+  "name": "Jane Doe"
+}

@@ -1,0 +1,31 @@
+{
+  "_links": {},
+  "_embedded": {
+    "business-classifications": [
+      {
+        "_links": {
+          "self": {
+            "href": "https://api-sandbox.dwolla.com/business-classifications/9ed3f669-7d6f-11e3-b545-5404a6144203"
+          }
+        },
+        "_embedded": {
+          "industry-classifications": [
+            {
+              "id": "9ed3f671-7d6f-11e3-803c-5404a6144203",
+              "name": "Gourmet foods"
+            },
+            {
+              "id": "9ed3f66c-7d6f-11e3-86ae-5404a6144203",
+              "name": "Distilleries"
+            },
+            {
+            }
+          ]
+        },
+        "id": "9ed3f669-7d6f-11e3-b545-5404a6144203",
+        "name": "Food retail and service"
+      }
+    ]
+  },
+  "total": 27
+}

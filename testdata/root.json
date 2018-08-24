@@ -1,0 +1,11 @@
+{
+  "_links": {
+    "account": {
+      "href": "https://api-sandbox.dwolla.com/accounts/ad5f2162-404a-4c4c-994e-6ab6c3a13254"
+    },
+    "customers": {
+      "href": "https://api-sandbox.dwolla.com/customers"
+    }
+  }
+}
+
