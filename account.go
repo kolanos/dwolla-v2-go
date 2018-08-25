@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"fmt"
 	"net/url"
 )
 
@@ -35,6 +36,10 @@ func (a *AccountServiceOp) Get() (*Account, error) {
 
 	var account Account
 
+	if _, ok := root.Links["account"]; !ok {
+		return nil, fmt.Errorf("No account resource link")
+	}
+
 	if err := a.client.Get(root.Links["account"].HREF, nil, nil, &account); err != nil {
 		return nil, err
 	}
@@ -48,6 +53,10 @@ func (a *AccountServiceOp) Get() (*Account, error) {
 func (a *Account) CreateFundingSource(body *FundingSourceCreate) (*FundingSource, error) {
 	var source FundingSource
 
+	if _, ok := a.Links["funding-sources"]; !ok {
+		return nil, fmt.Errorf("No funding sources resource link")
+	}
+
 	if err := a.client.Post(a.Links["funding-sources"].HREF, body, nil, &source); err != nil {
 		return nil, err
 	}
@@ -60,6 +69,10 @@ func (a *Account) CreateFundingSource(body *FundingSourceCreate) (*FundingSource
 // see: https://docsv2.dwolla.com/#list-funding-sources-for-an-account
 func (a *Account) ListFundingSources(params *url.Values) (*FundingSources, error) {
 	var sources FundingSources
+
+	if _, ok := a.Links["funding-sources"]; !ok {
+		return nil, fmt.Errorf("No funding sources resource link")
+	}
 
 	if err := a.client.Get(a.Links["funding-sources"].HREF, params, nil, &sources); err != nil {
 		return nil, err
@@ -79,6 +92,10 @@ func (a *Account) ListFundingSources(params *url.Values) (*FundingSources, error
 func (a *Account) ListMassPayments(params *url.Values) (*MassPayments, error) {
 	var payments MassPayments
 
+	if _, ok := a.Links["mass-payments"]; !ok {
+		return nil, fmt.Errorf("No mass payments resource link")
+	}
+
 	if err := a.client.Get(a.Links["mass-payments"].HREF, params, nil, &payments); err != nil {
 		return nil, err
 	}
@@ -96,6 +113,10 @@ func (a *Account) ListMassPayments(params *url.Values) (*MassPayments, error) {
 // see: https://docsv2.dwolla.com/#list-and-search-transfers-for-an-account
 func (a *Account) ListTransfers(params *url.Values) (*Transfers, error) {
 	var transfers Transfers
+
+	if _, ok := a.Links["transfers"]; !ok {
+		return nil, fmt.Errorf("No transfers resource link")
+	}
 
 	if err := a.client.Get(a.Links["transfers"].HREF, params, nil, &transfers); err != nil {
 		return nil, err
