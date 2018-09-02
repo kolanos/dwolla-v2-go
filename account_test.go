@@ -9,21 +9,44 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAccountGet(t *testing.T) {
+func TestAccountRetrieve(t *testing.T) {
 	f, _ := os.Open(filepath.Join("testdata", "account.json"))
 	mr := &http.Response{Body: f, StatusCode: 200}
 	mc := &MockHTTPClient{err: nil, res: mr}
 
 	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.root = &Resource{Links: Links{"account": Link{HREF: "foobar"}}}
+	c.root = &Resource{Links: Links{"account": Link{Href: "foobar"}}}
 	c.Token = &Token{}
 
-	res, err := c.Account.Get()
+	res, err := c.Account.Retrieve()
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, res.ID, "ca32853c-48fa-40be-ae75-77b37504581b")
 	assert.Equal(t, res.Name, "Jane Doe")
+}
+
+func TestAccountCreateFundingSource(t *testing.T) {
+	f, _ := os.Open(filepath.Join("testdata", "funding-source.json"))
+	mr := &http.Response{Body: f, StatusCode: 201}
+	mc := &MockHTTPClient{err: nil, res: mr}
+
+	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
+	c.Token = &Token{}
+
+	a := &Account{client: c}
+
+	fs := &FundingSourceRequest{
+		RoutingNumber:   "222222226",
+		AccountNumber:   "0123456789",
+		BankAccountType: FundingSourceBankAccountTypeChecking,
+		Name:            "My Checking Account",
+	}
+
+	res, err := a.CreateFundingSource(fs)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, res)
 }
 
 func TestAccountListFundingSources(t *testing.T) {
@@ -34,7 +57,7 @@ func TestAccountListFundingSources(t *testing.T) {
 	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
 	c.Token = &Token{}
 
-	a := &Account{client: c, Resource: Resource{Links: Links{"funding-sources": Link{HREF: "foobar"}}}}
+	a := &Account{client: c, Resource: Resource{Links: Links{"funding-sources": Link{Href: "foobar"}}}}
 	res, err := a.ListFundingSources(nil)
 
 	assert.Nil(t, err)
@@ -61,7 +84,7 @@ func TestAccountListMassPayments(t *testing.T) {
 	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
 	c.Token = &Token{}
 
-	a := &Account{client: c, Resource: Resource{Links: Links{"mass-payments": Link{HREF: "foobar"}}}}
+	a := &Account{client: c, Resource: Resource{Links: Links{"mass-payments": Link{Href: "foobar"}}}}
 	res, err := a.ListMassPayments(nil)
 
 	assert.Nil(t, err)
@@ -85,7 +108,7 @@ func TestAccountListTransfers(t *testing.T) {
 	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
 	c.Token = &Token{}
 
-	a := &Account{client: c, Resource: Resource{Links: Links{"transfers": Link{HREF: "foobar"}}}}
+	a := &Account{client: c, Resource: Resource{Links: Links{"transfers": Link{Href: "foobar"}}}}
 	res, err := a.ListTransfers(nil)
 
 	assert.Nil(t, err)

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCustomerGet(t *testing.T) {
+func TestCustomerRetrieve(t *testing.T) {
 	f, _ := os.Open(filepath.Join("testdata", "customer.json"))
 	mr := &http.Response{Body: f, StatusCode: 200}
 	mc := &MockHTTPClient{err: nil, res: mr}
@@ -17,7 +17,7 @@ func TestCustomerGet(t *testing.T) {
 	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
 	c.Token = &Token{}
 
-	res, err := c.Customer.Get("FC451A7A-AE30-4404-AB95-E3553FCD733F")
+	res, err := c.Customer.Retrieve("FC451A7A-AE30-4404-AB95-E3553FCD733F")
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)

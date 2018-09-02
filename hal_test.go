@@ -18,8 +18,8 @@ func TestLink(t *testing.T) {
 		t.Errorf("%v", err)
 	}
 
-	if link.HREF != "https://api.dwolla.com/customers/123" {
-		t.Errorf("Expected https://api.dwolla.com/customers/123, got %s", link.HREF)
+	if link.Href != "https://api.dwolla.com/customers/123" {
+		t.Errorf("Expected https://api.dwolla.com/customers/123, got %s", link.Href)
 	}
 }
 
@@ -41,7 +41,7 @@ func TestResource(t *testing.T) {
 		t.Errorf("%v", err)
 	}
 
-	if resource.Links["self"].HREF != "https://api.dwolla.com/customers/123" {
-		t.Errorf("Expected https://api.dwolla.com/customers/123, got %s", resource.Links["self"].HREF)
+	if resource.Links["self"].Href != "https://api.dwolla.com/customers/123" {
+		t.Errorf("Expected https://api.dwolla.com/customers/123, got %s", resource.Links["self"].Href)
 	}
 }

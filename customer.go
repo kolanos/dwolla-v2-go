@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 // CustomerService is the customerservice interface
 // see: https://docsv2.dwolla.com/#customers
 type CustomerService interface {
-	Get(string) (*Customer, error)
+	Create(*CustomerRequest) (*Customer, error)
+	Retrieve(string) (*Customer, error)
 	List(*url.Values) (*Customers, error)
+	Update(string, *CustomerRequest) (*Customer, error)
 }
 
 // CustomerServiceOp is an implementation of the customer service interface
@@ -20,19 +23,13 @@ type CustomerServiceOp struct {
 
 // Controller is a controller of a business
 type Controller struct {
-	FirstName   string   `json:"firstName"`
-	LastName    string   `json:"lastName"`
-	Title       string   `json:"title"`
+	FirstName   string   `json:"firstName,omitempty"`
+	LastName    string   `json:"lastName,omitempty"`
+	Title       string   `json:"title,omitempty"`
 	DateOfBirth string   `json:"dateOfBirth,omitempty"`
 	SSN         string   `json:"ssn,omitempty"`
-	Address     Address  `json:"address"`
+	Address     Address  `json:"address,omitempty"`
 	Passport    Passport `json:"passport,omitempty"`
-}
-
-// Passport is a controller's passport
-type Passport struct {
-	Number  string `json:"number"`
-	Country string `json:"country"`
 }
 
 // CustomerStatus is the customer's status
@@ -43,6 +40,8 @@ const (
 	CustomerStatusDeactivated CustomerStatus = "deactivated"
 	// CustomerStatusDocument is when the customer needs verification document
 	CustomerStatusDocument CustomerStatus = "document"
+	// CustomerStatusReactivated is when a deactivated customer is reactivated
+	CustomerStatusReactivated CustomerStatus = "reactivated"
 	// CustomerStatusRetry is when the customer needs to retry verification
 	CustomerStatusRetry CustomerStatus = "retry"
 	// CustomerStatusSuspended is when the customer has been suspended
@@ -92,31 +91,57 @@ type Customers struct {
 	Embedded map[string][]Customer `json:"_embedded"`
 }
 
-// CustomerCreate is a customer create request
-type CustomerCreate struct {
-	FirstName              string       `json:"firstName"`
-	LastName               string       `json:"lastName"`
-	Email                  string       `json:"email"`
-	IPAddress              string       `json:"ipAddress,omitempty"`
-	Type                   CustomerType `json:"type"`
-	DateOfBirth            string       `json:"dateOfBirth,omitempty"`
-	SSN                    string       `json:"ssn,omitempty"`
-	Phone                  string       `json:"phone,omitempty"`
-	Address1               string       `json:"address1,omitempty"`
-	Address2               string       `json:"address2,omitempty"`
-	City                   string       `json:"city,omitempty"`
-	State                  string       `json:"state,omitempty"`
-	PostalCode             string       `json:"postalCode,omitempty"`
-	BusinessClassification string       `json:businessClassification,omitempty"`
-	BusinessType           string       `json:"businessType,omitempty"`
-	BusinessName           string       `json:"businessName,omitempty"`
-	DoingBusinessAs        string       `json:"doingBusinessAs,omitempty"`
-	EIN                    string       `json:"ein,omitempty"`
-	Website                string       `json:"website,omitempty"`
+// CustomerRequest is a customer create/update request
+//
+// We don't just use the Customer struct here because there are fields that
+// are not returned by the Dwolla API. As such, we don't want fields to be
+// unset during marshaling.
+type CustomerRequest struct {
+	FirstName              string         `json:"firstName,omitempty"`
+	LastName               string         `json:"lastName,omitempty"`
+	Email                  string         `json:"email,omitempty"`
+	IPAddress              string         `json:"ipAddress,omitempty"`
+	Type                   CustomerType   `json:"type,omitempty"`
+	Status                 CustomerStatus `json:"status,omitempty"`
+	DateOfBirth            string         `json:"dateOfBirth,omitempty"`
+	SSN                    string         `json:"ssn,omitempty"`
+	Phone                  string         `json:"phone,omitempty"`
+	Address1               string         `json:"address1,omitempty"`
+	Address2               string         `json:"address2,omitempty"`
+	City                   string         `json:"city,omitempty"`
+	State                  string         `json:"state,omitempty"`
+	PostalCode             string         `json:"postalCode,omitempty"`
+	BusinessClassification string         `json:businessClassification,omitempty"`
+	BusinessType           string         `json:"businessType,omitempty"`
+	BusinessName           string         `json:"businessName,omitempty"`
+	DoingBusinessAs        string         `json:"doingBusinessAs,omitempty"`
+	EIN                    string         `json:"ein,omitempty"`
+	Website                string         `json:"website,omitempty"`
+	Controller             Controller     `json:"controller,omitempty"`
 }
 
-// Get returns a customer matching the id
-func (c *CustomerServiceOp) Get(id string) (*Customer, error) {
+// IAVToken is a instant account verification token
+type IAVToken struct {
+	Resource
+	Token string `json:"token"`
+}
+
+// Create creates a dwolla customer
+func (c *CustomerServiceOp) Create(body *CustomerRequest) (*Customer, error) {
+	var customer Customer
+
+	if err := c.client.Post("customers", body, nil, &customer); err != nil {
+		return nil, err
+	}
+
+	customer.client = c.client
+
+	return &customer, nil
+}
+
+// Retrieve retrieves a customer matching the id
+// see: https://docsv2.dwolla.com/#retrieve-a-customer
+func (c *CustomerServiceOp) Retrieve(id string) (*Customer, error) {
 	var customer Customer
 
 	if err := c.client.Get(fmt.Sprintf("customers/%s", id), nil, nil, &customer); err != nil {
@@ -144,14 +169,115 @@ func (c *CustomerServiceOp) List(params *url.Values) (*Customers, error) {
 	return &customers, nil
 }
 
+// Update updates a dwolla customer matching the id
+// see: https://docsv2.dwolla.com/#update-a-customer
+func (c *CustomerServiceOp) Update(id string, body *CustomerRequest) (*Customer, error) {
+	var customer Customer
+
+	if err := c.client.Post(fmt.Sprintf("customers/%s", id), body, nil, &customer); err != nil {
+		return nil, err
+	}
+
+	customer.client = c.client
+
+	return &customer, nil
+}
+
+// CreatedTime returns the created value as time.Time
+func (c Customer) CreatedTime() time.Time {
+	t, _ := time.Parse(time.RFC3339, c.Created)
+	return t
+}
+
+// CreateBeneficialOwner creates a beneficial owner for the customer
+// see: https://docsv2.dwolla.com/#create-a-beneficial-owner
+func (c *Customer) CreateBeneficialOwner(body *BeneficialOwnerRequest) (*BeneficialOwner, error) {
+	var owner BeneficialOwner
+
+	if _, ok := c.Links["beneficial-owners"]; !ok {
+		return nil, fmt.Errorf("No beneficial owners resource link")
+	}
+
+	if err := c.client.Post(c.Links["beneficial-owners"].Href, body, nil, &owner); err != nil {
+		return nil, err
+	}
+
+	owner.client = c.client
+
+	return &owner, nil
+}
+
+// CreateFundingSource creates a funding source for the customer
+// see: https://docsv2.dwolla.com/#create-a-funding-source-for-a-customer
+func (c *Customer) CreateFundingSource(body *FundingSourceRequest) (*FundingSource, error) {
+	var source FundingSource
+
+	if _, ok := c.Links["funding-sources"]; !ok {
+		return nil, fmt.Errorf("No funding sources resource link")
+	}
+
+	if err := c.client.Post(c.Links["funding-sources"].Href, body, nil, &source); err != nil {
+		return nil, err
+	}
+
+	source.client = c.client
+
+	return &source, nil
+}
+
+// Deactivate deactivates a dwolla customer
+func (c *Customer) Deactivate() error {
+	if _, ok := c.Links["self"]; !ok {
+		return fmt.Errorf("No self resource link")
+	}
+
+	request := &CustomerRequest{Status: CustomerStatusDeactivated}
+
+	return c.client.Post(c.Links["self"].Href, request, nil, c)
+}
+
+// IAVToken retrieves an instant account activation token
+func (c *Customer) IAVToken() (*IAVToken, error) {
+	var token IAVToken
+
+	if _, ok := c.Links["self"]; !ok {
+		return nil, fmt.Errorf("No self resource link")
+	}
+
+	if err := c.client.Post(fmt.Sprintf("%s/iav-token", c.Links["self"].Href), nil, nil, token); err != nil {
+		return nil, err
+	}
+
+	return &token, nil
+}
+
+// ListBeneficialOwners returns the customer's beneficial owners
+// see: https://docsv2.dwolla.com/#list-beneficial-owners
+func (c *Customer) ListBeneficialOwners() (*BeneficialOwners, error) {
+	var owners BeneficialOwners
+
+	if err := c.client.Get(c.Links["beneficial-owners"].Href, nil, nil, &owners); err != nil {
+		return nil, err
+	}
+
+	owners.client = c.client
+
+	for i := range owners.Embedded["beneficial-owners"] {
+		owners.Embedded["beneficial-owners"][i].client = c.client
+	}
+
+	return &owners, nil
+}
+
 // ListFundingSources returns the customer's funding sources
+// see: https://docsv2.dwolla.com/#list-funding-sources-for-a-customer
 func (c *Customer) ListFundingSources(removed bool) (*FundingSources, error) {
 	var sources FundingSources
 
 	params := &url.Values{}
 	params.Add("removed", strconv.FormatBool(removed))
 
-	if err := c.client.Get(c.Links["funding-sources"].HREF, params, nil, &sources); err != nil {
+	if err := c.client.Get(c.Links["funding-sources"].Href, params, nil, &sources); err != nil {
 		return nil, err
 	}
 
@@ -164,11 +290,38 @@ func (c *Customer) ListFundingSources(removed bool) (*FundingSources, error) {
 	return &sources, nil
 }
 
+// ListMassPayments returns the customer's mass payments
+// see: https://docsv2.dwolla.com/#list-mass-payments-for-a-customer
+func (c *Customer) ListMassPayments(params *url.Values) (*MassPayments, error) {
+	var payments MassPayments
+
+	if _, ok := c.Links["mass-payments"]; !ok {
+		return nil, fmt.Errorf("No mass payments resource link")
+	}
+
+	if err := c.client.Get(c.Links["mass-payments"].Href, params, nil, &payments); err != nil {
+		return nil, err
+	}
+
+	payments.client = c.client
+
+	for i := range payments.Embedded["mass-payments"] {
+		payments.Embedded["mass-payments"][i].client = c.client
+	}
+
+	return &payments, nil
+}
+
 // ListTransfers returns the customer's transfers
-func (c *Customer) ListTransfers() (*Transfers, error) {
+// see: https://docsv2.dwolla.com/#list-and-search-transfers-for-a-customer
+func (c *Customer) ListTransfers(params *url.Values) (*Transfers, error) {
 	var transfers Transfers
 
-	if err := c.client.Get(c.Links["transfers"].HREF, nil, nil, &transfers); err != nil {
+	if _, ok := c.Links["transfers"]; !ok {
+		return nil, fmt.Errorf("No transfers resource link")
+	}
+
+	if err := c.client.Get(c.Links["transfers"].Href, params, nil, &transfers); err != nil {
 		return nil, err
 	}
 
@@ -179,4 +332,36 @@ func (c *Customer) ListTransfers() (*Transfers, error) {
 	}
 
 	return &transfers, nil
+}
+
+// Reactivate reactivates a deactivated dwolla customer
+func (c *Customer) Reactivate() error {
+	if _, ok := c.Links["self"]; !ok {
+		return fmt.Errorf("No self resource link")
+	}
+
+	request := &CustomerRequest{Status: CustomerStatusReactivated}
+
+	return c.client.Post(c.Links["self"].Href, request, nil, c)
+}
+
+// Suspend suspends a dwolla customer
+func (c *Customer) Suspend() error {
+	if _, ok := c.Links["self"]; !ok {
+		return fmt.Errorf("No self resource link")
+	}
+
+	request := &CustomerRequest{Status: CustomerStatusSuspended}
+
+	return c.client.Post(c.Links["self"].Href, request, nil, c)
+}
+
+// Update updates a dwolla customer
+// see: https://docsv2.dwolla.com/#update-a-customer
+func (c *Customer) Update(body *CustomerRequest) error {
+	if _, ok := c.Links["self"]; !ok {
+		return fmt.Errorf("No self resource link")
+	}
+
+	return c.client.Post(c.Links["self"].Href, body, nil, c)
 }

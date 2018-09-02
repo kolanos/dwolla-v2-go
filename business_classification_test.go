@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBusinessClassificationGet(t *testing.T) {
+func TestBusinessClassificationRetrieve(t *testing.T) {
 	f, _ := os.Open(filepath.Join("testdata", "business-classification.json"))
 	mr := &http.Response{Body: f, StatusCode: 200}
 	mc := &MockHTTPClient{err: nil, res: mr}
@@ -17,7 +17,7 @@ func TestBusinessClassificationGet(t *testing.T) {
 	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
 	c.Token = &Token{}
 
-	res, err := c.BusinessClassification.Get("9ed3cf58-7d6f-11e3-81a4-5404a6144203")
+	res, err := c.BusinessClassification.Retrieve("9ed3cf58-7d6f-11e3-81a4-5404a6144203")
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)

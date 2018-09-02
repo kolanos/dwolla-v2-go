@@ -1,0 +1,32 @@
+
+{
+    "_links": {
+        "self": {
+            "href": "https://api-sandbox.dwolla.com/funding-sources/49dbaa24-1580-4b1c-8b58-24e26656fa31",
+            "type": "application/vnd.dwolla.v1.hal+json",
+            "resource-type": "funding-source"
+        },
+        "customer": {
+            "href": "https://api-sandbox.dwolla.com/customers/4594a375-ca4c-4220-a36a-fa7ce556449d",
+            "type": "application/vnd.dwolla.v1.hal+json",
+            "resource-type": "customer"
+        },
+        "initiate-micro-deposits": {
+            "href": "https://api-sandbox.dwolla.com/funding-sources/49dbaa24-1580-4b1c-8b58-24e26656fa31/micro-deposits",
+            "type": "application/vnd.dwolla.v1.hal+json",
+            "resource-type": "micro-deposits"
+        }
+    },
+    "id": "49dbaa24-1580-4b1c-8b58-24e26656fa31",
+    "status": "unverified",
+    "type": "bank",
+    "bankAccountType": "checking",
+    "name": "Test checking account",
+    "created": "2017-09-26T14:14:08.000Z",
+    "removed": false,
+    "channels": [
+        "ach"
+    ],
+    "bankName": "SANDBOX TEST BANK",
+    "fingerprint": "5012989b55af15400e8102f95d2ec5e7ce3aef45c01613280d80a236dd8d6c3a"
+}

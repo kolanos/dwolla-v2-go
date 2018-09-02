@@ -8,7 +8,7 @@ import (
 // AccountService is the account service interface
 // see: https://docsv2.dwolla.com/#accounts
 type AccountService interface {
-	Get() (*Account, error)
+	Retrieve() (*Account, error)
 }
 
 // AccountServiceOp is an implementation of the account service interface
@@ -26,9 +26,9 @@ type Account struct {
 	Type           string  `json:"type"`
 }
 
-// Get returns the dwolla account
+// Retrieve retrieves the dwolla account
 // see: https://docsv2.dwolla.com/#retrieve-account-details
-func (a *AccountServiceOp) Get() (*Account, error) {
+func (a *AccountServiceOp) Retrieve() (*Account, error) {
 	root, err := a.client.Root()
 	if err != nil {
 		return nil, err
@@ -40,28 +40,26 @@ func (a *AccountServiceOp) Get() (*Account, error) {
 		return nil, fmt.Errorf("No account resource link")
 	}
 
-	if err := a.client.Get(root.Links["account"].HREF, nil, nil, &account); err != nil {
+	if err := a.client.Get(root.Links["account"].Href, nil, nil, &account); err != nil {
 		return nil, err
 	}
 
 	account.client = a.client
+
 	return &account, nil
 }
 
 // CreateFundingSource creates a funding source for the account
 // see: https://docsv2.dwolla.com/#create-a-funding-source-for-an-account
-func (a *Account) CreateFundingSource(body *FundingSourceCreate) (*FundingSource, error) {
+func (a *Account) CreateFundingSource(body *FundingSourceRequest) (*FundingSource, error) {
 	var source FundingSource
 
-	if _, ok := a.Links["funding-sources"]; !ok {
-		return nil, fmt.Errorf("No funding sources resource link")
-	}
-
-	if err := a.client.Post(a.Links["funding-sources"].HREF, body, nil, &source); err != nil {
+	if err := a.client.Post("funding-sources", body, nil, &source); err != nil {
 		return nil, err
 	}
 
 	source.client = a.client
+
 	return &source, nil
 }
 
@@ -74,14 +72,16 @@ func (a *Account) ListFundingSources(params *url.Values) (*FundingSources, error
 		return nil, fmt.Errorf("No funding sources resource link")
 	}
 
-	if err := a.client.Get(a.Links["funding-sources"].HREF, params, nil, &sources); err != nil {
+	if err := a.client.Get(a.Links["funding-sources"].Href, params, nil, &sources); err != nil {
 		return nil, err
 	}
 
 	sources.client = a.client
 
-	for i := range sources.Embedded["funding-sources"] {
-		sources.Embedded["funding-sources"][i].client = a.client
+	if _, ok := sources.Embedded["funding-sources"]; ok {
+		for i := range sources.Embedded["funding-sources"] {
+			sources.Embedded["funding-sources"][i].client = a.client
+		}
 	}
 
 	return &sources, nil
@@ -96,14 +96,16 @@ func (a *Account) ListMassPayments(params *url.Values) (*MassPayments, error) {
 		return nil, fmt.Errorf("No mass payments resource link")
 	}
 
-	if err := a.client.Get(a.Links["mass-payments"].HREF, params, nil, &payments); err != nil {
+	if err := a.client.Get(a.Links["mass-payments"].Href, params, nil, &payments); err != nil {
 		return nil, err
 	}
 
 	payments.client = a.client
 
-	for i := range payments.Embedded["mass-payments"] {
-		payments.Embedded["mass-payments"][i].client = a.client
+	if _, ok := payments.Embedded["mass-payments"]; ok {
+		for i := range payments.Embedded["mass-payments"] {
+			payments.Embedded["mass-payments"][i].client = a.client
+		}
 	}
 
 	return &payments, nil
@@ -118,14 +120,16 @@ func (a *Account) ListTransfers(params *url.Values) (*Transfers, error) {
 		return nil, fmt.Errorf("No transfers resource link")
 	}
 
-	if err := a.client.Get(a.Links["transfers"].HREF, params, nil, &transfers); err != nil {
+	if err := a.client.Get(a.Links["transfers"].Href, params, nil, &transfers); err != nil {
 		return nil, err
 	}
 
 	transfers.client = a.client
 
-	for i := range transfers.Embedded["transfers"] {
-		transfers.Embedded["transfers"][i].client = a.client
+	if _, ok := transfers.Embedded["transfers"]; ok {
+		for i := range transfers.Embedded["transfers"] {
+			transfers.Embedded["transfers"][i].client = a.client
+		}
 	}
 
 	return &transfers, nil

@@ -1,0 +1,21 @@
+{
+    "_links": {
+        "self": {
+            "href": "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8",
+            "type": "application/vnd.dwolla.v1.hal+json",
+            "resource-type": "beneficial-owner"
+        }
+    },
+    "id": "00cb67f2-768c-4ee3-ac81-73bc4faf9c2b",
+    "firstName": "beneficial",
+    "lastName": "owner",
+    "address": {
+        "address1": "123 Main St.",
+        "address2": "Apt 123",
+        "city": "Des Moines",
+        "stateProvinceRegion": "IA",
+        "country": "US",
+        "postalCode": "50309"
+    },
+    "verificationStatus": "verified"
+}

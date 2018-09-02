@@ -21,6 +21,12 @@ type Amount struct {
 	Currency string `json:"currency"`
 }
 
+// Passport represents a passport
+type Passport struct {
+	Number  string `json:"number"`
+	Country string `json:"country"`
+}
+
 // MockHTTPClient mocks an http client
 type MockHTTPClient struct {
 	err error
@@ -35,4 +41,15 @@ func (m *MockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 // SetResponse sets the mocked response
 func (m *MockHTTPClient) SetResponse(res *http.Response, err error) {
 	m.res, m.err = res, err
+}
+
+// NewRedirectResponse returns a http redirect response
+func NewRedirectResponse(url string) *http.Response {
+	res := &http.Response{
+		Status:     "302",
+		StatusCode: 302,
+		Header:     http.Header{},
+	}
+	res.Header.Set("Location", url)
+	return res
 }

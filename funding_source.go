@@ -1,13 +1,14 @@
 package dwolla
 
 import (
+	"fmt"
 	"net/url"
 )
 
 // FundingSourceService is the funding source service interface
 // see: https://docsv2.dwolla.com/#funding-sources
 type FundingSourceService interface {
-	Get(string) (*FundingSource, error)
+	Retrieve(string) (*FundingSource, error)
 	List(*url.Values) (*FundingSources, error)
 }
 
@@ -49,6 +50,7 @@ type FundingSource struct {
 	Removed         bool                         `json:"removed"`
 	Channels        []string                     `json:"channels"`
 	BankName        string                       `json:"bankName"`
+	Fingerprint     string                       `json:"fingerprint"`
 }
 
 // FundingSources is a collection of funding sources
@@ -67,17 +69,19 @@ const (
 	FundingSourceBankAccountTypeSavings FundingSourceBankAccountType = "savings"
 )
 
-// FundingSourceCreate is a funding source create request
-type FundingSourceCreate struct {
-	RoutingNumber   string                       `json:"routingNumber"`
-	AccountNumber   string                       `json:"accountNumber"`
-	BankAccountType FundingSourceBankAccountType `json:"bankAccountType"`
-	Name            string                       `json:"name"`
+// FundingSourceRequest is a funding source request
+type FundingSourceRequest struct {
+	Resource
+	RoutingNumber   string                       `json:"routingNumber,omitempty"`
+	AccountNumber   string                       `json:"accountNumber,omitempty"`
+	BankAccountType FundingSourceBankAccountType `json:"bankAccountType,omitempty"`
+	Name            string                       `json:"name,omitempty"`
 	Channels        []string                     `json:"channels,omitempty"`
+	Removed         bool                         `json:"removed,omitempty"`
 }
 
-// Get returns a funding source with the matching the id
-func (f *FundingSourceServiceOp) Get(id string) (*FundingSource, error) {
+// Retrieve retrieves a funding source with the matching id
+func (f *FundingSourceServiceOp) Retrieve(id string) (*FundingSource, error) {
 	var fundingSource FundingSource
 	return &fundingSource, nil
 }
@@ -86,4 +90,16 @@ func (f *FundingSourceServiceOp) Get(id string) (*FundingSource, error) {
 func (f *FundingSourceServiceOp) List(params *url.Values) (*FundingSources, error) {
 	var fundingSources FundingSources
 	return &fundingSources, nil
+}
+
+// Remove removes a funding source from the account/customer
+// see: https://docsv2.dwolla.com/#remove-a-funding-source
+func (f *FundingSource) Remove() error {
+	if _, ok := f.Links["self"]; !ok {
+		return fmt.Errorf("No self resource link")
+	}
+
+	request := &FundingSourceRequest{Removed: true}
+
+	return f.client.Post(f.Links["self"].Href, request, nil, f)
 }

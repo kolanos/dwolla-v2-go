@@ -1,0 +1,63 @@
+{
+    "_links": {
+        "self": {
+            "href": "https://api-sandbox.dwolla.com/customers/81696e5d-a593-45a6-8863-3c20ad634de5/beneficial-owners",
+            "type": "application/vnd.dwolla.v1.hal+json",
+            "resource-type": "beneficial-owner"
+        }
+    },
+    "_embedded": {
+        "beneficial-owners": [
+            {
+                "_links": {
+                    "self": {
+                        "href": "https://api-sandbox.dwolla.com/beneficial-owners/55469604-40ab-44b6-962f-de2c0837ba98",
+                        "type": "application/vnd.dwolla.v1.hal+json",
+                        "resource-type": "beneficial-owner"
+                    },
+                    "verify-with-document": {
+                        "href": "https://api-sandbox.dwolla.com/beneficial-owners/55469604-40ab-44b6-962f-de2c0837ba98/documents",
+                        "type": "application/vnd.dwolla.v1.hal+json",
+                        "resource-type": "document"
+                    }
+                },
+                "id": "55469604-40ab-44b6-962f-de2c0837ba98",
+                "firstName": "document",
+                "lastName": "owner1",
+                "address": {
+                    "address1": "18749 18th st",
+                    "address2": "apt 12",
+                    "address3": "",
+                    "city": "Des Moines",
+                    "stateProvinceRegion": "IA",
+                    "country": "US",
+                    "postalCode": "50265"
+                },
+                "verificationStatus": "document"
+            },
+            {
+                "_links": {
+                    "self": {
+                        "href": "https://api-sandbox.dwolla.com/beneficial-owners/caa81a5f-ec1e-4559-8b32-d90655bfd03c",
+                        "type": "application/vnd.dwolla.v1.hal+json",
+                        "resource-type": "beneficial-owner"
+                    }
+                },
+                "id": "caa81a5f-ec1e-4559-8b32-d90655bfd03c",
+                "firstName": "Joe",
+                "lastName": "owner2",
+                "address": {
+                    "address1": "18749 18th st",
+                    "address2": "apt 12",
+                    "address3": "",
+                    "city": "Des Moines",
+                    "stateProvinceRegion": "IA",
+                    "country": "US",
+                    "postalCode": "50265"
+                },
+                "verificationStatus": "verified"
+            }
+        ]
+    },
+    "total": 2
+}

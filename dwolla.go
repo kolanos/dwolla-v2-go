@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strings"
@@ -27,14 +29,14 @@ const (
 	// ProductionAuthURL is the production auth url
 	ProductionAuthURL = "https://www.dwolla.com/oauth/v2/authenticate"
 	// ProductionTokenURL is the production token url
-	ProductionTokenURL = "https://www.dwolla.com/oauth/v2/token"
+	ProductionTokenURL = "https://accounts.dwolla.com/token"
 
 	// SandboxAPIURL is the sandbox api url
 	SandboxAPIURL = "https://api-sandbox.dwolla.com"
 	// SandboxAuthURL is the sandbox auth url
 	SandboxAuthURL = "https://sandbox.dwolla.com/oauth/v2/authenticate"
 	// SandboxTokenURL is the sandbox token url
-	SandboxTokenURL = "https://sandbox.dwolla.com/oauth/v2/token"
+	SandboxTokenURL = "https://accounts-sandbox.dwolla.com/token"
 )
 
 // Token is a dwolla auth token
@@ -64,6 +66,7 @@ type Client struct {
 	BusinessClassification BusinessClassificationService
 	Customer               CustomerService
 	FundingSource          FundingSourceService
+	OnDemandAuthorization  OnDemandAuthorizationService
 }
 
 // New initializes a new dwolla client
@@ -88,6 +91,7 @@ func NewWithHTTPClient(key, secret string, environment Environment, httpClient H
 	c.BusinessClassification = &BusinessClassificationServiceOp{c}
 	c.Customer = &CustomerServiceOp{c}
 	c.FundingSource = &FundingSourceServiceOp{c}
+	c.OnDemandAuthorization = &OnDemandAuthorizationServiceOp{c}
 
 	return c
 }
@@ -194,6 +198,17 @@ func (c *Client) RequestToken() error {
 	return nil
 }
 
+// EnsureToken ensures that a token exists for a request
+func (c *Client) EnsureToken() error {
+	if c.Token == nil {
+		if err := c.RequestToken(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Get performs a GET against the api
 func (c *Client) Get(path string, params *url.Values, headers *http.Header, container interface{}) error {
 	var (
@@ -201,11 +216,10 @@ func (c *Client) Get(path string, params *url.Values, headers *http.Header, cont
 		halError Error
 	)
 
-	if c.Token == nil {
-		if err := c.RequestToken(); err != nil {
-			return err
-		}
+	if err = c.EnsureToken(); err != nil {
+		return err
 	}
+
 	req, err := http.NewRequest("GET", c.BuildAPIURL(path), nil)
 	if err != nil {
 		return err
@@ -234,8 +248,6 @@ func (c *Client) Get(path string, params *url.Values, headers *http.Header, cont
 	if err != nil {
 		return err
 	}
-
-	//fmt.Println(string(resBody))
 
 	if res.StatusCode > 299 {
 		if err := json.Unmarshal(resBody, &halError); err != nil {
@@ -267,20 +279,23 @@ func (c *Client) Post(path string, body interface{}, headers *http.Header, conta
 		err             error
 		halError        Error
 		validationError ValidationError
+		bodyReader      io.Reader
 	)
 
-	if c.Token == nil {
-		if err := c.RequestToken(); err != nil {
-			return err
-		}
-	}
-
-	bodyBytes, err := json.Marshal(body)
-	if err != nil {
+	if err = c.EnsureToken(); err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", c.BuildAPIURL(path), bytes.NewReader(bodyBytes))
+	if body != nil {
+		bodyBytes, err := json.Marshal(body)
+		if err != nil {
+			return err
+		}
+
+		bodyReader = bytes.NewReader(bodyBytes)
+	}
+
+	req, err := http.NewRequest("POST", c.BuildAPIURL(path), bodyReader)
 	if err != nil {
 		return err
 	}
@@ -300,6 +315,12 @@ func (c *Client) Post(path string, body interface{}, headers *http.Header, conta
 	}
 
 	defer res.Body.Close()
+
+	// When creating a resource, Dwolla will return a 201 and a "Location"
+	// header. This just cuts to the chase and retrieves the resource.
+	if res.Header.Get("Location") != "" {
+		return c.Get(res.Header.Get("Location"), nil, nil, container)
+	}
 
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -326,6 +347,155 @@ func (c *Client) Post(path string, body interface{}, headers *http.Header, conta
 			}
 
 			return validationError
+		}
+
+		return halError
+	}
+
+	if container != nil {
+		return json.Unmarshal(resBody, container)
+	}
+
+	return nil
+}
+
+// Upload performs a multipart file upload to the Dwolla API
+func (c *Client) Upload(path, documentType, fileName string, file io.Reader, container interface{}) error {
+	var (
+		err      error
+		halError Error
+	)
+
+	if err = c.EnsureToken(); err != nil {
+		return err
+	}
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	part, err := writer.CreateFormFile("file", fileName)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(part, file)
+	if err != nil {
+		return err
+	}
+
+	err = writer.WriteField("documentType", documentType)
+	if err != nil {
+		return err
+	}
+
+	err = writer.Close()
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", c.BuildAPIURL(path), body)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Accept", "application/vnd.dwolla.v1.hal+json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token.AccessToken))
+	req.Header.Set("Cache-Control", "no-cache")
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("User-Agent", "dwolla-v2-go")
+
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+
+	if res.Header.Get("Location") != "" {
+		return c.Get(res.Header.Get("Location"), nil, nil, container)
+	}
+
+	resBody, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	if res.StatusCode > 299 {
+		if err := json.Unmarshal(resBody, &halError); err != nil {
+			return err
+		}
+
+		// If token is expired, we'll attempt to get a newone and reattempt
+		// the request. This should probably be moved to a method to handle
+		// all error scenarios.
+		if halError.Code == "ExpiredAccessToken" {
+			if err := c.RequestToken(); err == nil {
+				return c.Upload(path, documentType, fileName, file, container)
+			}
+		}
+
+		return halError
+	}
+
+	if container != nil {
+		return json.Unmarshal(resBody, container)
+	}
+
+	return nil
+}
+
+// Delete performs a DELETE against the api
+func (c *Client) Delete(path string, params *url.Values, headers *http.Header, container interface{}) error {
+	var (
+		err      error
+		halError Error
+	)
+
+	if err = c.EnsureToken(); err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("DELETE", c.BuildAPIURL(path), nil)
+	if err != nil {
+		return err
+	}
+
+	if headers != nil {
+		req.Header = *headers
+	}
+
+	req.Header.Set("Accept", "application/vnd.dwolla.v1.hal+json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token.AccessToken))
+	req.Header.Set("User-Agent", fmt.Sprintf("dwolla-v2-go/%s", Version))
+
+	if params != nil {
+		req.URL.RawQuery = params.Encode()
+	}
+
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+
+	resBody, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	if res.StatusCode > 299 {
+		if err := json.Unmarshal(resBody, &halError); err != nil {
+			return err
+		}
+
+		// If token is expired, we'll attempt to get a newone and reattempt
+		// the request. This should probably be moved to a method to handle
+		// all error scenarios.
+		if halError.Code == "ExpiredAccessToken" {
+			if err := c.RequestToken(); err == nil {
+				return c.Get(path, params, headers, container)
+			}
 		}
 
 		return halError

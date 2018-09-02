@@ -34,7 +34,7 @@ func (v ValidationError) Error() string {
 
 // Link is a hal resource link
 type Link struct {
-	HREF         string `json:"href"`
+	Href         string `json:"href"`
 	ResourceType string `json:"resource-type"`
 	Type         string `json:"type"`
 }
@@ -44,7 +44,7 @@ type Links map[string]Link
 
 // Resource is a hal resource
 type Resource struct {
-	Links  Links `json:"_links"`
+	Links  Links `json:"_links,omitempty"`
 	client *Client
 }
 

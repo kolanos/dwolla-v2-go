@@ -7,7 +7,7 @@ import (
 
 // BusinessClassificationService is the business classification interface
 type BusinessClassificationService interface {
-	Get(string) (*BusinessClassification, error)
+	Retrieve(string) (*BusinessClassification, error)
 	List(*url.Values) (*BusinessClassifications, error)
 }
 
@@ -25,6 +25,7 @@ type BusinessClassification struct {
 	Embedded map[string][]IndustryClassification `json:"_embedded"`
 }
 
+// BusinessClassifications is a business classification
 type BusinessClassifications struct {
 	Collection
 	Embedded map[string][]BusinessClassification `json:"_embedded"`
@@ -36,8 +37,9 @@ type IndustryClassification struct {
 	Name string `json:"name"`
 }
 
-// Get returns a business classification matching the id
-func (b *BusinessClassificationServiceOp) Get(id string) (*BusinessClassification, error) {
+// Retrieve retrieves a business classification matching the id
+// see: https://docsv2.dwolla.com/#retrieve-a-business-classification
+func (b *BusinessClassificationServiceOp) Retrieve(id string) (*BusinessClassification, error) {
 	var classification BusinessClassification
 
 	if err := b.client.Get(fmt.Sprintf("business-classifications/%s", id), nil, nil, &classification); err != nil {
@@ -49,6 +51,7 @@ func (b *BusinessClassificationServiceOp) Get(id string) (*BusinessClassificatio
 }
 
 // List returns a collection of business classifications
+// see: https://docsv2.dwolla.com/#list-business-classifications
 func (b *BusinessClassificationServiceOp) List(params *url.Values) (*BusinessClassifications, error) {
 	var classifications BusinessClassifications
 
