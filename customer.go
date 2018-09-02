@@ -240,19 +240,23 @@ func (c *Customer) CreateFundingSource(body *FundingSourceRequest) (*FundingSour
 
 // Deactivate deactivates a dwolla customer
 func (c *Customer) Deactivate() error {
-	if _, ok := c.Links["self"]; !ok {
-		return fmt.Errorf("No self resource link")
+	if _, ok := c.Links["deactivate"]; !ok {
+		return fmt.Errorf("No deactivate resource link")
 	}
 
 	request := &CustomerRequest{Status: CustomerStatusDeactivated}
 
-	return c.client.Post(c.Links["self"].Href, request, nil, c)
+	return c.client.Post(c.Links["deactivate"].Href, request, nil, c)
 }
 
 // ListBeneficialOwners returns the customer's beneficial owners
 // see: https://docsv2.dwolla.com/#list-beneficial-owners
 func (c *Customer) ListBeneficialOwners() (*BeneficialOwners, error) {
 	var owners BeneficialOwners
+
+	if _, ok := c.Links["beneficial-owners"]; !ok {
+		return nil, fmt.Errorf("No beneficial owners resource link")
+	}
 
 	if err := c.client.Get(c.Links["beneficial-owners"].Href, nil, nil, &owners); err != nil {
 		return nil, err
@@ -338,24 +342,24 @@ func (c *Customer) ListTransfers(params *url.Values) (*Transfers, error) {
 
 // Reactivate reactivates a deactivated dwolla customer
 func (c *Customer) Reactivate() error {
-	if _, ok := c.Links["self"]; !ok {
-		return fmt.Errorf("No self resource link")
+	if _, ok := c.Links["reactivate"]; !ok {
+		return fmt.Errorf("No reactivate resource link")
 	}
 
 	request := &CustomerRequest{Status: CustomerStatusReactivated}
 
-	return c.client.Post(c.Links["self"].Href, request, nil, c)
+	return c.client.Post(c.Links["reactivate"].Href, request, nil, c)
 }
 
 // RetrieveBeneficialOwnership retrieves the customer's beneficial ownership status
 func (c *Customer) RetrieveBeneficialOwnership() (*BeneficialOwnership, error) {
 	var ownership BeneficialOwnership
 
-	if _, ok := c.Links["beneficial-ownership"]; !ok {
-		return nil, fmt.Errorf("No beneficial ownership resource link")
+	if _, ok := c.Links["beneficial-owners"]; !ok {
+		return nil, fmt.Errorf("No beneficial owners resource link")
 	}
 
-	if err := c.client.Get(c.Links["beneficial-ownership"].Href, nil, nil, &ownership); err != nil {
+	if err := c.client.Get(fmt.Sprintf("%s/beneficial-ownership", c.Links["self"].Href), nil, nil, &ownership); err != nil {
 		return nil, err
 	}
 
@@ -364,8 +368,8 @@ func (c *Customer) RetrieveBeneficialOwnership() (*BeneficialOwnership, error) {
 	return &ownership, nil
 }
 
-// IAVToken retrieves an instant account activation token
-func (c *Customer) IAVToken() (*IAVToken, error) {
+// RetrieveIAVToken retrieves an instant account activation token
+func (c *Customer) RetrieveIAVToken() (*IAVToken, error) {
 	var token IAVToken
 
 	if _, ok := c.Links["self"]; !ok {
@@ -381,13 +385,13 @@ func (c *Customer) IAVToken() (*IAVToken, error) {
 
 // Suspend suspends a dwolla customer
 func (c *Customer) Suspend() error {
-	if _, ok := c.Links["self"]; !ok {
-		return fmt.Errorf("No self resource link")
+	if _, ok := c.Links["suspend"]; !ok {
+		return fmt.Errorf("No suspend resource link")
 	}
 
 	request := &CustomerRequest{Status: CustomerStatusSuspended}
 
-	return c.client.Post(c.Links["self"].Href, request, nil, c)
+	return c.client.Post(c.Links["suspend"].Href, request, nil, c)
 }
 
 // Update updates a dwolla customer
@@ -398,4 +402,28 @@ func (c *Customer) Update(body *CustomerRequest) error {
 	}
 
 	return c.client.Post(c.Links["self"].Href, body, nil, c)
+}
+
+// VerifyBeneficialOwners returns true if beneficial owners needed
+func (c *Customer) VerifyBeneficialOwners() bool {
+	_, ok := c.Links["verify-beneficial-owners"]
+	return ok
+}
+
+// VerifyBusiness returns true if business needs verification document
+func (c *Customer) VerifyBusiness() bool {
+	_, ok := c.Links["verify-business-with-document"]
+	return ok
+}
+
+// VerifyController returns true if controller needs verification document
+func (c *Customer) VerifyController() bool {
+	_, ok := c.Links["verify-with-document"]
+	return ok
+}
+
+// VerifyControllerAndBusiness returns true if controller and business need verification document
+func (c *Customer) VerifyControllerAndBusiness() bool {
+	_, ok := c.Links["verify-controller-and-business-with-document"]
+	return ok
 }
