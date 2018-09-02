@@ -63,6 +63,7 @@ type Client struct {
 
 	root                   *Resource
 	Account                AccountService
+	BeneficialOwner        BeneficialOwnerService
 	BusinessClassification BusinessClassificationService
 	Customer               CustomerService
 	FundingSource          FundingSourceService
@@ -88,6 +89,7 @@ func NewWithHTTPClient(key, secret string, environment Environment, httpClient H
 	}
 
 	c.Account = &AccountServiceOp{c}
+	c.BeneficialOwner = &BeneficialOwnerServiceOp{c}
 	c.BusinessClassification = &BusinessClassificationServiceOp{c}
 	c.Customer = &CustomerServiceOp{c}
 	c.FundingSource = &FundingSourceServiceOp{c}
@@ -258,9 +260,11 @@ func (c *Client) Get(path string, params *url.Values, headers *http.Header, cont
 		// the request. This should probably be moved to a method to handle
 		// all error scenarios.
 		if halError.Code == "ExpiredAccessToken" {
-			if err := c.RequestToken(); err == nil {
-				return c.Get(path, params, headers, container)
+			if err := c.RequestToken(); err != nil {
+				return err
 			}
+
+			return c.Get(path, params, headers, container)
 		}
 
 		return halError
@@ -336,9 +340,11 @@ func (c *Client) Post(path string, body interface{}, headers *http.Header, conta
 		// the request. This should probably be moved to a method to handle
 		// all error scenarios.
 		if halError.Code == "ExpiredAccessToken" {
-			if err := c.RequestToken(); err == nil {
-				return c.Post(path, body, headers, container)
+			if err := c.RequestToken(); err != nil {
+				return err
 			}
+
+			return c.Post(path, body, headers, container)
 		}
 
 		if halError.Code == "ValidationError" {
@@ -429,9 +435,11 @@ func (c *Client) Upload(path, documentType, fileName string, file io.Reader, con
 		// the request. This should probably be moved to a method to handle
 		// all error scenarios.
 		if halError.Code == "ExpiredAccessToken" {
-			if err := c.RequestToken(); err == nil {
-				return c.Upload(path, documentType, fileName, file, container)
+			if err := c.RequestToken(); err != nil {
+				return err
 			}
+
+			return c.Upload(path, documentType, fileName, file, container)
 		}
 
 		return halError
@@ -445,7 +453,7 @@ func (c *Client) Upload(path, documentType, fileName string, file io.Reader, con
 }
 
 // Delete performs a DELETE against the api
-func (c *Client) Delete(path string, params *url.Values, headers *http.Header, container interface{}) error {
+func (c *Client) Delete(path string, params *url.Values, headers *http.Header) error {
 	var (
 		err      error
 		halError Error
@@ -479,12 +487,12 @@ func (c *Client) Delete(path string, params *url.Values, headers *http.Header, c
 
 	defer res.Body.Close()
 
-	resBody, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-
 	if res.StatusCode > 299 {
+		resBody, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+
 		if err := json.Unmarshal(resBody, &halError); err != nil {
 			return err
 		}
@@ -493,16 +501,14 @@ func (c *Client) Delete(path string, params *url.Values, headers *http.Header, c
 		// the request. This should probably be moved to a method to handle
 		// all error scenarios.
 		if halError.Code == "ExpiredAccessToken" {
-			if err := c.RequestToken(); err == nil {
-				return c.Get(path, params, headers, container)
+			if err := c.RequestToken(); err != nil {
+				return err
 			}
+
+			return c.Delete(path, params, headers)
 		}
 
 		return halError
-	}
-
-	if container != nil {
-		return json.Unmarshal(resBody, container)
 	}
 
 	return nil

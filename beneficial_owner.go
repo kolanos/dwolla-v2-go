@@ -1,8 +1,13 @@
 package dwolla
 
+import (
+	"fmt"
+)
+
 // BeneficialOwnerService is the beneficial owner service interface
 // see: https://docsv2.dwolla.com/#beneficial-owners
 type BeneficialOwnerService interface {
+	Remove(string) error
 	Retrieve(string) (*BeneficialOwner, error)
 	Update(string, *BeneficialOwnerRequest) (*BeneficialOwner, error)
 }
@@ -42,18 +47,139 @@ type BeneficialOwners struct {
 	Embedded map[string][]BeneficialOwner `json:"_embedded"`
 }
 
+// BeneficialOwnerRequest is a beneficial owner request
+type BeneficialOwnerRequest struct {
+	FirstName   string   `json:"firstName,omitempty"`
+	LastName    string   `json:"lastName,omitempty"`
+	DateOfBirth string   `json:"dateOfBirth,omitempty"`
+	SSN         string   `json:"ssn,omitempty"`
+	Address     Address  `json:"address,omitempty"`
+	Passport    Passport `json:"passport,omitempty"`
+}
+
+// BeneficialOwnershipStatus is the beneficial ownership status
+type BeneficialOwnershipStatus string
+
+const (
+	// BeneficialOwnershipStatusCertified is when the ownership status is certified
+	BeneficialOwnershipStatusCertified BeneficialOwnershipStatus = "certified"
+	// BeneficialOwnershipStatusUncertified is when the ownership status is uncertified
+	BeneficialOwnershipStatusUncertified BeneficialOwnershipStatus = "uncertified"
+)
+
 // BeneficialOwnership is the beneficial ownership status
 type BeneficialOwnership struct {
 	Resource
-	Status string `json:"status"`
+	Status BeneficialOwnershipStatus `json:"status"`
 }
 
-// BeneficialOwnerRequest is a beneficial owner request
-type BeneficialOwnerRequest struct {
-	FirstName   string   `json:"firstName"`
-	LastName    string   `json:"lastName"`
-	DateOfBirth string   `json:"dateOfBirth"`
-	SSN         string   `json:"ssn,omitempty"`
-	Address     Address  `json:"address"`
-	Passport    Passport `json:"passport,omitempty"`
+// BeneficialOwnershipRequest is a beneficial ownership request
+type BeneficialOwnershipRequest struct {
+	Status BeneficialOwnershipStatus `json:"status,omitempty"`
+}
+
+// Remove removes a beneficial owner matching the id
+// see: https://docsv2.dwolla.com/#remove-a-beneficial-owner
+func (b *BeneficialOwnerServiceOp) Remove(id string) error {
+	return b.client.Delete(fmt.Sprintf("beneficial-owners/%s", id), nil, nil)
+}
+
+// Retrieve retrieves a beneficial owner matching the id
+// see: https://docsv2.dwolla.com/#retrieve-a-beneficial-owner
+func (b *BeneficialOwnerServiceOp) Retrieve(id string) (*BeneficialOwner, error) {
+	var owner BeneficialOwner
+
+	if err := b.client.Get(fmt.Sprintf("beneficial-owners/%s", id), nil, nil, &owner); err != nil {
+		return nil, err
+	}
+
+	owner.client = b.client
+
+	return &owner, nil
+}
+
+// Update updates a beneficial owner matching the id
+// see: https://docsv2.dwolla.com/#update-a-beneficial-owner
+func (b *BeneficialOwnerServiceOp) Update(id string, body *BeneficialOwnerRequest) (*BeneficialOwner, error) {
+	var owner BeneficialOwner
+
+	if err := b.client.Post(fmt.Sprintf("beneficial-owners/%s", id), body, nil, &owner); err != nil {
+		return nil, err
+	}
+
+	owner.client = b.client
+
+	return &owner, nil
+}
+
+// CreateDocument uploads a document for beneficial owner
+// see: https://docsv2.dwolla.com/#create-a-document-for-a-beneficial-owner
+func (b *BeneficialOwner) CreateDocument(body *DocumentRequest) (*Document, error) {
+	var document Document
+
+	if _, ok := b.Links["documents"]; !ok {
+		return nil, fmt.Errorf("No documents resource link")
+	}
+
+	if err := b.client.Upload(b.Links["documents"].Href, body.DocumentType, body.FileName, body.File, &document); err != nil {
+		return nil, err
+	}
+
+	document.client = b.client
+
+	return &document, nil
+}
+
+// ListDocuments returns documents for beneficial owner
+// see: https://docsv2.dwolla.com/#list-documents-for-beneficial-owners
+func (b *BeneficialOwner) ListDocuments() (*Documents, error) {
+	var documents Documents
+
+	if _, ok := b.Links["documents"]; !ok {
+		return nil, fmt.Errorf("No documents resource link")
+	}
+
+	if err := b.client.Get(b.Links["documents"].Href, nil, nil, &documents); err != nil {
+		return nil, err
+	}
+
+	documents.client = b.client
+
+	for i := range documents.Embedded["documents"] {
+		documents.Embedded["documents"][i].client = b.client
+	}
+
+	return &documents, nil
+}
+
+// Remove removes the beneficial owner
+// see: https://docsv2.dwolla.com/#remove-a-beneficial-owner
+func (b *BeneficialOwner) Remove() error {
+	if _, ok := b.Links["self"]; !ok {
+		return fmt.Errorf("No self resource link")
+	}
+
+	return b.client.Delete(b.Links["self"].Href, nil, nil)
+}
+
+// Update updates the dwolla beneficial owner
+// see: https://docsv2.dwolla.com/#update-a-beneficial-owner
+func (b *BeneficialOwner) Update(body *BeneficialOwnerRequest) error {
+	if _, ok := b.Links["self"]; !ok {
+		return fmt.Errorf("No self resource link")
+	}
+
+	return b.client.Post(b.Links["self"].Href, body, nil, b)
+}
+
+// Certify certifies beneficial ownership
+// see: https://docsv2.dwolla.com/#certify-beneficial-ownership
+func (b *BeneficialOwnership) Certify() error {
+	if _, ok := b.Links["self"]; !ok {
+		return fmt.Errorf("No self resource link")
+	}
+
+	request := &BeneficialOwnershipRequest{Status: BeneficialOwnershipStatusCertified}
+
+	return b.client.Post(b.Links["self"].Href, request, nil, b)
 }

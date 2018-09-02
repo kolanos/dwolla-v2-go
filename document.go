@@ -1,5 +1,9 @@
 package dwolla
 
+import (
+	"io"
+)
+
 // Document is a dwolla verification document
 type Document struct {
 	Resource
@@ -13,4 +17,11 @@ type Document struct {
 type Documents struct {
 	Collection
 	Embedded map[string][]Document `json:"_embedded"`
+}
+
+// DocumentRequest is a verification document request
+type DocumentRequest struct {
+	DocumentType string
+	FileName     string
+	File         io.Reader
 }

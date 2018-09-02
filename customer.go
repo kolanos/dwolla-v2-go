@@ -11,8 +11,8 @@ import (
 // see: https://docsv2.dwolla.com/#customers
 type CustomerService interface {
 	Create(*CustomerRequest) (*Customer, error)
-	Retrieve(string) (*Customer, error)
 	List(*url.Values) (*Customers, error)
+	Retrieve(string) (*Customer, error)
 	Update(string, *CustomerRequest) (*Customer, error)
 }
 
@@ -139,20 +139,8 @@ func (c *CustomerServiceOp) Create(body *CustomerRequest) (*Customer, error) {
 	return &customer, nil
 }
 
-// Retrieve retrieves a customer matching the id
-// see: https://docsv2.dwolla.com/#retrieve-a-customer
-func (c *CustomerServiceOp) Retrieve(id string) (*Customer, error) {
-	var customer Customer
-
-	if err := c.client.Get(fmt.Sprintf("customers/%s", id), nil, nil, &customer); err != nil {
-		return nil, err
-	}
-
-	customer.client = c.client
-	return &customer, nil
-}
-
 // List returns a collection of customers
+// see: https://docsv2.dwolla.com/#list-and-search-customers
 func (c *CustomerServiceOp) List(params *url.Values) (*Customers, error) {
 	var customers Customers
 
@@ -169,6 +157,19 @@ func (c *CustomerServiceOp) List(params *url.Values) (*Customers, error) {
 	return &customers, nil
 }
 
+// Retrieve retrieves a customer matching the id
+// see: https://docsv2.dwolla.com/#retrieve-a-customer
+func (c *CustomerServiceOp) Retrieve(id string) (*Customer, error) {
+	var customer Customer
+
+	if err := c.client.Get(fmt.Sprintf("customers/%s", id), nil, nil, &customer); err != nil {
+		return nil, err
+	}
+
+	customer.client = c.client
+	return &customer, nil
+}
+
 // Update updates a dwolla customer matching the id
 // see: https://docsv2.dwolla.com/#update-a-customer
 func (c *CustomerServiceOp) Update(id string, body *CustomerRequest) (*Customer, error) {
@@ -181,6 +182,18 @@ func (c *CustomerServiceOp) Update(id string, body *CustomerRequest) (*Customer,
 	customer.client = c.client
 
 	return &customer, nil
+}
+
+// CertifyBeneficialOwnership certifies beneficial ownership
+// see: https://docsv2.dwolla.com/#certify-beneficial-ownership
+func (c *Customer) CertifyBeneficialOwnership() error {
+	if _, ok := c.Links["certify-beneficial-ownership"]; !ok {
+		return fmt.Errorf("No certify beneficial ownership resource link")
+	}
+
+	request := &BeneficialOwnershipRequest{Status: BeneficialOwnershipStatusCertified}
+
+	return c.client.Post(c.Links["certify-beneficial-ownership"].Href, request, nil, nil)
 }
 
 // CreatedTime returns the created value as time.Time
@@ -236,21 +249,6 @@ func (c *Customer) Deactivate() error {
 	return c.client.Post(c.Links["self"].Href, request, nil, c)
 }
 
-// IAVToken retrieves an instant account activation token
-func (c *Customer) IAVToken() (*IAVToken, error) {
-	var token IAVToken
-
-	if _, ok := c.Links["self"]; !ok {
-		return nil, fmt.Errorf("No self resource link")
-	}
-
-	if err := c.client.Post(fmt.Sprintf("%s/iav-token", c.Links["self"].Href), nil, nil, token); err != nil {
-		return nil, err
-	}
-
-	return &token, nil
-}
-
 // ListBeneficialOwners returns the customer's beneficial owners
 // see: https://docsv2.dwolla.com/#list-beneficial-owners
 func (c *Customer) ListBeneficialOwners() (*BeneficialOwners, error) {
@@ -273,6 +271,10 @@ func (c *Customer) ListBeneficialOwners() (*BeneficialOwners, error) {
 // see: https://docsv2.dwolla.com/#list-funding-sources-for-a-customer
 func (c *Customer) ListFundingSources(removed bool) (*FundingSources, error) {
 	var sources FundingSources
+
+	if _, ok := c.Links["funding-sources"]; !ok {
+		return nil, fmt.Errorf("No funding sources resource link")
+	}
 
 	params := &url.Values{}
 	params.Add("removed", strconv.FormatBool(removed))
@@ -343,6 +345,38 @@ func (c *Customer) Reactivate() error {
 	request := &CustomerRequest{Status: CustomerStatusReactivated}
 
 	return c.client.Post(c.Links["self"].Href, request, nil, c)
+}
+
+// RetrieveBeneficialOwnership retrieves the customer's beneficial ownership status
+func (c *Customer) RetrieveBeneficialOwnership() (*BeneficialOwnership, error) {
+	var ownership BeneficialOwnership
+
+	if _, ok := c.Links["beneficial-ownership"]; !ok {
+		return nil, fmt.Errorf("No beneficial ownership resource link")
+	}
+
+	if err := c.client.Get(c.Links["beneficial-ownership"].Href, nil, nil, &ownership); err != nil {
+		return nil, err
+	}
+
+	ownership.client = c.client
+
+	return &ownership, nil
+}
+
+// IAVToken retrieves an instant account activation token
+func (c *Customer) IAVToken() (*IAVToken, error) {
+	var token IAVToken
+
+	if _, ok := c.Links["self"]; !ok {
+		return nil, fmt.Errorf("No self resource link")
+	}
+
+	if err := c.client.Post(fmt.Sprintf("%s/iav-token", c.Links["self"].Href), nil, nil, token); err != nil {
+		return nil, err
+	}
+
+	return &token, nil
 }
 
 // Suspend suspends a dwolla customer
