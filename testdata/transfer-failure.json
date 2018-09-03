@@ -1,0 +1,9 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/transfers/E6D9A950-AC9E-E511-80DC-0AA34A9B2388/failure"
+    }
+  },
+  "code": "R1",
+  "description": "Insufficient Funds"
+}

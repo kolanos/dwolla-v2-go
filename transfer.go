@@ -1,5 +1,9 @@
 package dwolla
 
+import (
+	"fmt"
+)
+
 // TransferService is the transfer service interface
 // see: https://docsv2.dwolla.com/#transfers
 type TransferService interface {
@@ -31,12 +35,14 @@ const (
 // Transfer is a dwolla transfer
 type Transfer struct {
 	Resource
-	ID              string         `json:"id"`
-	Status          TransferStatus `json:"status"`
-	Amount          Amount         `json:"amount"`
-	Created         string         `json:"created"`
-	Clearing        interface{}    `json:"clearing"`
-	IndividualACHID string         `json:"individualAchId"`
+	ID              string           `json:"id"`
+	Status          TransferStatus   `json:"status"`
+	Amount          Amount           `json:"amount"`
+	Created         string           `json:"created"`
+	MetaData        TransferMetaData `json:"metadata"`
+	Clearing        TransferClearing `json:"clearing"`
+	CorrelationID   string           `json:"correlationId"`
+	IndividualACHID string           `json:"individualAchId"`
 }
 
 // Transfers is a collection of dwolla transfers
@@ -45,13 +51,73 @@ type Transfers struct {
 	Embedded map[string][]Transfer `json:"_embedded"`
 }
 
+// TransferACHDetails contains data sent to the bank account
+type TransferACHDetails struct {
+	Destination TransferAddenda `json:"destination,omitempty"`
+	Source      TransferAddenda `json:"source,omitempty"`
+}
+
+// TransferAddenda is a transfer addenda
+type TransferAddenda struct {
+	Addenda TransferAddendaValues `json:"addenda,omitempty"`
+}
+
+// TransferAddendaValues is the addenda values
+type TransferAddendaValues struct {
+	Values []string `json:"values,omitempty"`
+}
+
+// TransferClearing is a transfer clearing schedule
+type TransferClearing struct {
+	Destination string `json:"destination,omitempty"`
+	Source      string `json:"source,omitempty"`
+}
+
+// TransferFailureReason contains details about a failed transfer
+type TransferFailureReason struct {
+	Resource
+	Code        string `json:"code"`
+	Description string `json:"description"`
+}
+
+// TransferFee is a transfer fee
+type TransferFee struct {
+	Resource
+	Amount Amount `json:"amount"`
+}
+
+// TransferFees contains fees related to a transfer
+type TransferFees struct {
+	Transactions []Transfer `json:"transactions"`
+	Total        int        `json:"total"`
+}
+
+// TransferMetaData is meta data about a transfer
+type TransferMetaData map[string]interface{}
+
 // TransferRequest is a transfer request
-type TransferRequest struct{}
+type TransferRequest struct {
+	Resource
+	Status        TransferStatus     `json:"status,omitempty"`
+	Amount        Amount             `json:"amount,omitempty"`
+	MetaData      TransferMetaData   `json:"metadata,omitempty"`
+	Fees          []TransferFee      `json:"fees,omitempty"`
+	Clearing      TransferClearing   `json:"clearing,omitempty"`
+	CorrelationID string             `json:"correlationId"`
+	ACHDetails    TransferACHDetails `json:"achDetails,omitempty"`
+}
 
 // Create initiates a transfer
 // see: https://docsv2.dwolla.com/#initiate-a-transfer
 func (t *TransferServiceOp) Create(body *TransferRequest) (*Transfer, error) {
 	var transfer Transfer
+
+	if err := t.client.Post("transfers", body, nil, &transfer); err != nil {
+		return nil, err
+	}
+
+	transfer.client = t.client
+
 	return &transfer, nil
 }
 
@@ -59,5 +125,96 @@ func (t *TransferServiceOp) Create(body *TransferRequest) (*Transfer, error) {
 // see: https://docsv2.dwolla.com/#retrieve-a-transfer
 func (t *TransferServiceOp) Retrieve(id string) (*Transfer, error) {
 	var transfer Transfer
+
+	if err := t.client.Get(fmt.Sprintf("transfers/%s", id), nil, nil, &transfer); err != nil {
+		return nil, err
+	}
+
+	transfer.client = t.client
+
 	return &transfer, nil
+}
+
+// Cancel cancels the transfer
+// see: https://docsv2.dwolla.com/#cancel-a-transfer
+func (t *Transfer) Cancel() error {
+	if _, ok := t.Links["cancel"]; !ok {
+		return fmt.Errorf("No cancel resource link")
+	}
+
+	body := &TransferRequest{Status: TransferStatusCancelled}
+
+	return t.client.Post(t.Links["cancel"].Href, body, nil, t)
+}
+
+// Destination returns the customer transfer destination
+func (t *Transfer) Destination() (*Customer, error) {
+	if _, ok := t.Links["destination"]; !ok {
+		return nil, fmt.Errorf("No destination resource link")
+	}
+
+	return t.client.Customer.Retrieve(t.Links["destination"].Href)
+}
+
+// DestinationFundingSource returns the transfer funding destination
+func (t *Transfer) DestinationFundingSource() (*FundingSource, error) {
+	if _, ok := t.Links["destination-funding-source"]; !ok {
+		return nil, fmt.Errorf("No destination funding source resource link")
+	}
+
+	return t.client.FundingSource.Retrieve(t.Links["destination-funding-source"].Href)
+}
+
+// ListFees returns the fees associated with the transfer
+// see: https://docsv2.dwolla.com/#list-fees-for-a-transfer
+func (t *Transfer) ListFees() (*TransferFees, error) {
+	var fees TransferFees
+
+	if _, ok := t.Links["fees"]; !ok {
+		return nil, fmt.Errorf("No fees resource link")
+	}
+
+	if err := t.client.Get(t.Links["fees"].Href, nil, nil, &fees); err != nil {
+		return nil, err
+	}
+
+	for i := range fees.Transactions {
+		fees.Transactions[i].client = t.client
+	}
+
+	return &fees, nil
+}
+
+// Source returns the customer transfer source
+func (t *Transfer) Source() (*Customer, error) {
+	if _, ok := t.Links["source"]; !ok {
+		return nil, fmt.Errorf("No source resource link")
+	}
+
+	return t.client.Customer.Retrieve(t.Links["source"].Href)
+}
+
+// SourceFundingSource returns the transfer funding source
+func (t *Transfer) SourceFundingSource() (*FundingSource, error) {
+	if _, ok := t.Links["source-funding-source"]; !ok {
+		return nil, fmt.Errorf("No source funding source resource link")
+	}
+
+	return t.client.FundingSource.Retrieve(t.Links["source-funding-souce"].Href)
+}
+
+// RetrieveFailureReason returns the transfer's failure reason
+// see: https://docsv2.dwolla.com/#retrieve-a-transfer-failure-reason
+func (t *Transfer) RetrieveFailureReason() (*TransferFailureReason, error) {
+	var reason TransferFailureReason
+
+	if _, ok := t.Links["failure"]; !ok {
+		return nil, fmt.Errorf("No failure resource link")
+	}
+
+	if err := t.client.Get(t.Links["failure"].Href, nil, nil, &reason); err != nil {
+		return nil, err
+	}
+
+	return &reason, nil
 }

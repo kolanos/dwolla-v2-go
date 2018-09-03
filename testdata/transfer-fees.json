@@ -1,0 +1,51 @@
+{
+  "transactions": [
+    {
+      "_links": {
+        "self": {
+          "href": "https://api-sandbox.dwolla.com/transfers/416a2857-c887-4cca-bd02-8c3f75c4bb0e"
+        },
+        "source": {
+          "href": "https://api-sandbox.dwolla.com/customers/b442c936-1f87-465d-a4e2-a982164b26bd"
+        },
+        "destination": {
+          "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b"
+        },
+        "created-from-transfer": {
+          "href": "https://api-sandbox.dwolla.com/transfers/83eb4b5e-a5d9-e511-80de-0aa34a9b2388"
+        }
+      },
+      "id": "416a2857-c887-4cca-bd02-8c3f75c4bb0e",
+      "status": "pending",
+      "amount": {
+        "value": "2.00",
+        "currency": "usd"
+      },
+      "created": "2016-02-22T20:46:38.777Z"
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "https://api-sandbox.dwolla.com/transfers/e58ae1f1-7007-47d3-a308-7e9aa6266d53"
+        },
+        "source": {
+          "href": "https://api-sandbox.dwolla.com/customers/b442c936-1f87-465d-a4e2-a982164b26bd"
+        },
+        "destination": {
+          "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b"
+        },
+        "created-from-transfer": {
+          "href": "https://api-sandbox.dwolla.com/transfers/83eb4b5e-a5d9-e511-80de-0aa34a9b2388"
+        }
+      },
+      "id": "e58ae1f1-7007-47d3-a308-7e9aa6266d53",
+      "status": "pending",
+      "amount": {
+        "value": "1.00",
+        "currency": "usd"
+      },
+      "created": "2016-02-22T20:46:38.860Z"
+    }
+  ],
+  "total": 2
+}

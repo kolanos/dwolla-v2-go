@@ -125,19 +125,11 @@ func (f *FundingSourceServiceOp) Remove(id string) error {
 
 // Customer returns the funding source's customer
 func (f *FundingSource) Customer() (*Customer, error) {
-	var customer Customer
-
 	if _, ok := f.Links["customer"]; !ok {
 		return nil, fmt.Errorf("No customer resource link")
 	}
 
-	if err := f.client.Get(f.Links["customer"].Href, nil, nil, &customer); err != nil {
-		return nil, err
-	}
-
-	customer.client = f.client
-
-	return &customer, nil
+	return f.client.Customer.Retrieve(f.Links["customer"].Href)
 }
 
 // FailedVerificationMicroDeposits returns true if micro deposit
