@@ -2,14 +2,14 @@ package dwolla
 
 import (
 	"fmt"
-	"net/url"
 )
 
 // FundingSourceService is the funding source service interface
 // see: https://docsv2.dwolla.com/#funding-sources
 type FundingSourceService interface {
 	Retrieve(string) (*FundingSource, error)
-	List(*url.Values) (*FundingSources, error)
+	Update(string, *FundingSourceRequest) (*FundingSource, error)
+	Remove(string) error
 }
 
 // FundingSourceServiceOp is an implementation of the funding source interface
@@ -69,6 +69,13 @@ const (
 	FundingSourceBankAccountTypeSavings FundingSourceBankAccountType = "savings"
 )
 
+// FundingSourceBalance is a funding source balance
+type FundingSourceBalance struct {
+	Resource
+	Balance     Amount `json:"balance"`
+	LastUpdated string `json:"lastUpdated"`
+}
+
 // FundingSourceRequest is a funding source request
 type FundingSourceRequest struct {
 	Resource
@@ -81,25 +88,171 @@ type FundingSourceRequest struct {
 }
 
 // Retrieve retrieves a funding source with the matching id
+// see: https://docsv2.dwolla.com/#retrieve-a-funding-source
 func (f *FundingSourceServiceOp) Retrieve(id string) (*FundingSource, error) {
-	var fundingSource FundingSource
-	return &fundingSource, nil
+	var source FundingSource
+
+	if err := f.client.Get(fmt.Sprintf("funding-sources/%s", id), nil, nil, &source); err != nil {
+		return nil, err
+	}
+
+	source.client = f.client
+
+	return &source, nil
 }
 
-// List returns a collection of funding sources
-func (f *FundingSourceServiceOp) List(params *url.Values) (*FundingSources, error) {
-	var fundingSources FundingSources
-	return &fundingSources, nil
+// Update updates the funding source with matching id
+// see: https://docsv2.dwolla.com/#update-a-funding-source
+func (f *FundingSourceServiceOp) Update(id string, body *FundingSourceRequest) (*FundingSource, error) {
+	var source FundingSource
+
+	if err := f.client.Post(fmt.Sprintf("funding-sources/%s", id), body, nil, &source); err != nil {
+		return nil, err
+	}
+
+	source.client = f.client
+
+	return &source, nil
 }
 
-// Remove removes a funding source from the account/customer
+// Remove removes a funding source matching the id
+// see: https://docsv2.dwolla.com/#remove-a-funding-source
+func (f *FundingSourceServiceOp) Remove(id string) error {
+	body := &FundingSourceRequest{Removed: true}
+
+	return f.client.Post(fmt.Sprintf("funding-sources/%s", id), body, nil, f)
+}
+
+// Customer returns the funding source's customer
+func (f *FundingSource) Customer() (*Customer, error) {
+	var customer Customer
+
+	if _, ok := f.Links["customer"]; !ok {
+		return nil, fmt.Errorf("No customer resource link")
+	}
+
+	if err := f.client.Get(f.Links["customer"].Href, nil, nil, &customer); err != nil {
+		return nil, err
+	}
+
+	customer.client = f.client
+
+	return &customer, nil
+}
+
+// FailedVerificationMicroDeposits returns true if micro deposit
+// verificationfailed
+func (f *FundingSource) FailedVerificationMicroDeposits() bool {
+	_, ok := f.Links["failed-verification-micro-deposits"]
+	return ok
+}
+
+// InitiateMicroDeposits initiates micro deposit verification
+// see: https://docsv2.dwolla.com/#initiate-micro-deposits
+func (f *FundingSource) InitiateMicroDeposits() (*MicroDeposit, error) {
+	var deposit MicroDeposit
+
+	if _, ok := f.Links["initiate-micro-deposits"]; !ok {
+		return nil, fmt.Errorf("No initiate micro deposits resource link")
+	}
+
+	if err := f.client.Post(f.Links["initiate-micro-deposits"].Href, nil, nil, &deposit); err != nil {
+		return nil, err
+	}
+
+	deposit.client = f.client
+
+	return &deposit, nil
+}
+
+// Remove removes the funding source
 // see: https://docsv2.dwolla.com/#remove-a-funding-source
 func (f *FundingSource) Remove() error {
-	if _, ok := f.Links["self"]; !ok {
-		return fmt.Errorf("No self resource link")
+	if _, ok := f.Links["remove"]; !ok {
+		return fmt.Errorf("No remove resource link")
 	}
 
 	request := &FundingSourceRequest{Removed: true}
 
-	return f.client.Post(f.Links["self"].Href, request, nil, f)
+	return f.client.Post(f.Links["remove"].Href, request, nil, f)
+}
+
+// RetrieveBalance retrieves the funding source balance
+// see: https://docsv2.dwolla.com/#retrieve-a-funding-source-balance
+func (f *FundingSource) RetrieveBalance() (*FundingSourceBalance, error) {
+	var balance FundingSourceBalance
+
+	if _, ok := f.Links["balance"]; !ok {
+		return nil, fmt.Errorf("No balance resource link")
+	}
+
+	if err := f.client.Get(f.Links["balance"].Href, nil, nil, &balance); err != nil {
+		return nil, err
+	}
+
+	balance.client = f.client
+
+	return &balance, nil
+}
+
+// RetrieveMicroDeposits retrieves funding source micro deposits
+// see: https://docsv2.dwolla.com/#retrieve-micro-deposits-details
+func (f *FundingSource) RetrieveMicroDeposits() (*MicroDeposit, error) {
+	var deposit MicroDeposit
+
+	if _, ok := f.Links["verify-micro-deposits"]; !ok {
+		return nil, fmt.Errorf("No verify micro deposits resource link")
+	}
+
+	if err := f.client.Get(f.Links["verify-micro-deposits"].Href, nil, nil, &deposit); err != nil {
+		return nil, err
+	}
+
+	deposit.client = f.client
+
+	return &deposit, nil
+}
+
+// TransferFromBalance returns true if funding source can transfer from balance
+func (f *FundingSource) TransferFromBalance() bool {
+	_, ok := f.Links["transfer-from-balance"]
+	return ok
+}
+
+// TransferToBalance returns true if funding source can transfer to balance
+func (f *FundingSource) TransferToBalance() bool {
+	_, ok := f.Links["transfer-to-balance"]
+	return ok
+}
+
+// TransferReceive returns true if funding source can receive transfers
+func (f *FundingSource) TransferReceive() bool {
+	_, ok := f.Links["transfer-receive"]
+	return ok
+}
+
+// TransferSend returns true if funding source can send transfers
+func (f *FundingSource) TransferSend() bool {
+	_, ok := f.Links["transfer-send"]
+	return ok
+}
+
+// Update updates the funding source
+// see: https://docsv2.dwolla.com/#update-a-funding-source
+func (f *FundingSource) Update(body *FundingSourceRequest) error {
+	if _, ok := f.Links["self"]; !ok {
+		return fmt.Errorf("No self resource link")
+	}
+
+	return f.client.Post(f.Links["self"].Href, body, nil, f)
+}
+
+// VerifyMicroDeposits verifies micro deposit amounts
+// see: https://docsv2.dwolla.com/#verify-micro-deposits
+func (f *FundingSource) VerifyMicroDeposits(body *MicroDepositRequest) error {
+	if _, ok := f.Links["verify-micro-deposits"]; !ok {
+		return fmt.Errorf("No verify micro deposits resource link")
+	}
+
+	return f.client.Post(f.Links["verify-micro-deposits"].Href, body, nil, nil)
 }

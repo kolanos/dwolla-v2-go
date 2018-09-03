@@ -66,8 +66,10 @@ type Client struct {
 	BeneficialOwner        BeneficialOwnerService
 	BusinessClassification BusinessClassificationService
 	Customer               CustomerService
+	Document               DocumentService
 	FundingSource          FundingSourceService
 	OnDemandAuthorization  OnDemandAuthorizationService
+	Transfer               TransferService
 }
 
 // New initializes a new dwolla client
@@ -92,8 +94,10 @@ func NewWithHTTPClient(key, secret string, environment Environment, httpClient H
 	c.BeneficialOwner = &BeneficialOwnerServiceOp{c}
 	c.BusinessClassification = &BusinessClassificationServiceOp{c}
 	c.Customer = &CustomerServiceOp{c}
+	c.Document = &DocumentServiceOp{c}
 	c.FundingSource = &FundingSourceServiceOp{c}
 	c.OnDemandAuthorization = &OnDemandAuthorizationServiceOp{c}
+	c.Transfer = &TransferServiceOp{c}
 
 	return c
 }

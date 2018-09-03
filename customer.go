@@ -196,6 +196,24 @@ func (c *Customer) CertifyBeneficialOwnership() error {
 	return c.client.Post(c.Links["certify-beneficial-ownership"].Href, request, nil, nil)
 }
 
+// CreateDocument uploads a verification document for the customer
+// see: https://docsv2.dwolla.com/#create-a-document
+func (c *Customer) CreateDocument(body *DocumentRequest) (*Document, error) {
+	var document Document
+
+	if _, ok := c.Links["self"]; !ok {
+		return nil, fmt.Errorf("No self resource link")
+	}
+
+	if err := c.client.Upload(fmt.Sprintf("%s/documents", c.Links["self"].Href), body.DocumentType, body.FileName, body.File, &document); err != nil {
+		return nil, err
+	}
+
+	document.client = c.client
+
+	return &document, nil
+}
+
 // CreatedTime returns the created value as time.Time
 func (c Customer) CreatedTime() time.Time {
 	t, _ := time.Parse(time.RFC3339, c.Created)
@@ -269,6 +287,28 @@ func (c *Customer) ListBeneficialOwners() (*BeneficialOwners, error) {
 	}
 
 	return &owners, nil
+}
+
+// ListDocuments returns documents for customer
+// see: https://docsv2.dwolla.com/#list-documents
+func (c *Customer) ListDocuments() (*Documents, error) {
+	var documents Documents
+
+	if _, ok := c.Links["self"]; !ok {
+		return nil, fmt.Errorf("No self resource link")
+	}
+
+	if err := c.client.Get(fmt.Sprintf("%s/documents", c.Links["self"].Href), nil, nil, &documents); err != nil {
+		return nil, err
+	}
+
+	documents.client = c.client
+
+	for i := range documents.Embedded["documents"] {
+		documents.Embedded["documents"][i].client = c.client
+	}
+
+	return &documents, nil
 }
 
 // ListFundingSources returns the customer's funding sources
@@ -351,6 +391,12 @@ func (c *Customer) Reactivate() error {
 	return c.client.Post(c.Links["reactivate"].Href, request, nil, c)
 }
 
+// Receive returns true if customer can receive transfers
+func (c *Customer) Receive() bool {
+	_, ok := c.Links["receive"]
+	return ok
+}
+
 // RetrieveBeneficialOwnership retrieves the customer's beneficial ownership status
 func (c *Customer) RetrieveBeneficialOwnership() (*BeneficialOwnership, error) {
 	var ownership BeneficialOwnership
@@ -381,6 +427,18 @@ func (c *Customer) RetrieveIAVToken() (*IAVToken, error) {
 	}
 
 	return &token, nil
+}
+
+// RetryVerification returns true if customer needs to retry verification
+func (c *Customer) RetryVerification() bool {
+	_, ok := c.Links["retry-verification"]
+	return ok
+}
+
+// Send returns true if customer can send transfers
+func (c *Customer) Send() bool {
+	_, ok := c.Links["send"]
+	return ok
 }
 
 // Suspend suspends a dwolla customer

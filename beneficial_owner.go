@@ -112,16 +112,16 @@ func (b *BeneficialOwnerServiceOp) Update(id string, body *BeneficialOwnerReques
 	return &owner, nil
 }
 
-// CreateDocument uploads a document for beneficial owner
+// CreateDocument uploads a document for the beneficial owner
 // see: https://docsv2.dwolla.com/#create-a-document-for-a-beneficial-owner
 func (b *BeneficialOwner) CreateDocument(body *DocumentRequest) (*Document, error) {
 	var document Document
 
-	if _, ok := b.Links["documents"]; !ok {
-		return nil, fmt.Errorf("No documents resource link")
+	if _, ok := b.Links["self"]; !ok {
+		return nil, fmt.Errorf("No self resource link")
 	}
 
-	if err := b.client.Upload(b.Links["documents"].Href, body.DocumentType, body.FileName, body.File, &document); err != nil {
+	if err := b.client.Upload(fmt.Sprintf("%s/documents", b.Links["self"].Href), body.DocumentType, body.FileName, body.File, &document); err != nil {
 		return nil, err
 	}
 
@@ -135,11 +135,11 @@ func (b *BeneficialOwner) CreateDocument(body *DocumentRequest) (*Document, erro
 func (b *BeneficialOwner) ListDocuments() (*Documents, error) {
 	var documents Documents
 
-	if _, ok := b.Links["documents"]; !ok {
-		return nil, fmt.Errorf("No documents resource link")
+	if _, ok := b.Links["self"]; !ok {
+		return nil, fmt.Errorf("No self resource link")
 	}
 
-	if err := b.client.Get(b.Links["documents"].Href, nil, nil, &documents); err != nil {
+	if err := b.client.Get(fmt.Sprintf("%s/documents", b.Links["self"].Href), nil, nil, &documents); err != nil {
 		return nil, err
 	}
 

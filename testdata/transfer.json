@@ -1,0 +1,25 @@
+
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/transfers/4C8AD8B8-3D69-E511-80DB-0AA34A9B2388"
+    },
+    "source": {
+      "href": "https://api-sandbox.dwolla.com/accounts/ca32853c-48fa-40be-ae75-77b37504581b"
+    },
+    "destination": {
+      "href": "https://api-sandbox.dwolla.com/customers/01B47CB2-52AC-42A7-926C-6F1F50B1F271"
+    }
+  },
+  "id": "4C8AD8B8-3D69-E511-80DB-0AA34A9B2388",
+  "status": "pending",
+  "amount": {
+    "value": "225.00",
+    "currency": "USD"
+  },
+  "created": "2015-10-02T19:42:32.950Z",
+  "metadata": {
+    "foo": "bar",
+    "baz": "foo"
+  }
+}

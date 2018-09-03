@@ -1,14 +1,10 @@
 package dwolla
 
-import (
-	"net/url"
-)
-
 // TransferService is the transfer service interface
 // see: https://docsv2.dwolla.com/#transfers
 type TransferService interface {
-	Get(string) (*Transfer, error)
-	List(*url.Values) (*Transfers, error)
+	Create(*TransferRequest) (*Transfer, error)
+	Retrieve(string) (*Transfer, error)
 }
 
 // TransferServiceOp is an implementation of the transfer service interface
@@ -47,4 +43,21 @@ type Transfer struct {
 type Transfers struct {
 	Collection
 	Embedded map[string][]Transfer `json:"_embedded"`
+}
+
+// TransferRequest is a transfer request
+type TransferRequest struct{}
+
+// Create initiates a transfer
+// see: https://docsv2.dwolla.com/#initiate-a-transfer
+func (t *TransferServiceOp) Create(body *TransferRequest) (*Transfer, error) {
+	var transfer Transfer
+	return &transfer, nil
+}
+
+// Retrieve returns the transfer matching the id
+// see: https://docsv2.dwolla.com/#retrieve-a-transfer
+func (t *TransferServiceOp) Retrieve(id string) (*Transfer, error) {
+	var transfer Transfer
+	return &transfer, nil
 }

@@ -1,0 +1,20 @@
+
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/funding-sources/c2eb3f03-1b0e-4d18-a4a2-e552cc111418/balance",
+      "type": "application/vnd.dwolla.v1.hal+json",
+      "resource-type": "balance"
+    },
+    "funding-source": {
+      "href": "https://api-sandbox.dwolla.com/funding-sources/c2eb3f03-1b0e-4d18-a4a2-e552cc111418",
+      "type": "application/vnd.dwolla.v1.hal+json",
+      "resource-type": "funding-source"
+    }
+  },
+  "balance": {
+    "value": "4616.87",
+    "currency": "USD"
+  },
+  "lastUpdated": "2017-04-18T15:20:25.880Z"
+}

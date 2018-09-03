@@ -1,0 +1,20 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/funding-sources/dfe59fdd-7467-44cf-a339-2020dab5e98a/micro-deposits",
+      "type": "application/vnd.dwolla.v1.hal+json",
+      "resource-type": "micro-deposits"
+    },
+    "verify-micro-deposits": {
+      "href": "https://api-sandbox.dwolla.com/funding-sources/dfe59fdd-7467-44cf-a339-2020dab5e98a/micro-deposits",
+      "type": "application/vnd.dwolla.v1.hal+json",
+      "resource-type": "micro-deposits"
+    }
+  },
+  "created": "2016-12-30T20:56:53.000Z",
+  "status": "failed",
+  "failure": {
+    "code": "R03",
+    "description": "No Account/Unable to Locate Account"
+  }
+}
