@@ -90,6 +90,24 @@ func (w *WebhookServiceOp) Retrieve(id string) (*Webhook, error) {
 	return &webhook, nil
 }
 
+// RetrieveEvent retrieves the event for the webhook
+func (w *Webhook) RetrieveEvent() (*Event, error) {
+	if _, ok := w.Links["event"]; !ok {
+		return nil, fmt.Errorf("No event resource link")
+	}
+
+	return w.client.Event.Retrieve(w.Links["event"].Href)
+}
+
+// RetrieveWebhookSubscription returns the subscription for the webhoook
+func (w *Webhook) RetrieveWebhookSubscription() (*WebhookSubscription, error) {
+	if _, ok := w.Links["subscription"]; !ok {
+		return nil, fmt.Errorf("No subscription resource link")
+	}
+
+	return w.client.WebhookSubscription.Retrieve(w.Links["subscription"].Href)
+}
+
 // ListRetries returns a collection of retries for this webhook
 // see: https://docsv2.dwolla.com/#list-retries-for-a-webhook
 func (w *Webhook) ListRetries() (*WebhookRetries, error) {
