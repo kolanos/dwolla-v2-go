@@ -2,6 +2,7 @@ package dwolla
 
 import (
 	"fmt"
+	"net/url"
 )
 
 // MassPaymentService is the mass payment service interface
@@ -76,6 +77,13 @@ type MassPaymentItem struct {
 	Embedded      HALErrors             `json:"_embedded,omitempty"`
 }
 
+// MassPaymentItems is a collection of mass payment items
+type MassPaymentItems struct {
+	Collection
+	Embedded map[string][]MassPaymentItem `json:"_embedded"`
+	Total    int                          `json:"total"`
+}
+
 // Create initiates a mass payment
 // see: https://docsv2.dwolla.com/#initiate-a-mass-payment
 func (m *MassPaymentServiceOp) Create(body *MassPayment) (*MassPayment, error) {
@@ -118,4 +126,76 @@ func (m *MassPaymentServiceOp) Update(id string, status MassPaymentStatus) (*Mas
 	payment.client = m.client
 
 	return &payment, nil
+}
+
+// ListItems returns a collection of items for the mass payment
+// see: https://docsv2.dwolla.com/#list-items-for-a-mass-payment
+func (m *MassPayment) ListItems(params *url.Values) (*MassPaymentItems, error) {
+	var items MassPaymentItems
+
+	if _, ok := m.Links["items"]; !ok {
+		return nil, fmt.Errorf("No items resource link")
+	}
+
+	if err := m.client.Get(m.Links["items"].Href, params, nil, &items); err != nil {
+		return nil, err
+	}
+
+	items.client = m.client
+
+	for i := range items.Embedded["items"] {
+		items.Embedded["items"][i].client = m.client
+	}
+
+	return &items, nil
+}
+
+// RetrieveItem returns a mass payment item matching id
+// see: https://docsv2.dwolla.com/#retrieve-a-mass-payment-item
+func (m *MassPayment) RetrieveItem(id string) (*MassPaymentItem, error) {
+	var item MassPaymentItem
+
+	if err := m.client.Get(fmt.Sprintf("mass-payment-items/%s", id), nil, nil, &item); err != nil {
+		return nil, err
+	}
+
+	item.client = m.client
+
+	return &item, nil
+}
+
+// RetrieveSource retrieves the mass payment funding source
+func (m *MassPayment) RetrieveSource() (*FundingSource, error) {
+	if _, ok := m.Links["source"]; !ok {
+		return nil, fmt.Errorf("No source resource link")
+	}
+
+	return m.client.FundingSource.Retrieve(m.Links["source"].Href)
+}
+
+// RetrieveDestination retrieves the destination for the item
+func (m *MassPaymentItem) RetrieveDestination() (*Customer, error) {
+	if _, ok := m.Links["destination"]; !ok {
+		return nil, fmt.Errorf("No destination resource link")
+	}
+
+	return m.client.Customer.Retrieve(m.Links["destination"].Href)
+}
+
+// RetrieveMassPayment retrieves the mass payment for the item
+func (m *MassPaymentItem) RetrieveMassPayment() (*MassPayment, error) {
+	if _, ok := m.Links["mass-payment"]; !ok {
+		return nil, fmt.Errorf("No mass payment resource link")
+	}
+
+	return m.client.MassPayment.Retrieve(m.Links["mass-payment"].Href)
+}
+
+// RetrieveTransfer retrieves the transfer for the item
+func (m *MassPaymentItem) RetrieveTransfer() (*Transfer, error) {
+	if _, ok := m.Links["transfer"]; !ok {
+		return nil, fmt.Errorf("No transfer resource link")
+	}
+
+	return m.client.Transfer.Retrieve(m.Links["transfer"].Href)
 }

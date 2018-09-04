@@ -1,0 +1,81 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/mass-payments/eb467252-808c-4bc0-b86f-a5cd01454563/items"
+    },
+    "first": {
+      "href": "https://api-sandbox.dwolla.com/mass-payments/eb467252-808c-4bc0-b86f-a5cd01454563/items?limit=25&offset=0"
+    },
+    "last": {
+      "href": "https://api-sandbox.dwolla.com/mass-payments/eb467252-808c-4bc0-b86f-a5cd01454563/items?limit=25&offset=0"
+    }
+  },
+  "_embedded": {
+    "items": [
+      {
+        "_links": {
+          "self": {
+            "href": "https://api-sandbox.dwolla.com/mass-payment-items/2f845bc9-41ed-e511-80df-0aa34a9b2388"
+          },
+          "mass-payment": {
+            "href": "https://api-sandbox.dwolla.com/mass-payments/eb467252-808c-4bc0-b86f-a5cd01454563"
+          },
+          "destination": {
+            "href": "https://api-sandbox.dwolla.com/customers/9c7f8d57-cd45-4e7a-bf7a-914dbd6131db"
+          },
+          "transfer": {
+            "href": "https://api-sandbox.dwolla.com/transfers/fa3999db-41ed-e511-80df-0aa34a9b2388"
+          }
+        },
+        "id": "2f845bc9-41ed-e511-80df-0aa34a9b2388",
+        "status": "success",
+        "amount": {
+          "value": "1.00",
+          "currency": "USD"
+        },
+        "metadata": {
+          "item1": "item1"
+        }
+      },
+      {
+        "_links": {
+            "self": {
+                "href": "https://api-sandbox.dwolla.com/mass-payment-items/30845bc9-41ed-e511-80df-0aa34a9b2388",
+                "type": "application/vnd.dwolla.v1.hal+json",
+                "resource-type": "mass-payment-item"
+            },
+            "mass-payment": {
+                "href": "https://api-sandbox.dwolla.com/mass-payments/eb467252-808c-4bc0-b86f-a5cd01454563",
+                "type": "application/vnd.dwolla.v1.hal+json",
+                "resource-type": "mass-payment"
+            },
+            "destination": {
+                "href": "https://api-sandbox.dwolla.com/customers/b442c936-1f87-465d-a4e2-a982164b26bd",
+                "type": "application/vnd.dwolla.v1.hal+json",
+                "resource-type": "customer"
+            }
+        },
+        "_embedded": {
+            "errors": [
+                {
+                    "code": "RequiresFundingSource",
+                    "message": "Receiver requires funding source.",
+                    "path": "/items/destination/href",
+                    "_links": {}
+                }
+            ]
+        },
+        "id": "30845bc9-41ed-e511-80df-0aa34a9b2388",
+        "status": "failed",
+        "amount": {
+            "value": "0.02",
+            "currency": "USD"
+        },
+        "metadata": {
+            "item2": "item2"
+        }
+      }
+    ]
+  },
+  "total": 2
+}

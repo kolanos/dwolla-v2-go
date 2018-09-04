@@ -1,0 +1,18 @@
+
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/mass-payments/eb467252-808c-4bc0-b86f-a5cd01454563"
+    },
+    "source": {
+      "href": "https://api-sandbox.dwolla.com/funding-sources/707177c3-bf15-4e7e-b37c-55c3898d9bf4"
+    },
+    "items": {
+      "href": "https://api-sandbox.dwolla.com/mass-payments/eb467252-808c-4bc0-b86f-a5cd01454563/items"
+    }
+  },
+  "id": "eb467252-808c-4bc0-b86f-a5cd01454563",
+  "status": "processing",
+  "created": "2016-03-18T19:44:16.000Z",
+  "metadata": {}
+}

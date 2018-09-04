@@ -1,0 +1,26 @@
+
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/mass-payment-items/2f845bc9-41ed-e511-80df-0aa34a9b2388"
+    },
+    "mass-payment": {
+      "href": "https://api-sandbox.dwolla.com/mass-payments/eb467252-808c-4bc0-b86f-a5cd01454563"
+    },
+    "destination": {
+      "href": "https://api-sandbox.dwolla.com/customers/9c7f8d57-cd45-4e7a-bf7a-914dbd6131db"
+    },
+    "transfer": {
+      "href": "https://api-sandbox.dwolla.com/transfers/fa3999db-41ed-e511-80df-0aa34a9b2388"
+    }
+  },
+  "id": "2f845bc9-41ed-e511-80df-0aa34a9b2388",
+  "status": "success",
+  "amount": {
+    "value": "1.00",
+    "currency": "USD"
+  },
+  "metadata": {
+    "item1": "item1"
+  }
+}
