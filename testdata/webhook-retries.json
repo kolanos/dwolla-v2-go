@@ -1,0 +1,24 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/webhooks/9ece9660-aa34-41eb-80d7-0125d53b45e8/retries"
+    }
+  },
+  "_embedded": {
+    "retries": [
+      {
+        "_links": {
+          "self": {
+            "href": "https://api-sandbox.dwolla.com/webhooks/9ece9660-aa34-41eb-80d7-0125d53b45e8/retries/5aa27a0f-cf99-418d-a3ee-67c0ff99a494"
+          },
+          "webhook": {
+            "href": "https://api-sandbox.dwolla.com/webhooks/9ece9660-aa34-41eb-80d7-0125d53b45e8"
+          }
+        },
+        "id": "5aa27a0f-cf99-418d-a3ee-67c0ff99a494",
+        "timestamp": "2015-11-02T17:43:26.000Z"
+      }
+    ]
+  },
+  "total": 1
+}
