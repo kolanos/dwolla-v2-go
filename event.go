@@ -1,16 +1,24 @@
 package dwolla
 
-// Topic is an event topic
-type Topic string
+// EventService is the event service interface
+// see: https://docsv2.dwolla.com/#events
+type EventService interface{}
+
+// EventServiceOp is an implementation of the event service interface
+type EventServiceOp struct {
+	client *Client
+}
+
+// EventTopic is an event topic
+type EventTopic string
 
 // Event is a dwolla event
 type Event struct {
 	Resource
-	client     *Client
-	ID         string `json:"id"`
-	Created    string `json:"created"`
-	Topic      Topic  `json:"topic"`
-	ResourceID string `json:"resourceId"`
+	ID         string     `json:"id"`
+	Created    string     `json:"created"`
+	Topic      EventTopic `json:"topic"`
+	ResourceID string     `json:"resourceId"`
 }
 
 // Events is a collection of dwolla events

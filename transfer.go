@@ -39,7 +39,7 @@ type Transfer struct {
 	Status          TransferStatus   `json:"status"`
 	Amount          Amount           `json:"amount"`
 	Created         string           `json:"created"`
-	MetaData        TransferMetaData `json:"metadata"`
+	MetaData        MetaData         `json:"metadata"`
 	Clearing        TransferClearing `json:"clearing"`
 	CorrelationID   string           `json:"correlationId"`
 	IndividualACHID string           `json:"individualAchId"`
@@ -92,15 +92,12 @@ type TransferFees struct {
 	Total        int        `json:"total"`
 }
 
-// TransferMetaData is meta data about a transfer
-type TransferMetaData map[string]interface{}
-
 // TransferRequest is a transfer request
 type TransferRequest struct {
 	Resource
 	Status        TransferStatus     `json:"status,omitempty"`
 	Amount        Amount             `json:"amount,omitempty"`
-	MetaData      TransferMetaData   `json:"metadata,omitempty"`
+	MetaData      MetaData           `json:"metadata,omitempty"`
 	Fees          []TransferFee      `json:"fees,omitempty"`
 	Clearing      TransferClearing   `json:"clearing,omitempty"`
 	CorrelationID string             `json:"correlationId"`

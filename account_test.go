@@ -94,9 +94,9 @@ func TestAccountListMassPayments(t *testing.T) {
 	mp := res.Embedded["mass-payments"][0]
 
 	assert.Equal(t, mp.ID, "b4b5a699-5278-4727-9f81-a50800ea9abc")
-	assert.Equal(t, mp.Status, "complete")
+	assert.Equal(t, mp.Status, MassPaymentStatusComplete)
 	assert.Equal(t, mp.Created, "2015-09-03T14:14:10.000Z")
-	assert.Equal(t, mp.MetaData, map[string]string(map[string]string{"UserJobId": "some ID"}))
+	assert.Equal(t, mp.MetaData, MetaData{"UserJobId": "some ID"})
 	assert.Equal(t, mp.CorrelationID, "8a2cdc8d-629d-4a24-98ac-40b735229fe2")
 }
 

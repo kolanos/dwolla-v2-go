@@ -21,6 +21,9 @@ type Amount struct {
 	Currency string `json:"currency"`
 }
 
+// MetaData represents key/value meta data
+type MetaData map[string]interface{}
+
 // Passport represents a passport
 type Passport struct {
 	Number  string `json:"number"`

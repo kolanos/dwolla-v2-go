@@ -67,9 +67,13 @@ type Client struct {
 	BusinessClassification BusinessClassificationService
 	Customer               CustomerService
 	Document               DocumentService
+	Event                  EventService
 	FundingSource          FundingSourceService
+	MassPayment            MassPaymentService
 	OnDemandAuthorization  OnDemandAuthorizationService
 	Transfer               TransferService
+	Webhook                WebhookService
+	WebhookSubscription    WebhookSubscriptionService
 }
 
 // New initializes a new dwolla client
@@ -95,9 +99,13 @@ func NewWithHTTPClient(key, secret string, environment Environment, httpClient H
 	c.BusinessClassification = &BusinessClassificationServiceOp{c}
 	c.Customer = &CustomerServiceOp{c}
 	c.Document = &DocumentServiceOp{c}
+	c.Event = &EventServiceOp{c}
 	c.FundingSource = &FundingSourceServiceOp{c}
+	c.MassPayment = &MassPaymentServiceOp{c}
 	c.OnDemandAuthorization = &OnDemandAuthorizationServiceOp{c}
 	c.Transfer = &TransferServiceOp{c}
+	c.Webhook = &WebhookServiceOp{c}
+	c.WebhookSubscription = &WebhookSubscriptionServiceOp{c}
 
 	return c
 }
@@ -219,7 +227,7 @@ func (c *Client) EnsureToken() error {
 func (c *Client) Get(path string, params *url.Values, headers *http.Header, container interface{}) error {
 	var (
 		err      error
-		halError Error
+		halError HALError
 	)
 
 	if err = c.EnsureToken(); err != nil {
@@ -285,7 +293,7 @@ func (c *Client) Get(path string, params *url.Values, headers *http.Header, cont
 func (c *Client) Post(path string, body interface{}, headers *http.Header, container interface{}) error {
 	var (
 		err             error
-		halError        Error
+		halError        HALError
 		validationError ValidationError
 		bodyReader      io.Reader
 	)
@@ -373,7 +381,7 @@ func (c *Client) Post(path string, body interface{}, headers *http.Header, conta
 func (c *Client) Upload(path, documentType, fileName string, file io.Reader, container interface{}) error {
 	var (
 		err      error
-		halError Error
+		halError HALError
 	)
 
 	if err = c.EnsureToken(); err != nil {
@@ -460,7 +468,7 @@ func (c *Client) Upload(path, documentType, fileName string, file io.Reader, con
 func (c *Client) Delete(path string, params *url.Values, headers *http.Header) error {
 	var (
 		err      error
-		halError Error
+		halError HALError
 	)
 
 	if err = c.EnsureToken(); err != nil {
