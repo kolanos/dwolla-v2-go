@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -93,7 +94,7 @@ func (w *WebhookServiceOp) Retrieve(id string) (*Webhook, error) {
 // RetrieveEvent retrieves the event for the webhook
 func (w *Webhook) RetrieveEvent() (*Event, error) {
 	if _, ok := w.Links["event"]; !ok {
-		return nil, fmt.Errorf("No event resource link")
+		return nil, errors.New("No event resource link")
 	}
 
 	return w.client.Event.Retrieve(w.Links["event"].Href)
@@ -102,7 +103,7 @@ func (w *Webhook) RetrieveEvent() (*Event, error) {
 // RetrieveWebhookSubscription returns the subscription for the webhoook
 func (w *Webhook) RetrieveWebhookSubscription() (*WebhookSubscription, error) {
 	if _, ok := w.Links["subscription"]; !ok {
-		return nil, fmt.Errorf("No subscription resource link")
+		return nil, errors.New("No subscription resource link")
 	}
 
 	return w.client.WebhookSubscription.Retrieve(w.Links["subscription"].Href)
@@ -114,7 +115,7 @@ func (w *Webhook) ListRetries() (*WebhookRetries, error) {
 	var retries WebhookRetries
 
 	if _, ok := w.Links["retry"]; !ok {
-		return nil, fmt.Errorf("No retry resource link")
+		return nil, errors.New("No retry resource link")
 	}
 
 	if err := w.client.Get(w.Links["retry"].Href, nil, nil, &retries); err != nil {
@@ -136,7 +137,7 @@ func (w *Webhook) Retry() (*WebhookRetry, error) {
 	var retry WebhookRetry
 
 	if _, ok := w.Links["retry"]; !ok {
-		return nil, fmt.Errorf("No retry resource link")
+		return nil, errors.New("No retry resource link")
 	}
 
 	if err := w.client.Post(w.Links["retry"].Href, nil, nil, &retry); err != nil {

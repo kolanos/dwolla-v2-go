@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 )
@@ -134,7 +135,7 @@ func (m *MassPayment) ListItems(params *url.Values) (*MassPaymentItems, error) {
 	var items MassPaymentItems
 
 	if _, ok := m.Links["items"]; !ok {
-		return nil, fmt.Errorf("No items resource link")
+		return nil, errors.New("No items resource link")
 	}
 
 	if err := m.client.Get(m.Links["items"].Href, params, nil, &items); err != nil {
@@ -167,7 +168,7 @@ func (m *MassPayment) RetrieveItem(id string) (*MassPaymentItem, error) {
 // RetrieveSource retrieves the mass payment funding source
 func (m *MassPayment) RetrieveSource() (*FundingSource, error) {
 	if _, ok := m.Links["source"]; !ok {
-		return nil, fmt.Errorf("No source resource link")
+		return nil, errors.New("No source resource link")
 	}
 
 	return m.client.FundingSource.Retrieve(m.Links["source"].Href)
@@ -176,7 +177,7 @@ func (m *MassPayment) RetrieveSource() (*FundingSource, error) {
 // RetrieveDestination retrieves the destination for the item
 func (m *MassPaymentItem) RetrieveDestination() (*Customer, error) {
 	if _, ok := m.Links["destination"]; !ok {
-		return nil, fmt.Errorf("No destination resource link")
+		return nil, errors.New("No destination resource link")
 	}
 
 	return m.client.Customer.Retrieve(m.Links["destination"].Href)
@@ -185,7 +186,7 @@ func (m *MassPaymentItem) RetrieveDestination() (*Customer, error) {
 // RetrieveMassPayment retrieves the mass payment for the item
 func (m *MassPaymentItem) RetrieveMassPayment() (*MassPayment, error) {
 	if _, ok := m.Links["mass-payment"]; !ok {
-		return nil, fmt.Errorf("No mass payment resource link")
+		return nil, errors.New("No mass payment resource link")
 	}
 
 	return m.client.MassPayment.Retrieve(m.Links["mass-payment"].Href)
@@ -194,7 +195,7 @@ func (m *MassPaymentItem) RetrieveMassPayment() (*MassPayment, error) {
 // RetrieveTransfer retrieves the transfer for the item
 func (m *MassPaymentItem) RetrieveTransfer() (*Transfer, error) {
 	if _, ok := m.Links["transfer"]; !ok {
-		return nil, fmt.Errorf("No transfer resource link")
+		return nil, errors.New("No transfer resource link")
 	}
 
 	return m.client.Transfer.Retrieve(m.Links["transfer"].Href)

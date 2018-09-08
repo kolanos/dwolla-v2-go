@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -118,7 +119,7 @@ func (b *BeneficialOwner) CreateDocument(body *DocumentRequest) (*Document, erro
 	var document Document
 
 	if _, ok := b.Links["self"]; !ok {
-		return nil, fmt.Errorf("No self resource link")
+		return nil, errors.New("No self resource link")
 	}
 
 	if err := b.client.Upload(fmt.Sprintf("%s/documents", b.Links["self"].Href), body.DocumentType, body.FileName, body.File, &document); err != nil {
@@ -136,7 +137,7 @@ func (b *BeneficialOwner) ListDocuments() (*Documents, error) {
 	var documents Documents
 
 	if _, ok := b.Links["self"]; !ok {
-		return nil, fmt.Errorf("No self resource link")
+		return nil, errors.New("No self resource link")
 	}
 
 	if err := b.client.Get(fmt.Sprintf("%s/documents", b.Links["self"].Href), nil, nil, &documents); err != nil {
@@ -156,7 +157,7 @@ func (b *BeneficialOwner) ListDocuments() (*Documents, error) {
 // see: https://docsv2.dwolla.com/#remove-a-beneficial-owner
 func (b *BeneficialOwner) Remove() error {
 	if _, ok := b.Links["self"]; !ok {
-		return fmt.Errorf("No self resource link")
+		return errors.New("No self resource link")
 	}
 
 	return b.client.Delete(b.Links["self"].Href, nil, nil)
@@ -166,7 +167,7 @@ func (b *BeneficialOwner) Remove() error {
 // see: https://docsv2.dwolla.com/#update-a-beneficial-owner
 func (b *BeneficialOwner) Update(body *BeneficialOwnerRequest) error {
 	if _, ok := b.Links["self"]; !ok {
-		return fmt.Errorf("No self resource link")
+		return errors.New("No self resource link")
 	}
 
 	return b.client.Post(b.Links["self"].Href, body, nil, b)
@@ -176,7 +177,7 @@ func (b *BeneficialOwner) Update(body *BeneficialOwnerRequest) error {
 // see: https://docsv2.dwolla.com/#certify-beneficial-ownership
 func (b *BeneficialOwnership) Certify() error {
 	if _, ok := b.Links["self"]; !ok {
-		return fmt.Errorf("No self resource link")
+		return errors.New("No self resource link")
 	}
 
 	request := &BeneficialOwnershipRequest{Status: BeneficialOwnershipStatusCertified}

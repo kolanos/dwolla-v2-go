@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -126,7 +127,7 @@ func (f *FundingSourceServiceOp) Remove(id string) error {
 // Customer returns the funding source's customer
 func (f *FundingSource) Customer() (*Customer, error) {
 	if _, ok := f.Links["customer"]; !ok {
-		return nil, fmt.Errorf("No customer resource link")
+		return nil, errors.New("No customer resource link")
 	}
 
 	return f.client.Customer.Retrieve(f.Links["customer"].Href)
@@ -145,7 +146,7 @@ func (f *FundingSource) InitiateMicroDeposits() (*MicroDeposit, error) {
 	var deposit MicroDeposit
 
 	if _, ok := f.Links["initiate-micro-deposits"]; !ok {
-		return nil, fmt.Errorf("No initiate micro deposits resource link")
+		return nil, errors.New("No initiate micro deposits resource link")
 	}
 
 	if err := f.client.Post(f.Links["initiate-micro-deposits"].Href, nil, nil, &deposit); err != nil {
@@ -161,7 +162,7 @@ func (f *FundingSource) InitiateMicroDeposits() (*MicroDeposit, error) {
 // see: https://docsv2.dwolla.com/#remove-a-funding-source
 func (f *FundingSource) Remove() error {
 	if _, ok := f.Links["remove"]; !ok {
-		return fmt.Errorf("No remove resource link")
+		return errors.New("No remove resource link")
 	}
 
 	request := &FundingSourceRequest{Removed: true}
@@ -175,7 +176,7 @@ func (f *FundingSource) RetrieveBalance() (*FundingSourceBalance, error) {
 	var balance FundingSourceBalance
 
 	if _, ok := f.Links["balance"]; !ok {
-		return nil, fmt.Errorf("No balance resource link")
+		return nil, errors.New("No balance resource link")
 	}
 
 	if err := f.client.Get(f.Links["balance"].Href, nil, nil, &balance); err != nil {
@@ -193,7 +194,7 @@ func (f *FundingSource) RetrieveMicroDeposits() (*MicroDeposit, error) {
 	var deposit MicroDeposit
 
 	if _, ok := f.Links["verify-micro-deposits"]; !ok {
-		return nil, fmt.Errorf("No verify micro deposits resource link")
+		return nil, errors.New("No verify micro deposits resource link")
 	}
 
 	if err := f.client.Get(f.Links["verify-micro-deposits"].Href, nil, nil, &deposit); err != nil {
@@ -233,7 +234,7 @@ func (f *FundingSource) TransferSend() bool {
 // see: https://docsv2.dwolla.com/#update-a-funding-source
 func (f *FundingSource) Update(body *FundingSourceRequest) error {
 	if _, ok := f.Links["self"]; !ok {
-		return fmt.Errorf("No self resource link")
+		return errors.New("No self resource link")
 	}
 
 	return f.client.Post(f.Links["self"].Href, body, nil, f)
@@ -243,7 +244,7 @@ func (f *FundingSource) Update(body *FundingSourceRequest) error {
 // see: https://docsv2.dwolla.com/#verify-micro-deposits
 func (f *FundingSource) VerifyMicroDeposits(body *MicroDepositRequest) error {
 	if _, ok := f.Links["verify-micro-deposits"]; !ok {
-		return fmt.Errorf("No verify micro deposits resource link")
+		return errors.New("No verify micro deposits resource link")
 	}
 
 	return f.client.Post(f.Links["verify-micro-deposits"].Href, body, nil, nil)

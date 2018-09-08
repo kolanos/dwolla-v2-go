@@ -1,7 +1,7 @@
 package dwolla
 
 import (
-	"fmt"
+	"errors"
 	"net/url"
 )
 
@@ -37,7 +37,7 @@ func (a *AccountServiceOp) Retrieve() (*Account, error) {
 	var account Account
 
 	if _, ok := root.Links["account"]; !ok {
-		return nil, fmt.Errorf("No account resource link")
+		return nil, errors.New("No account resource link")
 	}
 
 	if err := a.client.Get(root.Links["account"].Href, nil, nil, &account); err != nil {
@@ -69,7 +69,7 @@ func (a *Account) ListFundingSources(params *url.Values) (*FundingSources, error
 	var sources FundingSources
 
 	if _, ok := a.Links["funding-sources"]; !ok {
-		return nil, fmt.Errorf("No funding sources resource link")
+		return nil, errors.New("No funding sources resource link")
 	}
 
 	if err := a.client.Get(a.Links["funding-sources"].Href, params, nil, &sources); err != nil {
@@ -93,7 +93,7 @@ func (a *Account) ListMassPayments(params *url.Values) (*MassPayments, error) {
 	var payments MassPayments
 
 	if _, ok := a.Links["mass-payments"]; !ok {
-		return nil, fmt.Errorf("No mass payments resource link")
+		return nil, errors.New("No mass payments resource link")
 	}
 
 	if err := a.client.Get(a.Links["mass-payments"].Href, params, nil, &payments); err != nil {
@@ -117,7 +117,7 @@ func (a *Account) ListTransfers(params *url.Values) (*Transfers, error) {
 	var transfers Transfers
 
 	if _, ok := a.Links["transfers"]; !ok {
-		return nil, fmt.Errorf("No transfers resource link")
+		return nil, errors.New("No transfers resource link")
 	}
 
 	if err := a.client.Get(a.Links["transfers"].Href, params, nil, &transfers); err != nil {

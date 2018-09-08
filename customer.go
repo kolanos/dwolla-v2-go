@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -188,7 +189,7 @@ func (c *CustomerServiceOp) Update(id string, body *CustomerRequest) (*Customer,
 // see: https://docsv2.dwolla.com/#certify-beneficial-ownership
 func (c *Customer) CertifyBeneficialOwnership() error {
 	if _, ok := c.Links["certify-beneficial-ownership"]; !ok {
-		return fmt.Errorf("No certify beneficial ownership resource link")
+		return errors.New("No certify beneficial ownership resource link")
 	}
 
 	request := &BeneficialOwnershipRequest{Status: BeneficialOwnershipStatusCertified}
@@ -202,7 +203,7 @@ func (c *Customer) CreateDocument(body *DocumentRequest) (*Document, error) {
 	var document Document
 
 	if _, ok := c.Links["self"]; !ok {
-		return nil, fmt.Errorf("No self resource link")
+		return nil, errors.New("No self resource link")
 	}
 
 	if err := c.client.Upload(fmt.Sprintf("%s/documents", c.Links["self"].Href), body.DocumentType, body.FileName, body.File, &document); err != nil {
@@ -226,7 +227,7 @@ func (c *Customer) CreateBeneficialOwner(body *BeneficialOwnerRequest) (*Benefic
 	var owner BeneficialOwner
 
 	if _, ok := c.Links["beneficial-owners"]; !ok {
-		return nil, fmt.Errorf("No beneficial owners resource link")
+		return nil, errors.New("No beneficial owners resource link")
 	}
 
 	if err := c.client.Post(c.Links["beneficial-owners"].Href, body, nil, &owner); err != nil {
@@ -244,7 +245,7 @@ func (c *Customer) CreateFundingSource(body *FundingSourceRequest) (*FundingSour
 	var source FundingSource
 
 	if _, ok := c.Links["funding-sources"]; !ok {
-		return nil, fmt.Errorf("No funding sources resource link")
+		return nil, errors.New("No funding sources resource link")
 	}
 
 	if err := c.client.Post(c.Links["funding-sources"].Href, body, nil, &source); err != nil {
@@ -259,7 +260,7 @@ func (c *Customer) CreateFundingSource(body *FundingSourceRequest) (*FundingSour
 // Deactivate deactivates a dwolla customer
 func (c *Customer) Deactivate() error {
 	if _, ok := c.Links["deactivate"]; !ok {
-		return fmt.Errorf("No deactivate resource link")
+		return errors.New("No deactivate resource link")
 	}
 
 	request := &CustomerRequest{Status: CustomerStatusDeactivated}
@@ -273,7 +274,7 @@ func (c *Customer) ListBeneficialOwners() (*BeneficialOwners, error) {
 	var owners BeneficialOwners
 
 	if _, ok := c.Links["beneficial-owners"]; !ok {
-		return nil, fmt.Errorf("No beneficial owners resource link")
+		return nil, errors.New("No beneficial owners resource link")
 	}
 
 	if err := c.client.Get(c.Links["beneficial-owners"].Href, nil, nil, &owners); err != nil {
@@ -295,7 +296,7 @@ func (c *Customer) ListDocuments() (*Documents, error) {
 	var documents Documents
 
 	if _, ok := c.Links["self"]; !ok {
-		return nil, fmt.Errorf("No self resource link")
+		return nil, errors.New("No self resource link")
 	}
 
 	if err := c.client.Get(fmt.Sprintf("%s/documents", c.Links["self"].Href), nil, nil, &documents); err != nil {
@@ -317,7 +318,7 @@ func (c *Customer) ListFundingSources(removed bool) (*FundingSources, error) {
 	var sources FundingSources
 
 	if _, ok := c.Links["funding-sources"]; !ok {
-		return nil, fmt.Errorf("No funding sources resource link")
+		return nil, errors.New("No funding sources resource link")
 	}
 
 	params := &url.Values{}
@@ -342,7 +343,7 @@ func (c *Customer) ListMassPayments(params *url.Values) (*MassPayments, error) {
 	var payments MassPayments
 
 	if _, ok := c.Links["mass-payments"]; !ok {
-		return nil, fmt.Errorf("No mass payments resource link")
+		return nil, errors.New("No mass payments resource link")
 	}
 
 	if err := c.client.Get(c.Links["mass-payments"].Href, params, nil, &payments); err != nil {
@@ -364,7 +365,7 @@ func (c *Customer) ListTransfers(params *url.Values) (*Transfers, error) {
 	var transfers Transfers
 
 	if _, ok := c.Links["transfers"]; !ok {
-		return nil, fmt.Errorf("No transfers resource link")
+		return nil, errors.New("No transfers resource link")
 	}
 
 	if err := c.client.Get(c.Links["transfers"].Href, params, nil, &transfers); err != nil {
@@ -383,7 +384,7 @@ func (c *Customer) ListTransfers(params *url.Values) (*Transfers, error) {
 // Reactivate reactivates a deactivated dwolla customer
 func (c *Customer) Reactivate() error {
 	if _, ok := c.Links["reactivate"]; !ok {
-		return fmt.Errorf("No reactivate resource link")
+		return errors.New("No reactivate resource link")
 	}
 
 	request := &CustomerRequest{Status: CustomerStatusReactivated}
@@ -402,7 +403,7 @@ func (c *Customer) RetrieveBeneficialOwnership() (*BeneficialOwnership, error) {
 	var ownership BeneficialOwnership
 
 	if _, ok := c.Links["beneficial-owners"]; !ok {
-		return nil, fmt.Errorf("No beneficial owners resource link")
+		return nil, errors.New("No beneficial owners resource link")
 	}
 
 	if err := c.client.Get(fmt.Sprintf("%s/beneficial-ownership", c.Links["self"].Href), nil, nil, &ownership); err != nil {
@@ -419,7 +420,7 @@ func (c *Customer) RetrieveIAVToken() (*IAVToken, error) {
 	var token IAVToken
 
 	if _, ok := c.Links["self"]; !ok {
-		return nil, fmt.Errorf("No self resource link")
+		return nil, errors.New("No self resource link")
 	}
 
 	if err := c.client.Post(fmt.Sprintf("%s/iav-token", c.Links["self"].Href), nil, nil, token); err != nil {
@@ -444,7 +445,7 @@ func (c *Customer) Send() bool {
 // Suspend suspends a dwolla customer
 func (c *Customer) Suspend() error {
 	if _, ok := c.Links["suspend"]; !ok {
-		return fmt.Errorf("No suspend resource link")
+		return errors.New("No suspend resource link")
 	}
 
 	request := &CustomerRequest{Status: CustomerStatusSuspended}
@@ -456,7 +457,7 @@ func (c *Customer) Suspend() error {
 // see: https://docsv2.dwolla.com/#update-a-customer
 func (c *Customer) Update(body *CustomerRequest) error {
 	if _, ok := c.Links["self"]; !ok {
-		return fmt.Errorf("No self resource link")
+		return errors.New("No self resource link")
 	}
 
 	return c.client.Post(c.Links["self"].Href, body, nil, c)

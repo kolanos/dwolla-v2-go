@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -136,7 +137,7 @@ func (t *TransferServiceOp) Retrieve(id string) (*Transfer, error) {
 // see: https://docsv2.dwolla.com/#cancel-a-transfer
 func (t *Transfer) Cancel() error {
 	if _, ok := t.Links["cancel"]; !ok {
-		return fmt.Errorf("No cancel resource link")
+		return errors.New("No cancel resource link")
 	}
 
 	body := &TransferRequest{Status: TransferStatusCancelled}
@@ -147,7 +148,7 @@ func (t *Transfer) Cancel() error {
 // Destination returns the customer transfer destination
 func (t *Transfer) Destination() (*Customer, error) {
 	if _, ok := t.Links["destination"]; !ok {
-		return nil, fmt.Errorf("No destination resource link")
+		return nil, errors.New("No destination resource link")
 	}
 
 	return t.client.Customer.Retrieve(t.Links["destination"].Href)
@@ -156,7 +157,7 @@ func (t *Transfer) Destination() (*Customer, error) {
 // DestinationFundingSource returns the transfer funding destination
 func (t *Transfer) DestinationFundingSource() (*FundingSource, error) {
 	if _, ok := t.Links["destination-funding-source"]; !ok {
-		return nil, fmt.Errorf("No destination funding source resource link")
+		return nil, errors.New("No destination funding source resource link")
 	}
 
 	return t.client.FundingSource.Retrieve(t.Links["destination-funding-source"].Href)
@@ -168,7 +169,7 @@ func (t *Transfer) ListFees() (*TransferFees, error) {
 	var fees TransferFees
 
 	if _, ok := t.Links["fees"]; !ok {
-		return nil, fmt.Errorf("No fees resource link")
+		return nil, errors.New("No fees resource link")
 	}
 
 	if err := t.client.Get(t.Links["fees"].Href, nil, nil, &fees); err != nil {
@@ -185,7 +186,7 @@ func (t *Transfer) ListFees() (*TransferFees, error) {
 // Source returns the customer transfer source
 func (t *Transfer) Source() (*Customer, error) {
 	if _, ok := t.Links["source"]; !ok {
-		return nil, fmt.Errorf("No source resource link")
+		return nil, errors.New("No source resource link")
 	}
 
 	return t.client.Customer.Retrieve(t.Links["source"].Href)
@@ -194,7 +195,7 @@ func (t *Transfer) Source() (*Customer, error) {
 // SourceFundingSource returns the transfer funding source
 func (t *Transfer) SourceFundingSource() (*FundingSource, error) {
 	if _, ok := t.Links["source-funding-source"]; !ok {
-		return nil, fmt.Errorf("No source funding source resource link")
+		return nil, errors.New("No source funding source resource link")
 	}
 
 	return t.client.FundingSource.Retrieve(t.Links["source-funding-souce"].Href)
@@ -206,7 +207,7 @@ func (t *Transfer) RetrieveFailureReason() (*TransferFailureReason, error) {
 	var reason TransferFailureReason
 
 	if _, ok := t.Links["failure"]; !ok {
-		return nil, fmt.Errorf("No failure resource link")
+		return nil, errors.New("No failure resource link")
 	}
 
 	if err := t.client.Get(t.Links["failure"].Href, nil, nil, &reason); err != nil {
