@@ -1,0 +1,25 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://api-sandbox.dwolla.com/webhook-subscriptions"
+    }
+  },
+  "_embedded": {
+    "webhook-subscriptions": [
+      {
+        "_links": {
+          "self": {
+            "href": "https://api-sandbox.dwolla.com/webhook-subscriptions/f4d21628-fde2-4d3a-b69a-0a7cb42adc4c"
+          },
+          "webhooks": {
+            "href": "https://api-sandbox.dwolla.com/webhook-subscriptions/f4d21628-fde2-4d3a-b69a-0a7cb42adc4c/webhooks"
+          }
+        },
+        "id": "f4d21628-fde2-4d3a-b69a-0a7cb42adc4c",
+        "url": "https://destination.url",
+        "created": "2015-08-19T21:43:49.000Z"
+      }
+    ]
+  },
+  "total": 1
+}
