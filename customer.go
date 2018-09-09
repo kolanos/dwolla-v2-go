@@ -423,7 +423,7 @@ func (c *Customer) RetrieveIAVToken() (*IAVToken, error) {
 		return nil, errors.New("No self resource link")
 	}
 
-	if err := c.client.Post(fmt.Sprintf("%s/iav-token", c.Links["self"].Href), nil, nil, token); err != nil {
+	if err := c.client.Post(fmt.Sprintf("%s/iav-token", c.Links["self"].Href), nil, nil, &token); err != nil {
 		return nil, err
 	}
 

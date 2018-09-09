@@ -542,3 +542,9 @@ func (c *Client) Root() (*Resource, error) {
 
 	return &resource, nil
 }
+
+// SandboxSimulations simulates events within the sandbox environment
+// see: https://developers.dwolla.com/resources/testing.html#simulate-bank-transfer-processing
+func (c *Client) SandboxSimulations() error {
+	return c.Post("sandbox-simulations", nil, nil, nil)
+}
