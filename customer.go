@@ -8,6 +8,34 @@ import (
 	"time"
 )
 
+const (
+	// CustomerStatusDeactivated is when the customer has been deactivated
+	CustomerStatusDeactivated CustomerStatus = "deactivated"
+	// CustomerStatusDocument is when the customer needs verification document
+	CustomerStatusDocument CustomerStatus = "document"
+	// CustomerStatusReactivated is when a deactivated customer is reactivated
+	CustomerStatusReactivated CustomerStatus = "reactivated"
+	// CustomerStatusRetry is when the customer needs to retry verification
+	CustomerStatusRetry CustomerStatus = "retry"
+	// CustomerStatusSuspended is when the customer has been suspended
+	CustomerStatusSuspended CustomerStatus = "suspended"
+	// CustomerStatusUnverified is when the customer is unverified
+	CustomerStatusUnverified CustomerStatus = "unverified"
+	// CustomerStatusVerified is when the customer is verified
+	CustomerStatusVerified CustomerStatus = "verified"
+)
+
+const (
+	// CustomerTypeBusiness is when the customer is a business
+	CustomerTypeBusiness CustomerType = "business"
+	// CustomerTypePersonal is when the customer is an individual
+	CustomerTypePersonal CustomerType = "personal"
+	// CustomerTypeReceiveOnly is when the customer can only receive funds
+	CustomerTypeReceiveOnly CustomerType = "receive-only"
+	// CustomerTypeUnverified is when the customer is unverified
+	CustomerTypeUnverified CustomerType = "unverified"
+)
+
 // CustomerService is the customerservice interface
 //
 // see: https://docsv2.dwolla.com/#customers
@@ -37,36 +65,8 @@ type Controller struct {
 // CustomerStatus is the customer's status
 type CustomerStatus string
 
-const (
-	// CustomerStatusDeactivated is when the customer has been deactivated
-	CustomerStatusDeactivated CustomerStatus = "deactivated"
-	// CustomerStatusDocument is when the customer needs verification document
-	CustomerStatusDocument CustomerStatus = "document"
-	// CustomerStatusReactivated is when a deactivated customer is reactivated
-	CustomerStatusReactivated CustomerStatus = "reactivated"
-	// CustomerStatusRetry is when the customer needs to retry verification
-	CustomerStatusRetry CustomerStatus = "retry"
-	// CustomerStatusSuspended is when the customer has been suspended
-	CustomerStatusSuspended CustomerStatus = "suspended"
-	// CustomerStatusUnverified is when the customer is unverified
-	CustomerStatusUnverified CustomerStatus = "unverified"
-	// CustomerStatusVerified is when the customer is verified
-	CustomerStatusVerified CustomerStatus = "verified"
-)
-
 // CustomerType is the customer's type
 type CustomerType string
-
-const (
-	// CustomerTypeBusiness is when the customer is a business
-	CustomerTypeBusiness CustomerType = "business"
-	// CustomerTypePersonal is when the customer is an individual
-	CustomerTypePersonal CustomerType = "personal"
-	// CustomerTypeReceiveOnly is when the customer can only receive funds
-	CustomerTypeReceiveOnly CustomerType = "receive-only"
-	// CustomerTypeUnverified is when the customer is unverified
-	CustomerTypeUnverified CustomerType = "unverified"
-)
 
 // Customer is a dwolla customer
 type Customer struct {
@@ -197,7 +197,7 @@ func (c *Customer) CertifyBeneficialOwnership() error {
 		return errors.New("No certify beneficial ownership resource link")
 	}
 
-	request := &BeneficialOwnershipRequest{Status: BeneficialOwnershipStatusCertified}
+	request := &BeneficialOwnershipRequest{Status: CertificationStatusCertified}
 
 	return c.client.Post(c.Links["certify-beneficial-ownership"].Href, request, nil, nil)
 }
@@ -212,7 +212,7 @@ func (c *Customer) CreateDocument(body *DocumentRequest) (*Document, error) {
 		return nil, errors.New("No self resource link")
 	}
 
-	if err := c.client.Upload(fmt.Sprintf("%s/documents", c.Links["self"].Href), body.DocumentType, body.FileName, body.File, &document); err != nil {
+	if err := c.client.Upload(fmt.Sprintf("%s/documents", c.Links["self"].Href), body.Type, body.FileName, body.File, &document); err != nil {
 		return nil, err
 	}
 

@@ -378,7 +378,7 @@ func (c *Client) Post(path string, body interface{}, headers *http.Header, conta
 }
 
 // Upload performs a multipart file upload to the Dwolla API
-func (c *Client) Upload(path, documentType, fileName string, file io.Reader, container interface{}) error {
+func (c *Client) Upload(path string, documentType DocumentType, fileName string, file io.Reader, container interface{}) error {
 	var (
 		err      error
 		halError HALError
@@ -401,7 +401,7 @@ func (c *Client) Upload(path, documentType, fileName string, file io.Reader, con
 		return err
 	}
 
-	err = writer.WriteField("documentType", documentType)
+	err = writer.WriteField("documentType", string(documentType))
 	if err != nil {
 		return err
 	}

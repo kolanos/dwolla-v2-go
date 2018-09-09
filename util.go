@@ -17,9 +17,17 @@ type Address struct {
 
 // Amount is a monetary value
 type Amount struct {
-	Value    string `json:"value"`
-	Currency string `json:"currency"`
+	Value    string   `json:"value"`
+	Currency Currency `json:"currency"`
 }
+
+// Currency represents the monetary currency
+type Currency string
+
+const (
+	// USD is U.S. dollars
+	USD Currency = "usd"
+)
 
 // MetaData represents key/value meta data
 type MetaData map[string]interface{}

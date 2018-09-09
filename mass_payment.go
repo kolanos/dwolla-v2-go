@@ -6,6 +6,28 @@ import (
 	"net/url"
 )
 
+const (
+	// MassPaymentStatusDeferred is when a mass payment is deferred
+	MassPaymentStatusDeferred MassPaymentStatus = "deferred"
+	// MassPaymentStatusPending is when the mass payment is pending
+	MassPaymentStatusPending MassPaymentStatus = "pending"
+	// MassPaymentStatusProcessing is when the mass payment is processing
+	MassPaymentStatusProcessing MassPaymentStatus = "processing"
+	// MassPaymentStatusComplete is when the mass payment is complete
+	MassPaymentStatusComplete MassPaymentStatus = "complete"
+	// MassPaymentStatusCancelled is when the mass payment is cancelled
+	MassPaymentStatusCancelled MassPaymentStatus = "cancelled"
+)
+
+const (
+	// MassPaymentItemStatusPending is when a mass payment item is pending
+	MassPaymentItemStatusPending MassPaymentItemStatus = "pending"
+	// MassPaymentItemStatusSuccess is when amass payment item is successful
+	MassPaymentItemStatusSuccess MassPaymentItemStatus = "success"
+	// MassPaymentItemStatusFailed is when a mass payment item failed
+	MassPaymentItemStatusFailed MassPaymentItemStatus = "failed"
+)
+
 // MassPaymentService is the mass payment service interface
 //
 // see: https://docsv2.dwolla.com/#mass-payments
@@ -22,19 +44,6 @@ type MassPaymentServiceOp struct {
 
 // MassPaymentStatus is a mass payment status
 type MassPaymentStatus string
-
-const (
-	// MassPaymentStatusDeferred is when a mass payment is deferred
-	MassPaymentStatusDeferred MassPaymentStatus = "deferred"
-	// MassPaymentStatusPending is when the mass payment is pending
-	MassPaymentStatusPending MassPaymentStatus = "pending"
-	// MassPaymentStatusProcessing is when the mass payment is processing
-	MassPaymentStatusProcessing MassPaymentStatus = "processing"
-	// MassPaymentStatusComplete is when the mass payment is complete
-	MassPaymentStatusComplete MassPaymentStatus = "complete"
-	// MassPaymentStatusCancelled is when the mass payment is cancelled
-	MassPaymentStatusCancelled MassPaymentStatus = "cancelled"
-)
 
 // MassPayment is a dwolla mass payment
 type MassPayment struct {
@@ -58,15 +67,6 @@ type MassPayments struct {
 
 // MassPaymentItemStatus is a mass payment item status
 type MassPaymentItemStatus string
-
-const (
-	// MassPaymentItemStatusPending is when a mass payment item is pending
-	MassPaymentItemStatusPending MassPaymentItemStatus = "pending"
-	// MassPaymentItemStatusSuccess is when amass payment item is successful
-	MassPaymentItemStatusSuccess MassPaymentItemStatus = "success"
-	// MassPaymentItemStatusFailed is when a mass payment item failed
-	MassPaymentItemStatusFailed MassPaymentItemStatus = "failed"
-)
 
 // MassPaymentItem is a dwolla mass payment item
 type MassPaymentItem struct {

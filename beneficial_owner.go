@@ -5,6 +5,25 @@ import (
 	"fmt"
 )
 
+const (
+	// BeneficialOwnerStatusDocument is when the beneficial owner needs verification document
+	BeneficialOwnerStatusDocument BeneficialOwnerStatus = "document"
+	// BeneficialOwnerStatusIncomplete is when the beneficial owner is incomplete
+	BeneficialOwnerStatusIncomplete BeneficialOwnerStatus = "incomplete"
+	// BeneficialOwnerStatusVerified is when the beneficial owner is verified
+	BeneficialOwnerStatusVerified BeneficialOwnerStatus = "verified"
+)
+
+const (
+	// CertificationStatusCertified is when the ownership status is certified
+	CertificationStatusCertified CertificationStatus = "certified"
+	// CertificationStatusRecertify is when the ownership status needs
+	// to be recertified
+	CertificationStatusRecertify CertificationStatus = "recertify"
+	// CertificationStatusUncertified is when the ownership status is uncertified
+	CertificationStatusUncertified CertificationStatus = "uncertified"
+)
+
 // BeneficialOwnerService is the beneficial owner service interface
 //
 // see: https://docsv2.dwolla.com/#beneficial-owners
@@ -22,15 +41,6 @@ type BeneficialOwnerServiceOp struct {
 
 // BeneficialOwnerStatus is the status of the beneficial owner
 type BeneficialOwnerStatus string
-
-const (
-	// BeneficialOwnerStatusDocument is when the beneficial owner needs verification document
-	BeneficialOwnerStatusDocument BeneficialOwnerStatus = "document"
-	// BeneficialOwnerStatusIncomplete is when the beneficial owner is incomplete
-	BeneficialOwnerStatusIncomplete BeneficialOwnerStatus = "incomplete"
-	// BeneficialOwnerStatusVerified is when the beneficial owner is verified
-	BeneficialOwnerStatusVerified BeneficialOwnerStatus = "verified"
-)
 
 // BeneficialOwner is a beneficial owner
 type BeneficialOwner struct {
@@ -59,25 +69,18 @@ type BeneficialOwnerRequest struct {
 	Passport    Passport `json:"passport,omitempty"`
 }
 
-// BeneficialOwnershipStatus is the beneficial ownership status
-type BeneficialOwnershipStatus string
-
-const (
-	// BeneficialOwnershipStatusCertified is when the ownership status is certified
-	BeneficialOwnershipStatusCertified BeneficialOwnershipStatus = "certified"
-	// BeneficialOwnershipStatusUncertified is when the ownership status is uncertified
-	BeneficialOwnershipStatusUncertified BeneficialOwnershipStatus = "uncertified"
-)
+// CertificationStatus is the beneficial ownership certification status
+type CertificationStatus string
 
 // BeneficialOwnership is the beneficial ownership status
 type BeneficialOwnership struct {
 	Resource
-	Status BeneficialOwnershipStatus `json:"status"`
+	Status CertificationStatus `json:"status"`
 }
 
 // BeneficialOwnershipRequest is a beneficial ownership request
 type BeneficialOwnershipRequest struct {
-	Status BeneficialOwnershipStatus `json:"status,omitempty"`
+	Status CertificationStatus `json:"status,omitempty"`
 }
 
 // Remove removes a beneficial owner matching the id
@@ -127,7 +130,7 @@ func (b *BeneficialOwner) CreateDocument(body *DocumentRequest) (*Document, erro
 		return nil, errors.New("No self resource link")
 	}
 
-	if err := b.client.Upload(fmt.Sprintf("%s/documents", b.Links["self"].Href), body.DocumentType, body.FileName, body.File, &document); err != nil {
+	if err := b.client.Upload(fmt.Sprintf("%s/documents", b.Links["self"].Href), body.Type, body.FileName, body.File, &document); err != nil {
 		return nil, err
 	}
 
@@ -189,7 +192,7 @@ func (b *BeneficialOwnership) Certify() error {
 		return errors.New("No self resource link")
 	}
 
-	request := &BeneficialOwnershipRequest{Status: BeneficialOwnershipStatusCertified}
+	request := &BeneficialOwnershipRequest{Status: CertificationStatusCertified}
 
 	return b.client.Post(b.Links["self"].Href, request, nil, b)
 }

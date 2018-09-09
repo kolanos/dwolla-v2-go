@@ -5,6 +5,27 @@ import (
 	"fmt"
 )
 
+const (
+	// FundingSourceBankAccountTypeChecking is a checking bank account
+	FundingSourceBankAccountTypeChecking FundingSourceBankAccountType = "checking"
+	// FundingSourceBankAccountTypeSavings is a savings bank account
+	FundingSourceBankAccountTypeSavings FundingSourceBankAccountType = "savings"
+)
+
+const (
+	// FundingSourceStatusUnverified is when the funding source is unverified
+	FundingSourceStatusUnverified FundingSourceStatus = "unverified"
+	// FundingSourceStatusVerified is when the funding source is verified
+	FundingSourceStatusVerified FundingSourceStatus = "verified"
+)
+
+const (
+	// FundingSourceTypeBank is when the funding source is a bank account
+	FundingSourceTypeBank FundingSourceType = "bank"
+	// FundingSourceTypeBalance is when the funding source is a dwolla balance
+	FundingSourceTypeBalance FundingSourceType = "balance"
+)
+
 // FundingSourceService is the funding source service interface
 //
 // see: https://docsv2.dwolla.com/#funding-sources
@@ -22,22 +43,8 @@ type FundingSourceServiceOp struct {
 // FundingSourceStatus is a funding source's status
 type FundingSourceStatus string
 
-const (
-	// FundingSourceStatusUnverified is when the funding source is unverified
-	FundingSourceStatusUnverified FundingSourceStatus = "unverified"
-	// FundingSourceStatusVerified is when the funding source is verified
-	FundingSourceStatusVerified FundingSourceStatus = "verified"
-)
-
 // FundingSourceType is the funding source type
 type FundingSourceType string
-
-const (
-	// FundingSourceTypeBank is when the funding source is a bank account
-	FundingSourceTypeBank FundingSourceType = "bank"
-	// FundingSourceTypeBalance is when the funding source is a dwolla balance
-	FundingSourceTypeBalance FundingSourceType = "balance"
-)
 
 // FundingSource is a dwolla funding source
 type FundingSource struct {
@@ -63,13 +70,6 @@ type FundingSources struct {
 
 // FundingSourceBankAccountType is a dwolla bank account type enum
 type FundingSourceBankAccountType string
-
-const (
-	// FundingSourceBankAccountTypeChecking is a checking bank account
-	FundingSourceBankAccountTypeChecking FundingSourceBankAccountType = "checking"
-	// FundingSourceBankAccountTypeSavings is a savings bank account
-	FundingSourceBankAccountTypeSavings FundingSourceBankAccountType = "savings"
-)
 
 // FundingSourceBalance is a funding source balance
 type FundingSourceBalance struct {

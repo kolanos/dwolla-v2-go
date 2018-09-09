@@ -142,9 +142,9 @@ func TestCustomerCreateDocument(t *testing.T) {
 	f2, _ := os.Open(filepath.Join("testdata", "document-upload-success.png"))
 
 	doc, err := customer.CreateDocument(&DocumentRequest{
-		DocumentType: "passport",
-		FileName:     f2.Name(),
-		File:         f2,
+		Type:     DocumentTypePassport,
+		FileName: f2.Name(),
+		File:     f2,
 	})
 
 	assert.Nil(t, err)
