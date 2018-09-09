@@ -468,6 +468,33 @@ func TestCustomerSuspend(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestCustomerUpdate(t *testing.T) {
+	f, _ := os.Open(filepath.Join("testdata", "customer.json"))
+	mr := &http.Response{Body: f, StatusCode: 200}
+	mc := &MockHTTPClient{err: nil, res: mr}
+
+	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
+	c.Token = &Token{}
+
+	customer := &Customer{}
+	customer.client = c
+
+	err := customer.Update(&CustomerRequest{
+		FirstName: "Foo",
+		LastName:  "Bar",
+	})
+
+	assert.Error(t, err)
+
+	customer.Links = Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}
+	err = customer.Update(&CustomerRequest{
+		FirstName: "Foo",
+		LastName:  "Bar",
+	})
+
+	assert.Nil(t, err)
+}
+
 func TestCustomerVerifyBeneficialOwners(t *testing.T) {
 	customer := &Customer{}
 
