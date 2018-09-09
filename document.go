@@ -6,6 +6,7 @@ import (
 )
 
 // DocumentService is the document service interface
+//
 // see: https://docsv2.dwolla.com/#documents
 type DocumentService interface {
 	Retrieve(string) (*Document, error)

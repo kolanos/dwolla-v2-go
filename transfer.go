@@ -6,6 +6,7 @@ import (
 )
 
 // TransferService is the transfer service interface
+//
 // see: https://docsv2.dwolla.com/#transfers
 type TransferService interface {
 	Create(*TransferRequest) (*Transfer, error)
@@ -106,6 +107,7 @@ type TransferRequest struct {
 }
 
 // Create initiates a transfer
+//
 // see: https://docsv2.dwolla.com/#initiate-a-transfer
 func (t *TransferServiceOp) Create(body *TransferRequest) (*Transfer, error) {
 	var transfer Transfer
@@ -120,6 +122,7 @@ func (t *TransferServiceOp) Create(body *TransferRequest) (*Transfer, error) {
 }
 
 // Retrieve returns the transfer matching the id
+//
 // see: https://docsv2.dwolla.com/#retrieve-a-transfer
 func (t *TransferServiceOp) Retrieve(id string) (*Transfer, error) {
 	var transfer Transfer
@@ -134,6 +137,7 @@ func (t *TransferServiceOp) Retrieve(id string) (*Transfer, error) {
 }
 
 // Cancel cancels the transfer
+//
 // see: https://docsv2.dwolla.com/#cancel-a-transfer
 func (t *Transfer) Cancel() error {
 	if _, ok := t.Links["cancel"]; !ok {
@@ -164,6 +168,7 @@ func (t *Transfer) DestinationFundingSource() (*FundingSource, error) {
 }
 
 // ListFees returns the fees associated with the transfer
+//
 // see: https://docsv2.dwolla.com/#list-fees-for-a-transfer
 func (t *Transfer) ListFees() (*TransferFees, error) {
 	var fees TransferFees
@@ -202,6 +207,7 @@ func (t *Transfer) SourceFundingSource() (*FundingSource, error) {
 }
 
 // RetrieveFailureReason returns the transfer's failure reason
+//
 // see: https://docsv2.dwolla.com/#retrieve-a-transfer-failure-reason
 func (t *Transfer) RetrieveFailureReason() (*TransferFailureReason, error) {
 	var reason TransferFailureReason

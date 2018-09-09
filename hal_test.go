@@ -10,7 +10,7 @@ func TestLink(t *testing.T) {
 	linkJSON := `
 {
 		"href": "https://api.dwolla.com/customers/123",
-		"type": "applicaiton/json",
+		"type": "application/json",
 		"resource-type": "customer"
 }`
 

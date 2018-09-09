@@ -6,6 +6,7 @@ import (
 )
 
 // FundingSourceService is the funding source service interface
+//
 // see: https://docsv2.dwolla.com/#funding-sources
 type FundingSourceService interface {
 	Retrieve(string) (*FundingSource, error)
@@ -89,6 +90,7 @@ type FundingSourceRequest struct {
 }
 
 // Retrieve retrieves a funding source with the matching id
+//
 // see: https://docsv2.dwolla.com/#retrieve-a-funding-source
 func (f *FundingSourceServiceOp) Retrieve(id string) (*FundingSource, error) {
 	var source FundingSource
@@ -103,6 +105,7 @@ func (f *FundingSourceServiceOp) Retrieve(id string) (*FundingSource, error) {
 }
 
 // Update updates the funding source with matching id
+//
 // see: https://docsv2.dwolla.com/#update-a-funding-source
 func (f *FundingSourceServiceOp) Update(id string, body *FundingSourceRequest) (*FundingSource, error) {
 	var source FundingSource
@@ -117,6 +120,7 @@ func (f *FundingSourceServiceOp) Update(id string, body *FundingSourceRequest) (
 }
 
 // Remove removes a funding source matching the id
+//
 // see: https://docsv2.dwolla.com/#remove-a-funding-source
 func (f *FundingSourceServiceOp) Remove(id string) error {
 	body := &FundingSourceRequest{Removed: true}
@@ -141,6 +145,7 @@ func (f *FundingSource) FailedVerificationMicroDeposits() bool {
 }
 
 // InitiateMicroDeposits initiates micro deposit verification
+//
 // see: https://docsv2.dwolla.com/#initiate-micro-deposits
 func (f *FundingSource) InitiateMicroDeposits() (*MicroDeposit, error) {
 	var deposit MicroDeposit
@@ -159,6 +164,7 @@ func (f *FundingSource) InitiateMicroDeposits() (*MicroDeposit, error) {
 }
 
 // Remove removes the funding source
+//
 // see: https://docsv2.dwolla.com/#remove-a-funding-source
 func (f *FundingSource) Remove() error {
 	if _, ok := f.Links["remove"]; !ok {
@@ -171,6 +177,7 @@ func (f *FundingSource) Remove() error {
 }
 
 // RetrieveBalance retrieves the funding source balance
+//
 // see: https://docsv2.dwolla.com/#retrieve-a-funding-source-balance
 func (f *FundingSource) RetrieveBalance() (*FundingSourceBalance, error) {
 	var balance FundingSourceBalance
@@ -189,6 +196,7 @@ func (f *FundingSource) RetrieveBalance() (*FundingSourceBalance, error) {
 }
 
 // RetrieveMicroDeposits retrieves funding source micro deposits
+//
 // see: https://docsv2.dwolla.com/#retrieve-micro-deposits-details
 func (f *FundingSource) RetrieveMicroDeposits() (*MicroDeposit, error) {
 	var deposit MicroDeposit
@@ -231,6 +239,7 @@ func (f *FundingSource) TransferSend() bool {
 }
 
 // Update updates the funding source
+//
 // see: https://docsv2.dwolla.com/#update-a-funding-source
 func (f *FundingSource) Update(body *FundingSourceRequest) error {
 	if _, ok := f.Links["self"]; !ok {
@@ -241,6 +250,7 @@ func (f *FundingSource) Update(body *FundingSourceRequest) error {
 }
 
 // VerifyMicroDeposits verifies micro deposit amounts
+//
 // see: https://docsv2.dwolla.com/#verify-micro-deposits
 func (f *FundingSource) VerifyMicroDeposits(body *MicroDepositRequest) error {
 	if _, ok := f.Links["verify-micro-deposits"]; !ok {

@@ -62,9 +62,5 @@ type Collection struct {
 
 // Unmarshal unmarhsals a hal object into a struct
 func Unmarshal(data []byte, container interface{}) error {
-	if err := json.Unmarshal(data, container); err != nil {
-		return err
-	}
-
-	return nil
+	return json.Unmarshal(data, container)
 }

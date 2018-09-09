@@ -7,6 +7,7 @@ import (
 )
 
 // MassPaymentService is the mass payment service interface
+//
 // see: https://docsv2.dwolla.com/#mass-payments
 type MassPaymentService interface {
 	Create(*MassPayment) (*MassPayment, error)
@@ -86,6 +87,7 @@ type MassPaymentItems struct {
 }
 
 // Create initiates a mass payment
+//
 // see: https://docsv2.dwolla.com/#initiate-a-mass-payment
 func (m *MassPaymentServiceOp) Create(body *MassPayment) (*MassPayment, error) {
 	var payment MassPayment
@@ -100,6 +102,7 @@ func (m *MassPaymentServiceOp) Create(body *MassPayment) (*MassPayment, error) {
 }
 
 // Retrieve retrieves the mass payment matching the id
+//
 // see: https://docsv2.dwolla.com/#retrieve-a-mass-payment
 func (m *MassPaymentServiceOp) Retrieve(id string) (*MassPayment, error) {
 	var payment MassPayment
@@ -114,6 +117,7 @@ func (m *MassPaymentServiceOp) Retrieve(id string) (*MassPayment, error) {
 }
 
 // Update updates a mass payment's status
+//
 // see: https://docsv2.dwolla.com/#update-a-mass-payment
 func (m *MassPaymentServiceOp) Update(id string, status MassPaymentStatus) (*MassPayment, error) {
 	var payment MassPayment
@@ -130,6 +134,7 @@ func (m *MassPaymentServiceOp) Update(id string, status MassPaymentStatus) (*Mas
 }
 
 // ListItems returns a collection of items for the mass payment
+//
 // see: https://docsv2.dwolla.com/#list-items-for-a-mass-payment
 func (m *MassPayment) ListItems(params *url.Values) (*MassPaymentItems, error) {
 	var items MassPaymentItems
@@ -152,6 +157,7 @@ func (m *MassPayment) ListItems(params *url.Values) (*MassPaymentItems, error) {
 }
 
 // RetrieveItem returns a mass payment item matching id
+//
 // see: https://docsv2.dwolla.com/#retrieve-a-mass-payment-item
 func (m *MassPayment) RetrieveItem(id string) (*MassPaymentItem, error) {
 	var item MassPaymentItem

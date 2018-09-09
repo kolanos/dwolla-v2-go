@@ -9,6 +9,7 @@ import (
 )
 
 // CustomerService is the customerservice interface
+//
 // see: https://docsv2.dwolla.com/#customers
 type CustomerService interface {
 	Create(*CustomerRequest) (*Customer, error)
@@ -112,7 +113,7 @@ type CustomerRequest struct {
 	City                   string         `json:"city,omitempty"`
 	State                  string         `json:"state,omitempty"`
 	PostalCode             string         `json:"postalCode,omitempty"`
-	BusinessClassification string         `json:businessClassification,omitempty"`
+	BusinessClassification string         `json:"businessClassification,omitempty"`
 	BusinessType           string         `json:"businessType,omitempty"`
 	BusinessName           string         `json:"businessName,omitempty"`
 	DoingBusinessAs        string         `json:"doingBusinessAs,omitempty"`
@@ -141,6 +142,7 @@ func (c *CustomerServiceOp) Create(body *CustomerRequest) (*Customer, error) {
 }
 
 // List returns a collection of customers
+//
 // see: https://docsv2.dwolla.com/#list-and-search-customers
 func (c *CustomerServiceOp) List(params *url.Values) (*Customers, error) {
 	var customers Customers
@@ -159,6 +161,7 @@ func (c *CustomerServiceOp) List(params *url.Values) (*Customers, error) {
 }
 
 // Retrieve retrieves a customer matching the id
+//
 // see: https://docsv2.dwolla.com/#retrieve-a-customer
 func (c *CustomerServiceOp) Retrieve(id string) (*Customer, error) {
 	var customer Customer
@@ -172,6 +175,7 @@ func (c *CustomerServiceOp) Retrieve(id string) (*Customer, error) {
 }
 
 // Update updates a dwolla customer matching the id
+//
 // see: https://docsv2.dwolla.com/#update-a-customer
 func (c *CustomerServiceOp) Update(id string, body *CustomerRequest) (*Customer, error) {
 	var customer Customer
@@ -186,6 +190,7 @@ func (c *CustomerServiceOp) Update(id string, body *CustomerRequest) (*Customer,
 }
 
 // CertifyBeneficialOwnership certifies beneficial ownership
+//
 // see: https://docsv2.dwolla.com/#certify-beneficial-ownership
 func (c *Customer) CertifyBeneficialOwnership() error {
 	if _, ok := c.Links["certify-beneficial-ownership"]; !ok {
@@ -198,6 +203,7 @@ func (c *Customer) CertifyBeneficialOwnership() error {
 }
 
 // CreateDocument uploads a verification document for the customer
+//
 // see: https://docsv2.dwolla.com/#create-a-document
 func (c *Customer) CreateDocument(body *DocumentRequest) (*Document, error) {
 	var document Document
@@ -222,6 +228,7 @@ func (c Customer) CreatedTime() time.Time {
 }
 
 // CreateBeneficialOwner creates a beneficial owner for the customer
+//
 // see: https://docsv2.dwolla.com/#create-a-beneficial-owner
 func (c *Customer) CreateBeneficialOwner(body *BeneficialOwnerRequest) (*BeneficialOwner, error) {
 	var owner BeneficialOwner
@@ -240,6 +247,7 @@ func (c *Customer) CreateBeneficialOwner(body *BeneficialOwnerRequest) (*Benefic
 }
 
 // CreateFundingSource creates a funding source for the customer
+//
 // see: https://docsv2.dwolla.com/#create-a-funding-source-for-a-customer
 func (c *Customer) CreateFundingSource(body *FundingSourceRequest) (*FundingSource, error) {
 	var source FundingSource
@@ -269,6 +277,7 @@ func (c *Customer) Deactivate() error {
 }
 
 // ListBeneficialOwners returns the customer's beneficial owners
+//
 // see: https://docsv2.dwolla.com/#list-beneficial-owners
 func (c *Customer) ListBeneficialOwners() (*BeneficialOwners, error) {
 	var owners BeneficialOwners
@@ -291,6 +300,7 @@ func (c *Customer) ListBeneficialOwners() (*BeneficialOwners, error) {
 }
 
 // ListDocuments returns documents for customer
+//
 // see: https://docsv2.dwolla.com/#list-documents
 func (c *Customer) ListDocuments() (*Documents, error) {
 	var documents Documents
@@ -313,6 +323,7 @@ func (c *Customer) ListDocuments() (*Documents, error) {
 }
 
 // ListFundingSources returns the customer's funding sources
+//
 // see: https://docsv2.dwolla.com/#list-funding-sources-for-a-customer
 func (c *Customer) ListFundingSources(removed bool) (*FundingSources, error) {
 	var sources FundingSources
@@ -338,6 +349,7 @@ func (c *Customer) ListFundingSources(removed bool) (*FundingSources, error) {
 }
 
 // ListMassPayments returns the customer's mass payments
+//
 // see: https://docsv2.dwolla.com/#list-mass-payments-for-a-customer
 func (c *Customer) ListMassPayments(params *url.Values) (*MassPayments, error) {
 	var payments MassPayments
@@ -360,6 +372,7 @@ func (c *Customer) ListMassPayments(params *url.Values) (*MassPayments, error) {
 }
 
 // ListTransfers returns the customer's transfers
+//
 // see: https://docsv2.dwolla.com/#list-and-search-transfers-for-a-customer
 func (c *Customer) ListTransfers(params *url.Values) (*Transfers, error) {
 	var transfers Transfers
@@ -454,6 +467,7 @@ func (c *Customer) Suspend() error {
 }
 
 // Update updates a dwolla customer
+//
 // see: https://docsv2.dwolla.com/#update-a-customer
 func (c *Customer) Update(body *CustomerRequest) error {
 	if _, ok := c.Links["self"]; !ok {

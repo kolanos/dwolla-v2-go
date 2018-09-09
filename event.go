@@ -6,6 +6,7 @@ import (
 )
 
 // EventService is the event service interface
+//
 // see: https://docsv2.dwolla.com/#events
 type EventService interface {
 	List(*url.Values) (*Events, error)
@@ -37,6 +38,7 @@ type Events struct {
 }
 
 // List returns a collection of events
+//
 // see: https://docsv2.dwolla.com/#list-events
 func (e *EventServiceOp) List(params *url.Values) (*Events, error) {
 	var events Events
@@ -55,6 +57,7 @@ func (e *EventServiceOp) List(params *url.Values) (*Events, error) {
 }
 
 // Retrieve retrieves the event matching the id
+//
 // see: https://docsv2.dwolla.com/#retrieve-an-event
 func (e *EventServiceOp) Retrieve(id string) (*Event, error) {
 	var event Event

@@ -6,6 +6,7 @@ import (
 )
 
 // BeneficialOwnerService is the beneficial owner service interface
+//
 // see: https://docsv2.dwolla.com/#beneficial-owners
 type BeneficialOwnerService interface {
 	Remove(string) error
@@ -80,12 +81,14 @@ type BeneficialOwnershipRequest struct {
 }
 
 // Remove removes a beneficial owner matching the id
+//
 // see: https://docsv2.dwolla.com/#remove-a-beneficial-owner
 func (b *BeneficialOwnerServiceOp) Remove(id string) error {
 	return b.client.Delete(fmt.Sprintf("beneficial-owners/%s", id), nil, nil)
 }
 
 // Retrieve retrieves a beneficial owner matching the id
+//
 // see: https://docsv2.dwolla.com/#retrieve-a-beneficial-owner
 func (b *BeneficialOwnerServiceOp) Retrieve(id string) (*BeneficialOwner, error) {
 	var owner BeneficialOwner
@@ -100,6 +103,7 @@ func (b *BeneficialOwnerServiceOp) Retrieve(id string) (*BeneficialOwner, error)
 }
 
 // Update updates a beneficial owner matching the id
+//
 // see: https://docsv2.dwolla.com/#update-a-beneficial-owner
 func (b *BeneficialOwnerServiceOp) Update(id string, body *BeneficialOwnerRequest) (*BeneficialOwner, error) {
 	var owner BeneficialOwner
@@ -114,6 +118,7 @@ func (b *BeneficialOwnerServiceOp) Update(id string, body *BeneficialOwnerReques
 }
 
 // CreateDocument uploads a document for the beneficial owner
+//
 // see: https://docsv2.dwolla.com/#create-a-document-for-a-beneficial-owner
 func (b *BeneficialOwner) CreateDocument(body *DocumentRequest) (*Document, error) {
 	var document Document
@@ -132,6 +137,7 @@ func (b *BeneficialOwner) CreateDocument(body *DocumentRequest) (*Document, erro
 }
 
 // ListDocuments returns documents for beneficial owner
+//
 // see: https://docsv2.dwolla.com/#list-documents-for-beneficial-owners
 func (b *BeneficialOwner) ListDocuments() (*Documents, error) {
 	var documents Documents
@@ -154,6 +160,7 @@ func (b *BeneficialOwner) ListDocuments() (*Documents, error) {
 }
 
 // Remove removes the beneficial owner
+//
 // see: https://docsv2.dwolla.com/#remove-a-beneficial-owner
 func (b *BeneficialOwner) Remove() error {
 	if _, ok := b.Links["self"]; !ok {
@@ -164,6 +171,7 @@ func (b *BeneficialOwner) Remove() error {
 }
 
 // Update updates the dwolla beneficial owner
+//
 // see: https://docsv2.dwolla.com/#update-a-beneficial-owner
 func (b *BeneficialOwner) Update(body *BeneficialOwnerRequest) error {
 	if _, ok := b.Links["self"]; !ok {
@@ -174,6 +182,7 @@ func (b *BeneficialOwner) Update(body *BeneficialOwnerRequest) error {
 }
 
 // Certify certifies beneficial ownership
+//
 // see: https://docsv2.dwolla.com/#certify-beneficial-ownership
 func (b *BeneficialOwnership) Certify() error {
 	if _, ok := b.Links["self"]; !ok {

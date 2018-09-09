@@ -6,6 +6,7 @@ import (
 )
 
 // WebhookSubscriptionService is the webhook subscription service interface
+//
 // see: https://docsv2.dwolla.com/#webhook-subscriptions
 type WebhookSubscriptionService interface {
 	Create(*WebhookSubscriptionRequest) (*WebhookSubscription, error)

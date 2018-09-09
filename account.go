@@ -6,6 +6,7 @@ import (
 )
 
 // AccountService is the account service interface
+//
 // see: https://docsv2.dwolla.com/#accounts
 type AccountService interface {
 	Retrieve() (*Account, error)
@@ -27,6 +28,7 @@ type Account struct {
 }
 
 // Retrieve retrieves the dwolla account
+//
 // see: https://docsv2.dwolla.com/#retrieve-account-details
 func (a *AccountServiceOp) Retrieve() (*Account, error) {
 	root, err := a.client.Root()
@@ -50,6 +52,7 @@ func (a *AccountServiceOp) Retrieve() (*Account, error) {
 }
 
 // CreateFundingSource creates a funding source for the account
+//
 // see: https://docsv2.dwolla.com/#create-a-funding-source-for-an-account
 func (a *Account) CreateFundingSource(body *FundingSourceRequest) (*FundingSource, error) {
 	var source FundingSource
@@ -64,6 +67,7 @@ func (a *Account) CreateFundingSource(body *FundingSourceRequest) (*FundingSourc
 }
 
 // ListFundingSources returns the account's funding sources
+//
 // see: https://docsv2.dwolla.com/#list-funding-sources-for-an-account
 func (a *Account) ListFundingSources(params *url.Values) (*FundingSources, error) {
 	var sources FundingSources
@@ -88,6 +92,7 @@ func (a *Account) ListFundingSources(params *url.Values) (*FundingSources, error
 }
 
 // ListMassPayments returns mass payments for the account
+//
 // see: https://docsv2.dwolla.com/#list-mass-payments-for-an-account
 func (a *Account) ListMassPayments(params *url.Values) (*MassPayments, error) {
 	var payments MassPayments
@@ -112,6 +117,7 @@ func (a *Account) ListMassPayments(params *url.Values) (*MassPayments, error) {
 }
 
 // ListTransfers returns the account's transfers
+//
 // see: https://docsv2.dwolla.com/#list-and-search-transfers-for-an-account
 func (a *Account) ListTransfers(params *url.Values) (*Transfers, error) {
 	var transfers Transfers

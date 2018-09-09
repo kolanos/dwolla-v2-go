@@ -5,6 +5,7 @@ import (
 )
 
 // OnDemandAuthorizationService is the on-demand authorization interface
+//
 // see: https://docsv2.dwolla.com/#create-an-on-demand-transfer-authorization
 type OnDemandAuthorizationService interface {
 	Create() (*OnDemandAuthorization, error)

@@ -38,6 +38,7 @@ type IndustryClassification struct {
 }
 
 // Retrieve retrieves a business classification matching the id
+//
 // see: https://docsv2.dwolla.com/#retrieve-a-business-classification
 func (b *BusinessClassificationServiceOp) Retrieve(id string) (*BusinessClassification, error) {
 	var classification BusinessClassification
@@ -51,6 +52,7 @@ func (b *BusinessClassificationServiceOp) Retrieve(id string) (*BusinessClassifi
 }
 
 // List returns a collection of business classifications
+//
 // see: https://docsv2.dwolla.com/#list-business-classifications
 func (b *BusinessClassificationServiceOp) List(params *url.Values) (*BusinessClassifications, error) {
 	var classifications BusinessClassifications

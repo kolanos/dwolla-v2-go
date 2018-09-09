@@ -6,6 +6,7 @@ import (
 )
 
 // WebhookService is the webhook service interface
+//
 // see: https://docsv2.dwolla.com/#webhooks
 type WebhookService interface {
 	Retrieve(string) (*Webhook, error)
@@ -78,6 +79,7 @@ type WebhookRetries struct {
 }
 
 // Retrieve retrieves the webhook with matching id
+//
 // see: https://docsv2.dwolla.com/#retrieve-a-webhook
 func (w *WebhookServiceOp) Retrieve(id string) (*Webhook, error) {
 	var webhook Webhook
@@ -110,6 +112,7 @@ func (w *Webhook) RetrieveWebhookSubscription() (*WebhookSubscription, error) {
 }
 
 // ListRetries returns a collection of retries for this webhook
+//
 // see: https://docsv2.dwolla.com/#list-retries-for-a-webhook
 func (w *Webhook) ListRetries() (*WebhookRetries, error) {
 	var retries WebhookRetries
@@ -132,6 +135,7 @@ func (w *Webhook) ListRetries() (*WebhookRetries, error) {
 }
 
 // Retry retries the webhook
+//
 // see: https://docsv2.dwolla.com/#retry-a-webhook
 func (w *Webhook) Retry() (*WebhookRetry, error) {
 	var retry WebhookRetry
