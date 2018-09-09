@@ -3,7 +3,7 @@ defaults: &defaults
     - image: circleci/golang:1-stretch
   working_directory: /go/src/github.com/kolanos/dwolla-v2-go
   environment:
-    GO111MODULE: on
+    GO111MODULE: "on"
     GOARCH: amd64
     GOOS: linux
     TEST_RESULTS: /tmp/test-results
