@@ -1,8 +1,6 @@
 package dwolla
 
 import (
-	"net/http"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -10,13 +8,8 @@ import (
 )
 
 func TestAccountRetrieve(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "account.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
+	c := newMockClient(200, filepath.Join("testdata", "account.json"))
 	c.root = &Resource{Links: Links{"account": Link{Href: "foobar"}}}
-	c.Token = &Token{}
 
 	res, err := c.Account.Retrieve()
 
@@ -27,12 +20,7 @@ func TestAccountRetrieve(t *testing.T) {
 }
 
 func TestAccountCreateFundingSource(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "funding-source.json"))
-	mr := &http.Response{Body: f, StatusCode: 201}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "funding-source.json"))
 
 	a := &Account{client: c}
 
@@ -50,12 +38,7 @@ func TestAccountCreateFundingSource(t *testing.T) {
 }
 
 func TestAccountListFundingSources(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "funding-sources.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "funding-sources.json"))
 
 	a := &Account{client: c, Resource: Resource{Links: Links{"funding-sources": Link{Href: "foobar"}}}}
 	res, err := a.ListFundingSources(nil)
@@ -77,12 +60,7 @@ func TestAccountListFundingSources(t *testing.T) {
 }
 
 func TestAccountListMassPayments(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "mass-payments.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "mass-payments.json"))
 
 	a := &Account{client: c, Resource: Resource{Links: Links{"mass-payments": Link{Href: "foobar"}}}}
 	res, err := a.ListMassPayments(nil)
@@ -101,12 +79,7 @@ func TestAccountListMassPayments(t *testing.T) {
 }
 
 func TestAccountListTransfers(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "transfers.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "transfers.json"))
 
 	a := &Account{client: c, Resource: Resource{Links: Links{"transfers": Link{Href: "foobar"}}}}
 	res, err := a.ListTransfers(nil)

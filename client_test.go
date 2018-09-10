@@ -1,8 +1,6 @@
 package dwolla
 
 import (
-	"net/http"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -24,23 +22,15 @@ func TestClientEnvironment(t *testing.T) {
 }
 
 func TestClientRequestToken(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "token.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
+	c := newMockClient(201, filepath.Join("testdata", "token.json"))
+	c.Token = nil
 
 	assert.NoError(t, c.RequestToken())
 	assert.NotEmpty(t, c.Token.AccessToken)
 }
 
 func TestClientRoot(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "root.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "root.json"))
 
 	res, err := c.Root()
 

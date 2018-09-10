@@ -2,6 +2,7 @@ package dwolla
 
 import (
 	"net/http"
+	"os"
 )
 
 // Address represents a street address
@@ -38,24 +39,20 @@ type Passport struct {
 	Country string `json:"country"`
 }
 
-// MockHTTPClient mocks an http client
-type MockHTTPClient struct {
+type mockHTTPClient struct {
 	err error
 	res *http.Response
 }
 
-// Do mocks an http request/response
-func (m *MockHTTPClient) Do(req *http.Request) (*http.Response, error) {
+func (m *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	return m.res, m.err
 }
 
-// SetResponse sets the mocked response
-func (m *MockHTTPClient) SetResponse(res *http.Response, err error) {
+func (m *mockHTTPClient) SetResponse(res *http.Response, err error) {
 	m.res, m.err = res, err
 }
 
-// NewRedirectResponse returns a http redirect response
-func NewRedirectResponse(url string) *http.Response {
+func newRedirectResponse(url string) *http.Response {
 	res := &http.Response{
 		Status:     "302",
 		StatusCode: 302,
@@ -63,4 +60,14 @@ func NewRedirectResponse(url string) *http.Response {
 	}
 	res.Header.Set("Location", url)
 	return res
+}
+
+func newMockClient(status int, file string) *Client {
+	f, _ := os.Open(file)
+	mr := &http.Response{Body: f, StatusCode: status}
+	mc := &mockHTTPClient{err: nil, res: mr}
+
+	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
+	c.Token = &Token{}
+	return c
 }

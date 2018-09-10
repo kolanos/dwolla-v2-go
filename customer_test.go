@@ -1,7 +1,6 @@
 package dwolla
 
 import (
-	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -10,12 +9,7 @@ import (
 )
 
 func TestCustomerServiceCreate(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "customer.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	res, err := c.Customer.Create(&CustomerRequest{
 		FirstName: "Jane",
@@ -36,12 +30,7 @@ func TestCustomerServiceCreate(t *testing.T) {
 }
 
 func TestCustomerServiceRetrieve(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "customer.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	res, err := c.Customer.Retrieve("FC451A7A-AE30-4404-AB95-E3553FCD733F")
 
@@ -57,12 +46,7 @@ func TestCustomerServiceRetrieve(t *testing.T) {
 }
 
 func TestCustomerServiceList(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "customers.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "customers.json"))
 
 	res, err := c.Customer.List(nil)
 
@@ -82,12 +66,7 @@ func TestCustomerServiceList(t *testing.T) {
 }
 
 func TestCustomerServiceUpdate(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "customer.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	res, err := c.Customer.Update("FC451A7A-AE30-4404-AB95-E3553FCD733F", &CustomerRequest{
 		FirstName: "Jane",
@@ -108,15 +87,11 @@ func TestCustomerServiceUpdate(t *testing.T) {
 }
 
 func TestCustomerCertifyBeneficialOwnership(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "customer.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	customer := &Customer{}
 	customer.client = c
+
 	err := customer.CertifyBeneficialOwnership()
 
 	assert.Error(t, err)
@@ -128,12 +103,7 @@ func TestCustomerCertifyBeneficialOwnership(t *testing.T) {
 }
 
 func TestCustomerCreateDocument(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "document.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(201, filepath.Join("testdata", "document.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -152,12 +122,7 @@ func TestCustomerCreateDocument(t *testing.T) {
 }
 
 func TestCustomerCreateBeneficialOwner(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "beneficial-owner.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(201, filepath.Join("testdata", "beneficial-owner.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -183,12 +148,7 @@ func TestCustomerCreateBeneficialOwner(t *testing.T) {
 }
 
 func TestCustomerCreateFundingSource(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "funding-source.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(201, filepath.Join("testdata", "funding-source.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -206,12 +166,7 @@ func TestCustomerCreateFundingSource(t *testing.T) {
 }
 
 func TestCustomerDeactivate(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "customer.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -227,12 +182,7 @@ func TestCustomerDeactivate(t *testing.T) {
 }
 
 func TestCustomerListBeneficialOwners(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "beneficial-owners.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "beneficial-owners.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -250,12 +200,7 @@ func TestCustomerListBeneficialOwners(t *testing.T) {
 }
 
 func TestCustomerListDocuments(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "documents.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "documents.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -273,12 +218,7 @@ func TestCustomerListDocuments(t *testing.T) {
 }
 
 func TestCustomerListFundingSources(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "funding-sources.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "funding-sources.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -296,12 +236,7 @@ func TestCustomerListFundingSources(t *testing.T) {
 }
 
 func TestCustomerListMassPayments(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "mass-payments.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "mass-payments.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -319,12 +254,7 @@ func TestCustomerListMassPayments(t *testing.T) {
 }
 
 func TestCustomerListTransfers(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "transfers.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "transfers.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -342,12 +272,7 @@ func TestCustomerListTransfers(t *testing.T) {
 }
 
 func TestCustomerReactivate(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "customer.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -376,12 +301,7 @@ func TestCustomerReceive(t *testing.T) {
 }
 
 func TestCustomerRetrieveBeneficialOwnership(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "beneficial-ownership.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "beneficial-ownership.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -399,12 +319,7 @@ func TestCustomerRetrieveBeneficialOwnership(t *testing.T) {
 }
 
 func TestCustomerRetrieveIAVToken(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "iav-token.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "iav-token.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -448,12 +363,7 @@ func TestCustomerSend(t *testing.T) {
 }
 
 func TestCustomerSuspend(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "customer.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	customer := &Customer{}
 	customer.client = c
@@ -469,12 +379,7 @@ func TestCustomerSuspend(t *testing.T) {
 }
 
 func TestCustomerUpdate(t *testing.T) {
-	f, _ := os.Open(filepath.Join("testdata", "customer.json"))
-	mr := &http.Response{Body: f, StatusCode: 200}
-	mc := &MockHTTPClient{err: nil, res: mr}
-
-	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	customer := &Customer{}
 	customer.client = c
