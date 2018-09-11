@@ -7,10 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAccountRetrieve(t *testing.T) {
+func TestAccountServiceRetrieve(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "account.json"))
 	c.root = &Resource{Links: Links{"account": Link{Href: "foobar"}}}
-
 	res, err := c.Account.Retrieve()
 
 	assert.Nil(t, err)
@@ -19,11 +18,18 @@ func TestAccountRetrieve(t *testing.T) {
 	assert.Equal(t, res.Name, "Jane Doe")
 }
 
+func TestAccountServiceRetrieveError(t *testing.T) {
+	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
+	c.root = &Resource{Links: Links{"account": Link{Href: "foobar"}}}
+	res, err := c.Account.Retrieve()
+
+	assert.Error(t, err)
+	assert.Nil(t, res)
+}
+
 func TestAccountCreateFundingSource(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "funding-source.json"))
-
 	a := &Account{client: c}
-
 	fs := &FundingSourceRequest{
 		RoutingNumber:   "222222226",
 		AccountNumber:   "0123456789",
@@ -37,9 +43,23 @@ func TestAccountCreateFundingSource(t *testing.T) {
 	assert.NotNil(t, res)
 }
 
+func TestAccountCreateFundingSourceError(t *testing.T) {
+	c := newMockClient(400, filepath.Join("testdata", "validation-error.json"))
+	a := &Account{client: c}
+	res, err := a.CreateFundingSource(&FundingSourceRequest{
+		RoutingNumber:   "222222226",
+		AccountNumber:   "0123456789",
+		BankAccountType: FundingSourceBankAccountTypeChecking,
+		Name:            "My Checking Account",
+	})
+
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "[ValidationError] There was a validation error.")
+	assert.Nil(t, res)
+}
+
 func TestAccountListFundingSources(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "funding-sources.json"))
-
 	a := &Account{client: c, Resource: Resource{Links: Links{"funding-sources": Link{Href: "foobar"}}}}
 	res, err := a.ListFundingSources(nil)
 
@@ -59,9 +79,17 @@ func TestAccountListFundingSources(t *testing.T) {
 	assert.Equal(t, fs.BankName, "First Midwestern Bank")
 }
 
+func TestAccountListFundingSourcesError(t *testing.T) {
+	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
+	a := &Account{client: c, Resource: Resource{Links: Links{"funding-sources": Link{Href: "foobar"}}}}
+	res, err := a.ListFundingSources(nil)
+
+	assert.Error(t, err)
+	assert.Nil(t, res)
+}
+
 func TestAccountListMassPayments(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "mass-payments.json"))
-
 	a := &Account{client: c, Resource: Resource{Links: Links{"mass-payments": Link{Href: "foobar"}}}}
 	res, err := a.ListMassPayments(nil)
 
@@ -78,12 +106,29 @@ func TestAccountListMassPayments(t *testing.T) {
 	assert.Equal(t, mp.CorrelationID, "8a2cdc8d-629d-4a24-98ac-40b735229fe2")
 }
 
+func TestAccountListMassPaymentsError(t *testing.T) {
+	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
+	a := &Account{client: c, Resource: Resource{Links: Links{"mass-payments": Link{Href: "foobar"}}}}
+	res, err := a.ListMassPayments(nil)
+
+	assert.Error(t, err)
+	assert.Nil(t, res)
+}
+
 func TestAccountListTransfers(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "transfers.json"))
-
 	a := &Account{client: c, Resource: Resource{Links: Links{"transfers": Link{Href: "foobar"}}}}
 	res, err := a.ListTransfers(nil)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
+}
+
+func TestAccountListTransfersError(t *testing.T) {
+	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
+	a := &Account{client: c, Resource: Resource{Links: Links{"transfers": Link{Href: "foobar"}}}}
+	res, err := a.ListTransfers(nil)
+
+	assert.Error(t, err)
+	assert.Nil(t, res)
 }
