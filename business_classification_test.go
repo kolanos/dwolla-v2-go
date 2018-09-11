@@ -18,6 +18,14 @@ func TestBusinessClassificationServiceRetrieve(t *testing.T) {
 	assert.Equal(t, res.Name, "Entertainment and media")
 }
 
+func TestBusinessClassificationServiceRetrieveError(t *testing.T) {
+	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
+	res, err := c.BusinessClassification.Retrieve("9ed3cf58-7d6f-11e3-81a4-5404a6144203")
+
+	assert.Error(t, err)
+	assert.Nil(t, res)
+}
+
 func TestBusinessClassificationServiceList(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "business-classifications.json"))
 
@@ -26,4 +34,12 @@ func TestBusinessClassificationServiceList(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, res.Total, 27)
+}
+
+func TestBusinessClassificationServiceListError(t *testing.T) {
+	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
+	res, err := c.BusinessClassification.List(nil)
+
+	assert.Error(t, err)
+	assert.Nil(t, res)
 }

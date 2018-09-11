@@ -48,6 +48,7 @@ func (b *BusinessClassificationServiceOp) Retrieve(id string) (*BusinessClassifi
 	}
 
 	classification.client = b.client
+
 	return &classification, nil
 }
 
