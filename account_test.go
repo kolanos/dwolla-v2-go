@@ -20,10 +20,25 @@ func TestAccountServiceRetrieve(t *testing.T) {
 
 func TestAccountServiceRetrieveError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
-	c.root = &Resource{Links: Links{"account": Link{Href: "foobar"}}}
 	res, err := c.Account.Retrieve()
 
 	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "[NotFound] Resource Not Found")
+	assert.Nil(t, res)
+
+	c = newMockClient(200, filepath.Join("testdata", "account.json"))
+	res, err = c.Account.Retrieve()
+
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "No account resource link")
+	assert.Nil(t, res)
+
+	c = newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
+	c.root = &Resource{Links: Links{"account": Link{Href: "foobar"}}}
+	res, err = c.Account.Retrieve()
+
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "[NotFound] Resource Not Found")
 	assert.Nil(t, res)
 }
 
@@ -84,7 +99,16 @@ func TestAccountListFundingSourcesError(t *testing.T) {
 	a := &Account{client: c, Resource: Resource{Links: Links{"funding-sources": Link{Href: "foobar"}}}}
 	res, err := a.ListFundingSources(nil)
 
+	assert.Equal(t, err.Error(), "[NotFound] Resource Not Found")
 	assert.Error(t, err)
+	assert.Nil(t, res)
+
+	c = newMockClient(200, filepath.Join("testdata", "funding-sources.json"))
+	a = &Account{client: c}
+	res, err = a.ListFundingSources(nil)
+
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "No funding sources resource link")
 	assert.Nil(t, res)
 }
 
@@ -113,6 +137,14 @@ func TestAccountListMassPaymentsError(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
+
+	c = newMockClient(200, filepath.Join("testdata", "mass-payments.json"))
+	a = &Account{client: c}
+	res, err = a.ListMassPayments(nil)
+
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "No mass payments resource link")
+	assert.Nil(t, res)
 }
 
 func TestAccountListTransfers(t *testing.T) {
@@ -130,5 +162,13 @@ func TestAccountListTransfersError(t *testing.T) {
 	res, err := a.ListTransfers(nil)
 
 	assert.Error(t, err)
+	assert.Nil(t, res)
+
+	c = newMockClient(200, filepath.Join("testdata", "transfers.json"))
+	a = &Account{client: c}
+	res, err = a.ListTransfers(nil)
+
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "No transfers resource link")
 	assert.Nil(t, res)
 }
