@@ -20,7 +20,6 @@ type AccountServiceOp struct {
 // Account is a dwolla account
 type Account struct {
 	Resource
-	client         *Client
 	ID             string  `json:"id"`
 	Name           string  `json:"name"`
 	TimezoneOffset float32 `json:"timezoneOffset"`

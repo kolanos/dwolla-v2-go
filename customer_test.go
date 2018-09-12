@@ -29,6 +29,19 @@ func TestCustomerServiceCreate(t *testing.T) {
 	assert.Equal(t, res.Created, "2015-09-03T23:56:10.023Z")
 }
 
+func TestCustomerServiceCreateError(t *testing.T) {
+	c := newMockClient(400, filepath.Join("testdata", "validation-error.json"))
+	res, err := c.Customer.Create(&CustomerRequest{
+		FirstName: "Jane",
+		LastName:  "Doe",
+		Email:     "janedoe@nomail.com",
+		Type:      CustomerTypeUnverified,
+	})
+
+	assert.Error(t, err)
+	assert.Nil(t, res)
+}
+
 func TestCustomerServiceRetrieve(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
@@ -43,6 +56,14 @@ func TestCustomerServiceRetrieve(t *testing.T) {
 	assert.Equal(t, res.Type, CustomerTypeUnverified)
 	assert.Equal(t, res.Status, CustomerStatusUnverified)
 	assert.Equal(t, res.Created, "2015-09-03T23:56:10.023Z")
+}
+
+func TestCustomerServiceRetrieveError(t *testing.T) {
+	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
+	res, err := c.Customer.Retrieve("FC451A7A-AE30-4404-AB95-E3553FCD733F")
+
+	assert.Error(t, err)
+	assert.Nil(t, res)
 }
 
 func TestCustomerServiceList(t *testing.T) {
@@ -89,9 +110,7 @@ func TestCustomerServiceUpdate(t *testing.T) {
 func TestCustomerCertifyBeneficialOwnership(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	err := customer.CertifyBeneficialOwnership()
 
 	assert.Error(t, err)
@@ -105,9 +124,7 @@ func TestCustomerCertifyBeneficialOwnership(t *testing.T) {
 func TestCustomerCreateDocument(t *testing.T) {
 	c := newMockClient(201, filepath.Join("testdata", "document.json"))
 
-	customer := &Customer{}
-	customer.client = c
-	customer.Links = Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}
+	customer := &Customer{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
 
 	f2, _ := os.Open(filepath.Join("testdata", "document-upload-success.png"))
 
@@ -124,10 +141,7 @@ func TestCustomerCreateDocument(t *testing.T) {
 func TestCustomerCreateBeneficialOwner(t *testing.T) {
 	c := newMockClient(201, filepath.Join("testdata", "beneficial-owner.json"))
 
-	customer := &Customer{}
-	customer.client = c
-	customer.Links = Links{"beneficial-owners": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-owners"}}
-
+	customer := &Customer{Resource: Resource{client: c, Links: Links{"beneficial-owners": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-owners"}}}}
 	owner, err := customer.CreateBeneficialOwner(&BeneficialOwnerRequest{
 		FirstName:   "beneficial",
 		LastName:    "owner",
@@ -150,10 +164,7 @@ func TestCustomerCreateBeneficialOwner(t *testing.T) {
 func TestCustomerCreateFundingSource(t *testing.T) {
 	c := newMockClient(201, filepath.Join("testdata", "funding-source.json"))
 
-	customer := &Customer{}
-	customer.client = c
-	customer.Links = Links{"funding-sources": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/funding-sources"}}
-
+	customer := &Customer{Resource: Resource{client: c, Links: Links{"funding-sources": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/funding-sources"}}}}
 	source, err := customer.CreateFundingSource(&FundingSourceRequest{
 		RoutingNumber:   "1234567890",
 		AccountNumber:   "1234567890",
@@ -168,9 +179,7 @@ func TestCustomerCreateFundingSource(t *testing.T) {
 func TestCustomerDeactivate(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	err := customer.Deactivate()
 
 	assert.Error(t, err)
@@ -184,9 +193,7 @@ func TestCustomerDeactivate(t *testing.T) {
 func TestCustomerListBeneficialOwners(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "beneficial-owners.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	owners, err := customer.ListBeneficialOwners()
 
 	assert.Error(t, err)
@@ -202,9 +209,7 @@ func TestCustomerListBeneficialOwners(t *testing.T) {
 func TestCustomerListDocuments(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "documents.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	documents, err := customer.ListDocuments()
 
 	assert.Error(t, err)
@@ -220,9 +225,7 @@ func TestCustomerListDocuments(t *testing.T) {
 func TestCustomerListFundingSources(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "funding-sources.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	sources, err := customer.ListFundingSources(true)
 
 	assert.Error(t, err)
@@ -238,9 +241,7 @@ func TestCustomerListFundingSources(t *testing.T) {
 func TestCustomerListMassPayments(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "mass-payments.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	payments, err := customer.ListMassPayments(nil)
 
 	assert.Error(t, err)
@@ -256,9 +257,7 @@ func TestCustomerListMassPayments(t *testing.T) {
 func TestCustomerListTransfers(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "transfers.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	transfers, err := customer.ListTransfers(nil)
 
 	assert.Error(t, err)
@@ -274,9 +273,7 @@ func TestCustomerListTransfers(t *testing.T) {
 func TestCustomerReactivate(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	err := customer.Reactivate()
 
 	assert.Error(t, err)
@@ -303,9 +300,7 @@ func TestCustomerReceive(t *testing.T) {
 func TestCustomerRetrieveBeneficialOwnership(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "beneficial-ownership.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	ownership, err := customer.RetrieveBeneficialOwnership()
 
 	assert.Error(t, err)
@@ -321,9 +316,7 @@ func TestCustomerRetrieveBeneficialOwnership(t *testing.T) {
 func TestCustomerRetrieveIAVToken(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "iav-token.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	token, err := customer.RetrieveIAVToken()
 
 	assert.Error(t, err)
@@ -365,9 +358,7 @@ func TestCustomerSend(t *testing.T) {
 func TestCustomerSuspend(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	err := customer.Suspend()
 
 	assert.Error(t, err)
@@ -381,9 +372,7 @@ func TestCustomerSuspend(t *testing.T) {
 func TestCustomerUpdate(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
-	customer := &Customer{}
-	customer.client = c
-
+	customer := &Customer{Resource: Resource{client: c}}
 	err := customer.Update(&CustomerRequest{
 		FirstName: "Foo",
 		LastName:  "Bar",
