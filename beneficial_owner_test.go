@@ -75,7 +75,6 @@ func TestBeneficialOwnerCreateDocumentError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	owner := &BeneficialOwner{Resource: Resource{client: c}}
-
 	f1, _ := os.Open(filepath.Join("testdata", "document-upload-success.png"))
 	defer f1.Close()
 	res, err := owner.CreateDocument(&DocumentRequest{
@@ -83,7 +82,6 @@ func TestBeneficialOwnerCreateDocumentError(t *testing.T) {
 		FileName: f1.Name(),
 		File:     f1,
 	})
-
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "No self resource link")
 	assert.Nil(t, res)
@@ -113,9 +111,13 @@ func TestBeneficialOwnerListDocuments(t *testing.T) {
 func TestBeneficialOwnerListDocumentsError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
-	owner := &BeneficialOwner{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8"}}}}
+	owner := &BeneficialOwner{Resource: Resource{client: c}}
 	res, err := owner.ListDocuments()
+	assert.Error(t, err)
+	assert.Nil(t, res)
 
+	owner = &BeneficialOwner{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8"}}}}
+	res, err = owner.ListDocuments()
 	assert.Error(t, err)
 	assert.Nil(t, res)
 }
@@ -132,8 +134,62 @@ func TestBeneficialOwnerRemove(t *testing.T) {
 func TestBeneficialOwnerRemoveError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
-	owner := &BeneficialOwner{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8"}}}}
+	owner := &BeneficialOwner{Resource: Resource{client: c}}
 	err := owner.Remove()
+	assert.Error(t, err)
 
+	owner = &BeneficialOwner{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8"}}}}
+	err = owner.Remove()
+	assert.Error(t, err)
+}
+
+func TestBeneficialOwnerUpdate(t *testing.T) {
+	c := newMockClient(200, filepath.Join("testdata", "beneficial-owner.json"))
+
+	owner := &BeneficialOwner{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8"}}}}
+	err := owner.Update(&BeneficialOwnerRequest{
+		FirstName: "John",
+		LastName:  "Doe",
+	})
+
+	assert.Nil(t, err)
+}
+
+func TestBeneficialOwnerUpdateError(t *testing.T) {
+	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
+
+	owner := &BeneficialOwner{Resource: Resource{client: c}}
+	err := owner.Update(&BeneficialOwnerRequest{
+		FirstName: "John",
+		LastName:  "Doe",
+	})
+	assert.Error(t, err)
+
+	owner = &BeneficialOwner{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8"}}}}
+	err = owner.Update(&BeneficialOwnerRequest{
+		FirstName: "John",
+		LastName:  "Doe",
+	})
+	assert.Error(t, err)
+}
+
+func TestBeneficialOwnershipCertify(t *testing.T) {
+	c := newMockClient(200, filepath.Join("testdata", "beneficial-ownership.json"))
+
+	ownership := &BeneficialOwnership{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8"}}}}
+	err := ownership.Certify()
+
+	assert.Nil(t, err)
+}
+
+func TestBeneficialOwnershipCertifyError(t *testing.T) {
+	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
+
+	ownership := &BeneficialOwnership{Resource: Resource{client: c}}
+	err := ownership.Certify()
+	assert.Error(t, err)
+
+	ownership = &BeneficialOwnership{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8"}}}}
+	err = ownership.Certify()
 	assert.Error(t, err)
 }
