@@ -166,6 +166,11 @@ func TestCustomerCreateDocument(t *testing.T) {
 	assert.NotNil(t, res)
 }
 
+func TestCustomerCreatedTime(t *testing.T) {
+	customer := &Customer{Created: "2015-09-03T23:56:10.023Z"}
+	assert.NotNil(t, customer.CreatedTime())
+}
+
 func TestCustomerCreateDocumentError(t *testing.T) {
 	c := newMockClient(400, filepath.Join("testdata", "validation-error.json"))
 
