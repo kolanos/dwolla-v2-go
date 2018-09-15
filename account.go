@@ -3,6 +3,7 @@ package dwolla
 import (
 	"errors"
 	"net/url"
+	"strconv"
 )
 
 // AccountService is the account service interface
@@ -68,12 +69,15 @@ func (a *Account) CreateFundingSource(body *FundingSourceRequest) (*FundingSourc
 // ListFundingSources returns the account's funding sources
 //
 // see: https://docsv2.dwolla.com/#list-funding-sources-for-an-account
-func (a *Account) ListFundingSources(params *url.Values) (*FundingSources, error) {
+func (a *Account) ListFundingSources(removed bool) (*FundingSources, error) {
 	var sources FundingSources
 
 	if _, ok := a.Links["funding-sources"]; !ok {
 		return nil, errors.New("No funding sources resource link")
 	}
+
+	params := &url.Values{}
+	params.Add("removed", strconv.FormatBool(removed))
 
 	if err := a.client.Get(a.Links["funding-sources"].Href, params, nil, &sources); err != nil {
 		return nil, err
