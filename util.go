@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 )
@@ -20,6 +21,11 @@ type Address struct {
 type Amount struct {
 	Value    string   `json:"value"`
 	Currency Currency `json:"currency"`
+}
+
+// String returns a string representation of the amount
+func (a Amount) String() string {
+	return fmt.Sprintf("%s %s", a.Value, a.Currency)
 }
 
 // Currency represents the monetary currency

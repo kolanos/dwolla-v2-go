@@ -3,6 +3,7 @@ package dwolla
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 const (
@@ -158,13 +159,35 @@ func (t *Transfer) Destination() (*Customer, error) {
 	return t.client.Customer.Retrieve(t.Links["destination"].Href)
 }
 
-// DestinationFundingSource returns the transfer funding destination
+// DestinationString returns the customer transfer destination id
+func (t Transfer) DestinationString() string {
+	if _, ok := t.Links["destination"]; !ok {
+		return ""
+	}
+
+	parts := strings.Split(t.Links["destination"].Href, "/")
+
+	return parts[len(parts)-1]
+}
+
+// DestinationFundingSource returns the transfer funding source destination
 func (t *Transfer) DestinationFundingSource() (*FundingSource, error) {
 	if _, ok := t.Links["destination-funding-source"]; !ok {
 		return nil, errors.New("No destination funding source resource link")
 	}
 
 	return t.client.FundingSource.Retrieve(t.Links["destination-funding-source"].Href)
+}
+
+// DestinationFundingSourceString returns the funding source destination id
+func (t Transfer) DestinationFundingSourceString() string {
+	if _, ok := t.Links["destination-funding-source"]; !ok {
+		return ""
+	}
+
+	parts := strings.Split(t.Links["destination-funding-source"].Href, "/")
+
+	return parts[len(parts)-1]
 }
 
 // ListFees returns the fees associated with the transfer
@@ -197,13 +220,35 @@ func (t *Transfer) Source() (*Customer, error) {
 	return t.client.Customer.Retrieve(t.Links["source"].Href)
 }
 
+// SourceString returns the customer transfer source id
+func (t Transfer) SourceString() string {
+	if _, ok := t.Links["source"]; !ok {
+		return ""
+	}
+
+	parts := strings.Split(t.Links["source"].Href, "/")
+
+	return parts[len(parts)-1]
+}
+
 // SourceFundingSource returns the transfer funding source
 func (t *Transfer) SourceFundingSource() (*FundingSource, error) {
 	if _, ok := t.Links["source-funding-source"]; !ok {
 		return nil, errors.New("No source funding source resource link")
 	}
 
-	return t.client.FundingSource.Retrieve(t.Links["source-funding-souce"].Href)
+	return t.client.FundingSource.Retrieve(t.Links["source-funding-source"].Href)
+}
+
+// SourceFundingSourceString returns the transfer funding source
+func (t Transfer) SourceFundingSourceString() string {
+	if _, ok := t.Links["source-funding-source"]; !ok {
+		return ""
+	}
+
+	parts := strings.Split(t.Links["source-funding-source"].Href, "/")
+
+	return parts[len(parts)-1]
 }
 
 // RetrieveFailureReason returns the transfer's failure reason
