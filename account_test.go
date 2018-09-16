@@ -114,7 +114,7 @@ func TestAccountListFundingSourcesError(t *testing.T) {
 
 func TestAccountListMassPayments(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "mass-payments.json"))
-	a := &Account{Resource: Resource{client: c, Links: Links{"mass-payments": Link{Href: "foobar"}}}}
+	a := &Account{Resource: Resource{client: c, Links: Links{"self": Link{Href: "foobar"}}}}
 	res, err := a.ListMassPayments(nil)
 
 	assert.Nil(t, err)
@@ -132,7 +132,7 @@ func TestAccountListMassPayments(t *testing.T) {
 
 func TestAccountListMassPaymentsError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
-	a := &Account{Resource: Resource{client: c, Links: Links{"mass-payments": Link{Href: "foobar"}}}}
+	a := &Account{Resource: Resource{client: c, Links: Links{"self": Link{Href: "foobar"}}}}
 	res, err := a.ListMassPayments(nil)
 
 	assert.Error(t, err)
@@ -143,7 +143,7 @@ func TestAccountListMassPaymentsError(t *testing.T) {
 	res, err = a.ListMassPayments(nil)
 
 	assert.Error(t, err)
-	assert.Equal(t, err.Error(), "No mass payments resource link")
+	assert.Equal(t, err.Error(), "No self resource link")
 	assert.Nil(t, res)
 }
 

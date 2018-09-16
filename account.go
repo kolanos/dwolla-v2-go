@@ -2,6 +2,7 @@ package dwolla
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
 )
@@ -100,11 +101,11 @@ func (a *Account) ListFundingSources(removed bool) (*FundingSources, error) {
 func (a *Account) ListMassPayments(params *url.Values) (*MassPayments, error) {
 	var payments MassPayments
 
-	if _, ok := a.Links["mass-payments"]; !ok {
-		return nil, errors.New("No mass payments resource link")
+	if _, ok := a.Links["self"]; !ok {
+		return nil, errors.New("No self resource link")
 	}
 
-	if err := a.client.Get(a.Links["mass-payments"].Href, params, nil, &payments); err != nil {
+	if err := a.client.Get(fmt.Sprintf("%s/mass-payments", a.Links["self"].Href), params, nil, &payments); err != nil {
 		return nil, err
 	}
 
