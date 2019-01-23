@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -61,4 +62,12 @@ func TestClientRootLive(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
+}
+
+func TestTokenIsExpired(t *testing.T) {
+	token := &Token{}
+	assert.True(t, token.IsExpired())
+
+	token = &Token{ExpiresIn: 3600, startTime: time.Now()}
+	assert.False(t, token.IsExpired())
 }

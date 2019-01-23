@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 )
 
 // Address represents a street address
@@ -74,6 +75,6 @@ func newMockClient(status int, file string) *Client {
 	mc := &mockHTTPClient{err: nil, res: mr}
 
 	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
-	c.Token = &Token{}
+	c.Token = &Token{ExpiresIn: 3600, startTime: time.Now()}
 	return c
 }

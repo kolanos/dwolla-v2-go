@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 // Environment is a supported dwolla environment
@@ -46,6 +47,12 @@ type Token struct {
 	TokenType        string `json:"token_type"`
 	Error            string `json:"error"`
 	ErrorDescription string `json:"error_description"`
+	startTime        time.Time
+}
+
+// IsExpired returns true if token expired
+func (t *Token) IsExpired() bool {
+	return time.Since(t.startTime) > time.Duration(t.ExpiresIn)*time.Second
 }
 
 // HTTPClient is the http client interface
@@ -208,6 +215,7 @@ func (c *Client) RequestToken() error {
 	}
 
 	c.Token = &token
+	c.Token.startTime = time.Now()
 
 	return nil
 }
@@ -215,6 +223,12 @@ func (c *Client) RequestToken() error {
 // EnsureToken ensures that a token exists for a request
 func (c *Client) EnsureToken() error {
 	if c.Token == nil {
+		if err := c.RequestToken(); err != nil {
+			return err
+		}
+	}
+
+	if c.Token.IsExpired() {
 		if err := c.RequestToken(); err != nil {
 			return err
 		}
