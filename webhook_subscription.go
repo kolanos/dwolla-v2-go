@@ -40,7 +40,7 @@ type WebhookSubscriptions struct {
 type WebhookSubscriptionRequest struct {
 	URL    string `json:"url,omitempty"`
 	Secret string `json:"secret,omitempty"`
-	Paused bool   `json:"paused,omitempty"`
+	Paused bool   `json:"paused"`
 }
 
 // Create creates a webhook subscription
