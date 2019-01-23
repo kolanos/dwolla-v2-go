@@ -50,8 +50,8 @@ type Token struct {
 	startTime        time.Time
 }
 
-// IsExpired returns true if token expired
-func (t *Token) IsExpired() bool {
+// Expired returns true if token has expired
+func (t *Token) Expired() bool {
 	return time.Since(t.startTime) > time.Duration(t.ExpiresIn)*time.Second
 }
 
@@ -228,7 +228,7 @@ func (c *Client) EnsureToken() error {
 		}
 	}
 
-	if c.Token.IsExpired() {
+	if c.Token.Expired() {
 		if err := c.RequestToken(); err != nil {
 			return err
 		}

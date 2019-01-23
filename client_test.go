@@ -64,10 +64,16 @@ func TestClientRootLive(t *testing.T) {
 	assert.NotNil(t, res)
 }
 
-func TestTokenIsExpired(t *testing.T) {
+func TestTokenExpired(t *testing.T) {
 	token := &Token{}
-	assert.True(t, token.IsExpired())
+	assert.True(t, token.Expired())
+
+	token = &Token{ExpiresIn: 0, startTime: time.Now()}
+	assert.True(t, token.Expired())
+
+	token = &Token{ExpiresIn: 1, startTime: time.Now()}
+	assert.False(t, token.Expired())
 
 	token = &Token{ExpiresIn: 3600, startTime: time.Now()}
-	assert.False(t, token.IsExpired())
+	assert.False(t, token.Expired())
 }
