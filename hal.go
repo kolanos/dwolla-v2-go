@@ -49,6 +49,11 @@ type Resource struct {
 	client *Client
 }
 
+// NewResource is constructor for Resource
+func NewResource(links Links, client *Client) *Resource {
+	return &Resource{Links: links, client: client}
+}
+
 // Embedded is a hal embedded resource
 type Embedded map[string][]Resource
 

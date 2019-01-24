@@ -98,13 +98,13 @@ type TransferFees struct {
 // TransferRequest is a transfer request
 type TransferRequest struct {
 	Resource
-	Status        TransferStatus     `json:"status,omitempty"`
-	Amount        Amount             `json:"amount,omitempty"`
-	MetaData      MetaData           `json:"metadata,omitempty"`
-	Fees          []TransferFee      `json:"fees,omitempty"`
-	Clearing      TransferClearing   `json:"clearing,omitempty"`
-	CorrelationID string             `json:"correlationId"`
-	ACHDetails    TransferACHDetails `json:"achDetails,omitempty"`
+	Status        TransferStatus      `json:"status,omitempty"`
+	Amount        Amount              `json:"amount,omitempty"`
+	MetaData      MetaData            `json:"metadata,omitempty"`
+	Fees          []TransferFee       `json:"fees,omitempty"`
+	Clearing      TransferClearing    `json:"clearing,omitempty"`
+	CorrelationID string              `json:"correlationId,omitempty"`
+	ACHDetails    *TransferACHDetails `json:"achDetails,omitempty"`
 }
 
 // Create initiates a transfer

@@ -87,6 +87,7 @@ type FundingSourceRequest struct {
 	Name            string                       `json:"name,omitempty"`
 	Channels        []string                     `json:"channels,omitempty"`
 	Removed         bool                         `json:"removed,omitempty"`
+	PlaidToken      string                       `json:"plaidToken,omitempty"`
 }
 
 // Retrieve retrieves a funding source with the matching id
