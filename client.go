@@ -30,14 +30,14 @@ const (
 	// ProductionAuthURL is the production auth url
 	ProductionAuthURL = "https://www.dwolla.com/oauth/v2/authenticate"
 	// ProductionTokenURL is the production token url
-	ProductionTokenURL = "https://www.dwolla.com/oauth/v2/token"
+	ProductionTokenURL = "https://accounts.dwolla.com/token"
 
 	// SandboxAPIURL is the sandbox api url
 	SandboxAPIURL = "https://api-sandbox.dwolla.com"
 	// SandboxAuthURL is the sandbox auth url
 	SandboxAuthURL = "https://sandbox.dwolla.com/oauth/v2/authenticate"
 	// SandboxTokenURL is the sandbox token url
-	SandboxTokenURL = "https://sandbox.dwolla.com/oauth/v2/token"
+	SandboxTokenURL = "https://accounts-sandbox.dwolla.com/token"
 )
 
 // Token is a dwolla auth token

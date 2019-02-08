@@ -61,12 +61,12 @@ type BeneficialOwners struct {
 
 // BeneficialOwnerRequest is a beneficial owner request
 type BeneficialOwnerRequest struct {
-	FirstName   string   `json:"firstName,omitempty"`
-	LastName    string   `json:"lastName,omitempty"`
-	DateOfBirth string   `json:"dateOfBirth,omitempty"`
-	SSN         string   `json:"ssn,omitempty"`
-	Address     Address  `json:"address,omitempty"`
-	Passport    Passport `json:"passport,omitempty"`
+	FirstName   string    `json:"firstName,omitempty"`
+	LastName    string    `json:"lastName,omitempty"`
+	DateOfBirth string    `json:"dateOfBirth,omitempty"`
+	SSN         string    `json:"ssn,omitempty"`
+	Address     Address   `json:"address,omitempty"`
+	Passport    *Passport `json:"passport,omitempty"`
 }
 
 // CertificationStatus is the beneficial ownership certification status
