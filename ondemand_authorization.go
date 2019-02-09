@@ -9,7 +9,7 @@ import (
 // see: https://docsv2.dwolla.com/#create-an-on-demand-transfer-authorization
 type OnDemandAuthorizationService interface {
 	Create() (*OnDemandAuthorization, error)
-	Get(string) (*OnDemandAuthorization, error)
+	Retrieve(string) (*OnDemandAuthorization, error)
 }
 
 // OnDemandAuthorizationServiceOp is an implementation of the on-demand authorization interface
@@ -37,8 +37,8 @@ func (o *OnDemandAuthorizationServiceOp) Create() (*OnDemandAuthorization, error
 	return &authorization, nil
 }
 
-// Get returns a on-demand authorization matching the id
-func (o *OnDemandAuthorizationServiceOp) Get(id string) (*OnDemandAuthorization, error) {
+// Retrieve returns a on-demand authorization matching the id
+func (o *OnDemandAuthorizationServiceOp) Retrieve(id string) (*OnDemandAuthorization, error) {
 	var authorization OnDemandAuthorization
 
 	if err := o.client.Get(fmt.Sprintf("on-demand-authorizations/%s", id), nil, nil, &authorization); err != nil {
