@@ -8,8 +8,10 @@ import (
 const (
 	// BeneficialOwnerStatusDocument is when the beneficial owner needs verification document
 	BeneficialOwnerStatusDocument BeneficialOwnerStatus = "document"
+
 	// BeneficialOwnerStatusIncomplete is when the beneficial owner is incomplete
 	BeneficialOwnerStatusIncomplete BeneficialOwnerStatus = "incomplete"
+
 	// BeneficialOwnerStatusVerified is when the beneficial owner is verified
 	BeneficialOwnerStatusVerified BeneficialOwnerStatus = "verified"
 )
@@ -17,9 +19,11 @@ const (
 const (
 	// CertificationStatusCertified is when the ownership status is certified
 	CertificationStatusCertified CertificationStatus = "certified"
+
 	// CertificationStatusRecertify is when the ownership status needs
 	// to be recertified
 	CertificationStatusRecertify CertificationStatus = "recertify"
+
 	// CertificationStatusUncertified is when the ownership status is uncertified
 	CertificationStatusUncertified CertificationStatus = "uncertified"
 )
