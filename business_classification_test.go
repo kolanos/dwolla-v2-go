@@ -9,8 +9,7 @@ import (
 
 func TestBusinessClassificationServiceRetrieve(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "business-classification.json"))
-
-	res, err := c.BusinessClassification.Retrieve("9ed3cf58-7d6f-11e3-81a4-5404a6144203")
+	res, err := c.BusinessClassification.Retrieve(ctx, "9ed3cf58-7d6f-11e3-81a4-5404a6144203")
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -20,7 +19,7 @@ func TestBusinessClassificationServiceRetrieve(t *testing.T) {
 
 func TestBusinessClassificationServiceRetrieveError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
-	res, err := c.BusinessClassification.Retrieve("9ed3cf58-7d6f-11e3-81a4-5404a6144203")
+	res, err := c.BusinessClassification.Retrieve(ctx, "9ed3cf58-7d6f-11e3-81a4-5404a6144203")
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
@@ -28,8 +27,7 @@ func TestBusinessClassificationServiceRetrieveError(t *testing.T) {
 
 func TestBusinessClassificationServiceList(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "business-classifications.json"))
-
-	res, err := c.BusinessClassification.List(nil)
+	res, err := c.BusinessClassification.List(ctx, nil)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -38,7 +36,7 @@ func TestBusinessClassificationServiceList(t *testing.T) {
 
 func TestBusinessClassificationServiceListError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
-	res, err := c.BusinessClassification.List(nil)
+	res, err := c.BusinessClassification.List(ctx, nil)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)

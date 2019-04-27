@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -23,8 +24,8 @@ const (
 //
 // see: https://docsv2.dwolla.com/#transfers
 type TransferService interface {
-	Create(*TransferRequest) (*Transfer, error)
-	Retrieve(string) (*Transfer, error)
+	Create(context.Context, *TransferRequest) (*Transfer, error)
+	Retrieve(context.Context, string) (*Transfer, error)
 }
 
 // TransferServiceOp is an implementation of the transfer service interface
@@ -110,10 +111,10 @@ type TransferRequest struct {
 // Create initiates a transfer
 //
 // see: https://docsv2.dwolla.com/#initiate-a-transfer
-func (t *TransferServiceOp) Create(body *TransferRequest) (*Transfer, error) {
+func (t *TransferServiceOp) Create(ctx context.Context, body *TransferRequest) (*Transfer, error) {
 	var transfer Transfer
 
-	if err := t.client.Post("transfers", body, nil, &transfer); err != nil {
+	if err := t.client.Post(ctx, "transfers", body, nil, &transfer); err != nil {
 		return nil, err
 	}
 
@@ -125,10 +126,10 @@ func (t *TransferServiceOp) Create(body *TransferRequest) (*Transfer, error) {
 // Retrieve returns the transfer matching the id
 //
 // see: https://docsv2.dwolla.com/#retrieve-a-transfer
-func (t *TransferServiceOp) Retrieve(id string) (*Transfer, error) {
+func (t *TransferServiceOp) Retrieve(ctx context.Context, id string) (*Transfer, error) {
 	var transfer Transfer
 
-	if err := t.client.Get(fmt.Sprintf("transfers/%s", id), nil, nil, &transfer); err != nil {
+	if err := t.client.Get(ctx, fmt.Sprintf("transfers/%s", id), nil, nil, &transfer); err != nil {
 		return nil, err
 	}
 
@@ -140,23 +141,23 @@ func (t *TransferServiceOp) Retrieve(id string) (*Transfer, error) {
 // Cancel cancels the transfer
 //
 // see: https://docsv2.dwolla.com/#cancel-a-transfer
-func (t *Transfer) Cancel() error {
+func (t *Transfer) Cancel(ctx context.Context) error {
 	if _, ok := t.Links["cancel"]; !ok {
 		return errors.New("No cancel resource link")
 	}
 
 	body := &TransferRequest{Status: TransferStatusCancelled}
 
-	return t.client.Post(t.Links["cancel"].Href, body, nil, t)
+	return t.client.Post(ctx, t.Links["cancel"].Href, body, nil, t)
 }
 
 // Destination returns the customer transfer destination
-func (t *Transfer) Destination() (*Customer, error) {
+func (t *Transfer) Destination(ctx context.Context) (*Customer, error) {
 	if _, ok := t.Links["destination"]; !ok {
 		return nil, errors.New("No destination resource link")
 	}
 
-	return t.client.Customer.Retrieve(t.Links["destination"].Href)
+	return t.client.Customer.Retrieve(ctx, t.Links["destination"].Href)
 }
 
 // DestinationString returns the customer transfer destination id
@@ -171,12 +172,12 @@ func (t Transfer) DestinationString() string {
 }
 
 // DestinationFundingSource returns the transfer funding source destination
-func (t *Transfer) DestinationFundingSource() (*FundingSource, error) {
+func (t *Transfer) DestinationFundingSource(ctx context.Context) (*FundingSource, error) {
 	if _, ok := t.Links["destination-funding-source"]; !ok {
 		return nil, errors.New("No destination funding source resource link")
 	}
 
-	return t.client.FundingSource.Retrieve(t.Links["destination-funding-source"].Href)
+	return t.client.FundingSource.Retrieve(ctx, t.Links["destination-funding-source"].Href)
 }
 
 // DestinationFundingSourceString returns the funding source destination id
@@ -193,14 +194,14 @@ func (t Transfer) DestinationFundingSourceString() string {
 // ListFees returns the fees associated with the transfer
 //
 // see: https://docsv2.dwolla.com/#list-fees-for-a-transfer
-func (t *Transfer) ListFees() (*TransferFees, error) {
+func (t *Transfer) ListFees(ctx context.Context) (*TransferFees, error) {
 	var fees TransferFees
 
 	if _, ok := t.Links["fees"]; !ok {
 		return nil, errors.New("No fees resource link")
 	}
 
-	if err := t.client.Get(t.Links["fees"].Href, nil, nil, &fees); err != nil {
+	if err := t.client.Get(ctx, t.Links["fees"].Href, nil, nil, &fees); err != nil {
 		return nil, err
 	}
 
@@ -212,12 +213,12 @@ func (t *Transfer) ListFees() (*TransferFees, error) {
 }
 
 // Source returns the customer transfer source
-func (t *Transfer) Source() (*Customer, error) {
+func (t *Transfer) Source(ctx context.Context) (*Customer, error) {
 	if _, ok := t.Links["source"]; !ok {
 		return nil, errors.New("No source resource link")
 	}
 
-	return t.client.Customer.Retrieve(t.Links["source"].Href)
+	return t.client.Customer.Retrieve(ctx, t.Links["source"].Href)
 }
 
 // SourceString returns the customer transfer source id
@@ -232,12 +233,12 @@ func (t Transfer) SourceString() string {
 }
 
 // SourceFundingSource returns the transfer funding source
-func (t *Transfer) SourceFundingSource() (*FundingSource, error) {
+func (t *Transfer) SourceFundingSource(ctx context.Context) (*FundingSource, error) {
 	if _, ok := t.Links["source-funding-source"]; !ok {
 		return nil, errors.New("No source funding source resource link")
 	}
 
-	return t.client.FundingSource.Retrieve(t.Links["source-funding-source"].Href)
+	return t.client.FundingSource.Retrieve(ctx, t.Links["source-funding-source"].Href)
 }
 
 // SourceFundingSourceString returns the transfer funding source
@@ -254,14 +255,14 @@ func (t Transfer) SourceFundingSourceString() string {
 // RetrieveFailureReason returns the transfer's failure reason
 //
 // see: https://docsv2.dwolla.com/#retrieve-a-transfer-failure-reason
-func (t *Transfer) RetrieveFailureReason() (*TransferFailureReason, error) {
+func (t *Transfer) RetrieveFailureReason(ctx context.Context) (*TransferFailureReason, error) {
 	var reason TransferFailureReason
 
 	if _, ok := t.Links["failure"]; !ok {
 		return nil, errors.New("No failure resource link")
 	}
 
-	if err := t.client.Get(t.Links["failure"].Href, nil, nil, &reason); err != nil {
+	if err := t.client.Get(ctx, t.Links["failure"].Href, nil, nil, &reason); err != nil {
 		return nil, err
 	}
 

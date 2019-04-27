@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"context"
 	"fmt"
 	"io"
 )
@@ -45,7 +46,7 @@ const (
 //
 // see: https://docsv2.dwolla.com/#documents
 type DocumentService interface {
-	Retrieve(string) (*Document, error)
+	Retrieve(context.Context, string) (*Document, error)
 }
 
 // DocumentServiceOp is an implementation of the document service
@@ -86,13 +87,14 @@ type DocumentRequest struct {
 }
 
 // Retrieve retrieves a document matching the id
-func (d *DocumentServiceOp) Retrieve(id string) (*Document, error) {
+func (d *DocumentServiceOp) Retrieve(ctx context.Context, id string) (*Document, error) {
 	var document Document
 
-	if err := d.client.Get(fmt.Sprintf("documents/%s", id), nil, nil, &document); err != nil {
+	if err := d.client.Get(ctx, fmt.Sprintf("documents/%s", id), nil, nil, &document); err != nil {
 		return nil, err
 	}
 
 	document.client = d.client
+
 	return &document, nil
 }

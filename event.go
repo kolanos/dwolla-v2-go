@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 )
@@ -9,8 +10,8 @@ import (
 //
 // see: https://docsv2.dwolla.com/#events
 type EventService interface {
-	List(*url.Values) (*Events, error)
-	Retrieve(string) (*Event, error)
+	List(context.Context, *url.Values) (*Events, error)
+	Retrieve(context.Context, string) (*Event, error)
 }
 
 // EventServiceOp is an implementation of the event service interface
@@ -40,10 +41,10 @@ type Events struct {
 // List returns a collection of events
 //
 // see: https://docsv2.dwolla.com/#list-events
-func (e *EventServiceOp) List(params *url.Values) (*Events, error) {
+func (e *EventServiceOp) List(ctx context.Context, params *url.Values) (*Events, error) {
 	var events Events
 
-	if err := e.client.Get("events", params, nil, &events); err != nil {
+	if err := e.client.Get(ctx, "events", params, nil, &events); err != nil {
 		return nil, err
 	}
 
@@ -59,10 +60,10 @@ func (e *EventServiceOp) List(params *url.Values) (*Events, error) {
 // Retrieve retrieves the event matching the id
 //
 // see: https://docsv2.dwolla.com/#retrieve-an-event
-func (e *EventServiceOp) Retrieve(id string) (*Event, error) {
+func (e *EventServiceOp) Retrieve(ctx context.Context, id string) (*Event, error) {
 	var event Event
 
-	if err := e.client.Get(fmt.Sprintf("events/%s", id), nil, nil, &event); err != nil {
+	if err := e.client.Get(ctx, fmt.Sprintf("events/%s", id), nil, nil, &event); err != nil {
 		return nil, err
 	}
 

@@ -9,8 +9,7 @@ import (
 
 func TestEventServiceRetrieve(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "event.json"))
-
-	res, err := c.Event.Retrieve("9ed3cf58-7d6f-11e3-81a4-5404a6144203")
+	res, err := c.Event.Retrieve(ctx, "9ed3cf58-7d6f-11e3-81a4-5404a6144203")
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -19,7 +18,7 @@ func TestEventServiceRetrieve(t *testing.T) {
 
 func TestEventServiceRetrieveError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
-	res, err := c.Event.Retrieve("9ed3cf58-7d6f-11e3-81a4-5404a6144203")
+	res, err := c.Event.Retrieve(ctx, "9ed3cf58-7d6f-11e3-81a4-5404a6144203")
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
@@ -27,8 +26,7 @@ func TestEventServiceRetrieveError(t *testing.T) {
 
 func TestEventServiceList(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "events.json"))
-
-	res, err := c.Event.List(nil)
+	res, err := c.Event.List(ctx, nil)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -38,7 +36,7 @@ func TestEventServiceList(t *testing.T) {
 
 func TestEventServiceListError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
-	res, err := c.Event.List(nil)
+	res, err := c.Event.List(ctx, nil)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)

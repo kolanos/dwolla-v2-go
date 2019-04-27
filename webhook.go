@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"context"
 	"errors"
 	"fmt"
 )
@@ -9,7 +10,7 @@ import (
 //
 // see: https://docsv2.dwolla.com/#webhooks
 type WebhookService interface {
-	Retrieve(string) (*Webhook, error)
+	Retrieve(context.Context, string) (*Webhook, error)
 }
 
 // WebhookServiceOp is an implementation of the webhook service interface
@@ -81,10 +82,10 @@ type WebhookRetries struct {
 // Retrieve retrieves the webhook with matching id
 //
 // see: https://docsv2.dwolla.com/#retrieve-a-webhook
-func (w *WebhookServiceOp) Retrieve(id string) (*Webhook, error) {
+func (w *WebhookServiceOp) Retrieve(ctx context.Context, id string) (*Webhook, error) {
 	var webhook Webhook
 
-	if err := w.client.Get(fmt.Sprintf("webhooks/%s", id), nil, nil, &webhook); err != nil {
+	if err := w.client.Get(ctx, fmt.Sprintf("webhooks/%s", id), nil, nil, &webhook); err != nil {
 		return nil, err
 	}
 
@@ -94,34 +95,34 @@ func (w *WebhookServiceOp) Retrieve(id string) (*Webhook, error) {
 }
 
 // RetrieveEvent retrieves the event for the webhook
-func (w *Webhook) RetrieveEvent() (*Event, error) {
+func (w *Webhook) RetrieveEvent(ctx context.Context) (*Event, error) {
 	if _, ok := w.Links["event"]; !ok {
 		return nil, errors.New("No event resource link")
 	}
 
-	return w.client.Event.Retrieve(w.Links["event"].Href)
+	return w.client.Event.Retrieve(ctx, w.Links["event"].Href)
 }
 
 // RetrieveWebhookSubscription returns the subscription for the webhoook
-func (w *Webhook) RetrieveWebhookSubscription() (*WebhookSubscription, error) {
+func (w *Webhook) RetrieveWebhookSubscription(ctx context.Context) (*WebhookSubscription, error) {
 	if _, ok := w.Links["subscription"]; !ok {
 		return nil, errors.New("No subscription resource link")
 	}
 
-	return w.client.WebhookSubscription.Retrieve(w.Links["subscription"].Href)
+	return w.client.WebhookSubscription.Retrieve(ctx, w.Links["subscription"].Href)
 }
 
 // ListRetries returns a collection of retries for this webhook
 //
 // see: https://docsv2.dwolla.com/#list-retries-for-a-webhook
-func (w *Webhook) ListRetries() (*WebhookRetries, error) {
+func (w *Webhook) ListRetries(ctx context.Context) (*WebhookRetries, error) {
 	var retries WebhookRetries
 
 	if _, ok := w.Links["retry"]; !ok {
 		return nil, errors.New("No retry resource link")
 	}
 
-	if err := w.client.Get(w.Links["retry"].Href, nil, nil, &retries); err != nil {
+	if err := w.client.Get(ctx, w.Links["retry"].Href, nil, nil, &retries); err != nil {
 		return nil, err
 	}
 
@@ -137,14 +138,14 @@ func (w *Webhook) ListRetries() (*WebhookRetries, error) {
 // Retry retries the webhook
 //
 // see: https://docsv2.dwolla.com/#retry-a-webhook
-func (w *Webhook) Retry() (*WebhookRetry, error) {
+func (w *Webhook) Retry(ctx context.Context) (*WebhookRetry, error) {
 	var retry WebhookRetry
 
 	if _, ok := w.Links["retry"]; !ok {
 		return nil, errors.New("No retry resource link")
 	}
 
-	if err := w.client.Post(w.Links["retry"].Href, nil, nil, &retry); err != nil {
+	if err := w.client.Post(ctx, w.Links["retry"].Href, nil, nil, &retry); err != nil {
 		return nil, err
 	}
 

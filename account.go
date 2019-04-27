@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/url"
@@ -11,7 +12,7 @@ import (
 //
 // see: https://docsv2.dwolla.com/#accounts
 type AccountService interface {
-	Retrieve() (*Account, error)
+	Retrieve(context.Context) (*Account, error)
 }
 
 // AccountServiceOp is an implementation of the account service interface
@@ -31,8 +32,9 @@ type Account struct {
 // Retrieve retrieves the dwolla account
 //
 // see: https://docsv2.dwolla.com/#retrieve-account-details
-func (a *AccountServiceOp) Retrieve() (*Account, error) {
-	root, err := a.client.Root()
+func (a *AccountServiceOp) Retrieve(ctx context.Context) (*Account, error) {
+	root, err := a.client.Root(ctx)
+
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +45,7 @@ func (a *AccountServiceOp) Retrieve() (*Account, error) {
 		return nil, errors.New("No account resource link")
 	}
 
-	if err := a.client.Get(root.Links["account"].Href, nil, nil, &account); err != nil {
+	if err := a.client.Get(ctx, root.Links["account"].Href, nil, nil, &account); err != nil {
 		return nil, err
 	}
 
@@ -55,10 +57,10 @@ func (a *AccountServiceOp) Retrieve() (*Account, error) {
 // CreateFundingSource creates a funding source for the account
 //
 // see: https://docsv2.dwolla.com/#create-a-funding-source-for-an-account
-func (a *Account) CreateFundingSource(body *FundingSourceRequest) (*FundingSource, error) {
+func (a *Account) CreateFundingSource(ctx context.Context, body *FundingSourceRequest) (*FundingSource, error) {
 	var source FundingSource
 
-	if err := a.client.Post("funding-sources", body, nil, &source); err != nil {
+	if err := a.client.Post(ctx, "funding-sources", body, nil, &source); err != nil {
 		return nil, err
 	}
 
@@ -70,7 +72,7 @@ func (a *Account) CreateFundingSource(body *FundingSourceRequest) (*FundingSourc
 // ListFundingSources returns the account's funding sources
 //
 // see: https://docsv2.dwolla.com/#list-funding-sources-for-an-account
-func (a *Account) ListFundingSources(removed bool) (*FundingSources, error) {
+func (a *Account) ListFundingSources(ctx context.Context, removed bool) (*FundingSources, error) {
 	var sources FundingSources
 
 	if _, ok := a.Links["funding-sources"]; !ok {
@@ -80,7 +82,7 @@ func (a *Account) ListFundingSources(removed bool) (*FundingSources, error) {
 	params := &url.Values{}
 	params.Add("removed", strconv.FormatBool(removed))
 
-	if err := a.client.Get(a.Links["funding-sources"].Href, params, nil, &sources); err != nil {
+	if err := a.client.Get(ctx, a.Links["funding-sources"].Href, params, nil, &sources); err != nil {
 		return nil, err
 	}
 
@@ -98,14 +100,14 @@ func (a *Account) ListFundingSources(removed bool) (*FundingSources, error) {
 // ListMassPayments returns mass payments for the account
 //
 // see: https://docsv2.dwolla.com/#list-mass-payments-for-an-account
-func (a *Account) ListMassPayments(params *url.Values) (*MassPayments, error) {
+func (a *Account) ListMassPayments(ctx context.Context, params *url.Values) (*MassPayments, error) {
 	var payments MassPayments
 
 	if _, ok := a.Links["self"]; !ok {
 		return nil, errors.New("No self resource link")
 	}
 
-	if err := a.client.Get(fmt.Sprintf("%s/mass-payments", a.Links["self"].Href), params, nil, &payments); err != nil {
+	if err := a.client.Get(ctx, fmt.Sprintf("%s/mass-payments", a.Links["self"].Href), params, nil, &payments); err != nil {
 		return nil, err
 	}
 
@@ -123,14 +125,14 @@ func (a *Account) ListMassPayments(params *url.Values) (*MassPayments, error) {
 // ListTransfers returns the account's transfers
 //
 // see: https://docsv2.dwolla.com/#list-and-search-transfers-for-an-account
-func (a *Account) ListTransfers(params *url.Values) (*Transfers, error) {
+func (a *Account) ListTransfers(ctx context.Context, params *url.Values) (*Transfers, error) {
 	var transfers Transfers
 
 	if _, ok := a.Links["transfers"]; !ok {
 		return nil, errors.New("No transfers resource link")
 	}
 
-	if err := a.client.Get(a.Links["transfers"].Href, params, nil, &transfers); err != nil {
+	if err := a.client.Get(ctx, a.Links["transfers"].Href, params, nil, &transfers); err != nil {
 		return nil, err
 	}
 

@@ -11,7 +11,7 @@ import (
 func TestCustomerServiceCreate(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
-	res, err := c.Customer.Create(&CustomerRequest{
+	res, err := c.Customer.Create(ctx, &CustomerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "janedoe@nomail.com",
@@ -31,7 +31,8 @@ func TestCustomerServiceCreate(t *testing.T) {
 
 func TestCustomerServiceCreateError(t *testing.T) {
 	c := newMockClient(400, filepath.Join("testdata", "validation-error.json"))
-	res, err := c.Customer.Create(&CustomerRequest{
+
+	res, err := c.Customer.Create(ctx, &CustomerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "janedoe@nomail.com",
@@ -45,7 +46,7 @@ func TestCustomerServiceCreateError(t *testing.T) {
 func TestCustomerServiceRetrieve(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
-	res, err := c.Customer.Retrieve("FC451A7A-AE30-4404-AB95-E3553FCD733F")
+	res, err := c.Customer.Retrieve(ctx, "FC451A7A-AE30-4404-AB95-E3553FCD733F")
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -60,7 +61,7 @@ func TestCustomerServiceRetrieve(t *testing.T) {
 
 func TestCustomerServiceRetrieveError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
-	res, err := c.Customer.Retrieve("FC451A7A-AE30-4404-AB95-E3553FCD733F")
+	res, err := c.Customer.Retrieve(ctx, "FC451A7A-AE30-4404-AB95-E3553FCD733F")
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
@@ -68,8 +69,7 @@ func TestCustomerServiceRetrieveError(t *testing.T) {
 
 func TestCustomerServiceList(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customers.json"))
-
-	res, err := c.Customer.List(nil)
+	res, err := c.Customer.List(ctx, nil)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -88,8 +88,7 @@ func TestCustomerServiceList(t *testing.T) {
 
 func TestCustomerServiceListError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "document-not-found.json"))
-
-	res, err := c.Customer.List(nil)
+	res, err := c.Customer.List(ctx, nil)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
@@ -98,7 +97,7 @@ func TestCustomerServiceListError(t *testing.T) {
 func TestCustomerServiceUpdate(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
-	res, err := c.Customer.Update("FC451A7A-AE30-4404-AB95-E3553FCD733F", &CustomerRequest{
+	res, err := c.Customer.Update(ctx, "FC451A7A-AE30-4404-AB95-E3553FCD733F", &CustomerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "janedoe@nomail.com",
@@ -119,7 +118,7 @@ func TestCustomerServiceUpdate(t *testing.T) {
 func TestCustomerServiceUpdateError(t *testing.T) {
 	c := newMockClient(400, filepath.Join("testdata", "validation-error.json"))
 
-	res, err := c.Customer.Update("FC451A7A-AE30-4404-AB95-E3553FCD733F", &CustomerRequest{
+	res, err := c.Customer.Update(ctx, "FC451A7A-AE30-4404-AB95-E3553FCD733F", &CustomerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "janedoe@nomail.com",
@@ -134,7 +133,7 @@ func TestCustomerCertifyBeneficialOwnership(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"certify-beneficial-ownership": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-ownership"}}}}
-	err := customer.CertifyBeneficialOwnership()
+	err := customer.CertifyBeneficialOwnership(ctx)
 	assert.Nil(t, err)
 }
 
@@ -142,11 +141,11 @@ func TestCustomerCertifyBeneficialOwnershipError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	err := customer.CertifyBeneficialOwnership()
+	err := customer.CertifyBeneficialOwnership(ctx)
 	assert.Error(t, err)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"certify-beneficial-ownership": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-ownership"}}}}
-	err = customer.CertifyBeneficialOwnership()
+	err = customer.CertifyBeneficialOwnership(ctx)
 	assert.Error(t, err)
 }
 
@@ -156,7 +155,7 @@ func TestCustomerCreateDocument(t *testing.T) {
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
 
 	f, _ := os.Open(filepath.Join("testdata", "document-upload-success.png"))
-	res, err := customer.CreateDocument(&DocumentRequest{
+	res, err := customer.CreateDocument(ctx, &DocumentRequest{
 		Type:     DocumentTypePassport,
 		FileName: f.Name(),
 		File:     f,
@@ -177,7 +176,8 @@ func TestCustomerCreateDocumentError(t *testing.T) {
 	customer := &Customer{Resource: Resource{client: c}}
 	f1, _ := os.Open(filepath.Join("testdata", "document-upload-success.png"))
 	defer f1.Close()
-	res, err := customer.CreateDocument(&DocumentRequest{
+
+	res, err := customer.CreateDocument(ctx, &DocumentRequest{
 		Type:     DocumentTypePassport,
 		FileName: f1.Name(),
 		File:     f1,
@@ -188,7 +188,7 @@ func TestCustomerCreateDocumentError(t *testing.T) {
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
 	f2, _ := os.Open(filepath.Join("testdata", "document-upload-success.png"))
-	res, err = customer.CreateDocument(&DocumentRequest{
+	res, err = customer.CreateDocument(ctx, &DocumentRequest{
 		Type:     DocumentTypePassport,
 		FileName: f2.Name(),
 		File:     f2,
@@ -202,7 +202,7 @@ func TestCustomerCreateBeneficialOwner(t *testing.T) {
 	c := newMockClient(201, filepath.Join("testdata", "beneficial-owner.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"beneficial-owners": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-owners"}}}}
-	owner, err := customer.CreateBeneficialOwner(&BeneficialOwnerRequest{
+	owner, err := customer.CreateBeneficialOwner(ctx, &BeneficialOwnerRequest{
 		FirstName:   "beneficial",
 		LastName:    "owner",
 		DateOfBirth: "1980-01-01",
@@ -225,7 +225,7 @@ func TestCustomerCreateBeneficialOwnerError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	res, err := customer.CreateBeneficialOwner(&BeneficialOwnerRequest{
+	res, err := customer.CreateBeneficialOwner(ctx, &BeneficialOwnerRequest{
 		FirstName:   "beneficial",
 		LastName:    "owner",
 		DateOfBirth: "1980-01-01",
@@ -245,7 +245,7 @@ func TestCustomerCreateBeneficialOwnerError(t *testing.T) {
 	assert.Nil(t, res)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"beneficial-owners": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-owners"}}}}
-	res, err = customer.CreateBeneficialOwner(&BeneficialOwnerRequest{
+	res, err = customer.CreateBeneficialOwner(ctx, &BeneficialOwnerRequest{
 		FirstName:   "beneficial",
 		LastName:    "owner",
 		DateOfBirth: "1980-01-01",
@@ -268,7 +268,7 @@ func TestCustomerCreateFundingSource(t *testing.T) {
 	c := newMockClient(201, filepath.Join("testdata", "funding-source.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"funding-sources": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/funding-sources"}}}}
-	source, err := customer.CreateFundingSource(&FundingSourceRequest{
+	source, err := customer.CreateFundingSource(ctx, &FundingSourceRequest{
 		RoutingNumber:   "1234567890",
 		AccountNumber:   "1234567890",
 		BankAccountType: FundingSourceBankAccountTypeChecking,
@@ -283,7 +283,7 @@ func TestCustomerCreateFundingSourceError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	res, err := customer.CreateFundingSource(&FundingSourceRequest{
+	res, err := customer.CreateFundingSource(ctx, &FundingSourceRequest{
 		RoutingNumber:   "1234567890",
 		AccountNumber:   "1234567890",
 		BankAccountType: FundingSourceBankAccountTypeChecking,
@@ -295,7 +295,7 @@ func TestCustomerCreateFundingSourceError(t *testing.T) {
 	assert.Nil(t, res)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"funding-sources": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/funding-sources"}}}}
-	res, err = customer.CreateFundingSource(&FundingSourceRequest{
+	res, err = customer.CreateFundingSource(ctx, &FundingSourceRequest{
 		RoutingNumber:   "1234567890",
 		AccountNumber:   "1234567890",
 		BankAccountType: FundingSourceBankAccountTypeChecking,
@@ -310,7 +310,7 @@ func TestCustomerDeactivate(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"deactivate": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
-	err := customer.Deactivate()
+	err := customer.Deactivate(ctx)
 
 	assert.Nil(t, err)
 }
@@ -319,13 +319,13 @@ func TestCustomerDeactivateError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	err := customer.Deactivate()
+	err := customer.Deactivate(ctx)
 
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "No deactivate resource link")
 
 	customer.Links = Links{"deactivate": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}
-	err = customer.Deactivate()
+	err = customer.Deactivate(ctx)
 
 	assert.Error(t, err)
 }
@@ -334,7 +334,7 @@ func TestCustomerListBeneficialOwners(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "beneficial-owners.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"beneficial-owners": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-owners"}}}}
-	res, err := customer.ListBeneficialOwners()
+	res, err := customer.ListBeneficialOwners(ctx)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -344,13 +344,13 @@ func TestCustomerListBeneficialOwnersError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	res, err := customer.ListBeneficialOwners()
+	res, err := customer.ListBeneficialOwners(ctx)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"beneficial-owners": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-owners"}}}}
-	res, err = customer.ListBeneficialOwners()
+	res, err = customer.ListBeneficialOwners(ctx)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
@@ -360,7 +360,7 @@ func TestCustomerListDocuments(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "documents.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
-	res, err := customer.ListDocuments()
+	res, err := customer.ListDocuments(ctx)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -370,13 +370,13 @@ func TestCustomerListDocumentsError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	res, err := customer.ListDocuments()
+	res, err := customer.ListDocuments(ctx)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
-	res, err = customer.ListDocuments()
+	res, err = customer.ListDocuments(ctx)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
@@ -386,7 +386,7 @@ func TestCustomerListFundingSources(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "funding-sources.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"funding-sources": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/funding-sources"}}}}
-	res, err := customer.ListFundingSources(true)
+	res, err := customer.ListFundingSources(ctx, true)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -396,13 +396,13 @@ func TestCustomerListFundingSourcesError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	res, err := customer.ListFundingSources(true)
+	res, err := customer.ListFundingSources(ctx, true)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"funding-sources": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/funding-sources"}}}}
-	res, err = customer.ListFundingSources(true)
+	res, err = customer.ListFundingSources(ctx, true)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
@@ -412,7 +412,7 @@ func TestCustomerListMassPayments(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "mass-payments.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"mass-payments": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/mass-payments"}}}}
-	res, err := customer.ListMassPayments(nil)
+	res, err := customer.ListMassPayments(ctx, nil)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -422,13 +422,13 @@ func TestCustomerListMassPaymentsError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	res, err := customer.ListMassPayments(nil)
+	res, err := customer.ListMassPayments(ctx, nil)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"mass-payments": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/mass-payments"}}}}
-	res, err = customer.ListMassPayments(nil)
+	res, err = customer.ListMassPayments(ctx, nil)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
@@ -438,7 +438,7 @@ func TestCustomerListTransfers(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "transfers.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"transfers": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/transfers"}}}}
-	res, err := customer.ListTransfers(nil)
+	res, err := customer.ListTransfers(ctx, nil)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -448,13 +448,13 @@ func TestCustomerListTransfersError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	res, err := customer.ListTransfers(nil)
+	res, err := customer.ListTransfers(ctx, nil)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"transfers": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/transfers"}}}}
-	res, err = customer.ListTransfers(nil)
+	res, err = customer.ListTransfers(ctx, nil)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
@@ -464,12 +464,12 @@ func TestCustomerReactivate(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	err := customer.Reactivate()
+	err := customer.Reactivate(ctx)
 
 	assert.Error(t, err)
 
 	customer.Links = Links{"reactivate": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}
-	err = customer.Reactivate()
+	err = customer.Reactivate(ctx)
 
 	assert.Nil(t, err)
 }
@@ -478,13 +478,13 @@ func TestCustomerReactivateError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	err := customer.Reactivate()
+	err := customer.Reactivate(ctx)
 
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "No reactivate resource link")
 
 	customer.Links = Links{"reactivate": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}
-	err = customer.Reactivate()
+	err = customer.Reactivate(ctx)
 
 	assert.Error(t, err)
 }
@@ -506,7 +506,7 @@ func TestCustomerRetrieveBeneficialOwnership(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "beneficial-ownership.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"beneficial-owners": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-owners"}}}}
-	res, err := customer.RetrieveBeneficialOwnership()
+	res, err := customer.RetrieveBeneficialOwnership(ctx)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -516,13 +516,13 @@ func TestCustomerRetrieveBeneficialOwnershipError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	res, err := customer.RetrieveBeneficialOwnership()
+	res, err := customer.RetrieveBeneficialOwnership(ctx)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"beneficial-owners": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-owners"}}}}
-	res, err = customer.RetrieveBeneficialOwnership()
+	res, err = customer.RetrieveBeneficialOwnership(ctx)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
@@ -532,7 +532,7 @@ func TestCustomerRetrieveIAVToken(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "iav-token.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
-	res, err := customer.RetrieveIAVToken()
+	res, err := customer.RetrieveIAVToken(ctx)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -542,13 +542,13 @@ func TestCustomerRetrieveIAVTokenError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	res, err := customer.RetrieveIAVToken()
+	res, err := customer.RetrieveIAVToken(ctx)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
-	res, err = customer.RetrieveIAVToken()
+	res, err = customer.RetrieveIAVToken(ctx)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
@@ -584,12 +584,12 @@ func TestCustomerSuspend(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	err := customer.Suspend()
+	err := customer.Suspend(ctx)
 
 	assert.Error(t, err)
 
 	customer.Links = Links{"suspend": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}
-	err = customer.Suspend()
+	err = customer.Suspend(ctx)
 
 	assert.Nil(t, err)
 }
@@ -598,13 +598,13 @@ func TestCustomerSuspendError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	err := customer.Suspend()
+	err := customer.Suspend(ctx)
 
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "No suspend resource link")
 
 	customer.Links = Links{"suspend": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}
-	err = customer.Suspend()
+	err = customer.Suspend(ctx)
 
 	assert.Error(t, err)
 }
@@ -613,7 +613,7 @@ func TestCustomerUpdate(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
-	err := customer.Update(&CustomerRequest{
+	err := customer.Update(ctx, &CustomerRequest{
 		FirstName: "Foo",
 		LastName:  "Bar",
 	})
@@ -625,7 +625,7 @@ func TestCustomerUpdateError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	err := customer.Update(&CustomerRequest{
+	err := customer.Update(ctx, &CustomerRequest{
 		FirstName: "Foo",
 		LastName:  "Bar",
 	})
@@ -633,7 +633,7 @@ func TestCustomerUpdateError(t *testing.T) {
 	assert.Error(t, err)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
-	err = customer.Update(&CustomerRequest{
+	err = customer.Update(ctx, &CustomerRequest{
 		FirstName: "Foo",
 		LastName:  "Bar",
 	})

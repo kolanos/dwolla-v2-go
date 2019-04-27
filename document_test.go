@@ -9,8 +9,7 @@ import (
 
 func TestDocumentServiceRetrieve(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "document.json"))
-
-	res, err := c.Document.Retrieve("9ed3cf58-7d6f-11e3-81a4-5404a6144203")
+	res, err := c.Document.Retrieve(ctx, "9ed3cf58-7d6f-11e3-81a4-5404a6144203")
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -19,7 +18,7 @@ func TestDocumentServiceRetrieve(t *testing.T) {
 
 func TestDocumentServiceRetrieveError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
-	res, err := c.Document.Retrieve("9ed3cf58-7d6f-11e3-81a4-5404a6144203")
+	res, err := c.Document.Retrieve(ctx, "9ed3cf58-7d6f-11e3-81a4-5404a6144203")
 
 	assert.Error(t, err)
 	assert.Nil(t, res)

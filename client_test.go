@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -8,6 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
+
+var ctx = context.TODO()
 
 func TestClientEnvironment(t *testing.T) {
 	productionClient := New("foobar", "barbaz", Production)
@@ -27,7 +30,7 @@ func TestClientRequestToken(t *testing.T) {
 	c := newMockClient(201, filepath.Join("testdata", "token.json"))
 	c.Token = nil
 
-	assert.NoError(t, c.RequestToken())
+	assert.NoError(t, c.RequestToken(ctx))
 	assert.NotEmpty(t, c.Token.AccessToken)
 }
 
@@ -38,14 +41,14 @@ func TestClientRequestTokenLive(t *testing.T) {
 
 	c := New(os.Getenv("DWOLLA_API_KEY"), os.Getenv("DWOLLA_API_SECRET"), Sandbox)
 
-	assert.NoError(t, c.RequestToken())
+	assert.NoError(t, c.RequestToken(ctx))
 	assert.NotEmpty(t, c.Token.AccessToken)
 }
 
 func TestClientRoot(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "root.json"))
 
-	res, err := c.Root()
+	res, err := c.Root(ctx)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -58,7 +61,7 @@ func TestClientRootLive(t *testing.T) {
 
 	c := New(os.Getenv("DWOLLA_API_KEY"), os.Getenv("DWOLLA_API_SECRET"), Sandbox)
 
-	res, err := c.Root()
+	res, err := c.Root(ctx)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)

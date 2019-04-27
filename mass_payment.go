@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/url"
@@ -32,9 +33,9 @@ const (
 //
 // see: https://docsv2.dwolla.com/#mass-payments
 type MassPaymentService interface {
-	Create(*MassPayment) (*MassPayment, error)
-	Retrieve(string) (*MassPayment, error)
-	Update(string, MassPaymentStatus) (*MassPayment, error)
+	Create(context.Context, *MassPayment) (*MassPayment, error)
+	Retrieve(context.Context, string) (*MassPayment, error)
+	Update(context.Context, string, MassPaymentStatus) (*MassPayment, error)
 }
 
 // MassPaymentServiceOp is an implementation of the mass payment interface
@@ -89,10 +90,10 @@ type MassPaymentItems struct {
 // Create initiates a mass payment
 //
 // see: https://docsv2.dwolla.com/#initiate-a-mass-payment
-func (m *MassPaymentServiceOp) Create(body *MassPayment) (*MassPayment, error) {
+func (m *MassPaymentServiceOp) Create(ctx context.Context, body *MassPayment) (*MassPayment, error) {
 	var payment MassPayment
 
-	if err := m.client.Post("mass-payments", body, nil, &payment); err != nil {
+	if err := m.client.Post(ctx, "mass-payments", body, nil, &payment); err != nil {
 		return nil, err
 	}
 
@@ -104,10 +105,10 @@ func (m *MassPaymentServiceOp) Create(body *MassPayment) (*MassPayment, error) {
 // Retrieve retrieves the mass payment matching the id
 //
 // see: https://docsv2.dwolla.com/#retrieve-a-mass-payment
-func (m *MassPaymentServiceOp) Retrieve(id string) (*MassPayment, error) {
+func (m *MassPaymentServiceOp) Retrieve(ctx context.Context, id string) (*MassPayment, error) {
 	var payment MassPayment
 
-	if err := m.client.Get(fmt.Sprintf("mass-payments/%s", id), nil, nil, &payment); err != nil {
+	if err := m.client.Get(ctx, fmt.Sprintf("mass-payments/%s", id), nil, nil, &payment); err != nil {
 		return nil, err
 	}
 
@@ -119,12 +120,12 @@ func (m *MassPaymentServiceOp) Retrieve(id string) (*MassPayment, error) {
 // Update updates a mass payment's status
 //
 // see: https://docsv2.dwolla.com/#update-a-mass-payment
-func (m *MassPaymentServiceOp) Update(id string, status MassPaymentStatus) (*MassPayment, error) {
+func (m *MassPaymentServiceOp) Update(ctx context.Context, id string, status MassPaymentStatus) (*MassPayment, error) {
 	var payment MassPayment
 
 	body := &MassPayment{Status: status}
 
-	if err := m.client.Post(fmt.Sprintf("mass-payments/%s", id), body, nil, &payment); err != nil {
+	if err := m.client.Post(ctx, fmt.Sprintf("mass-payments/%s", id), body, nil, &payment); err != nil {
 		return nil, err
 	}
 
@@ -136,14 +137,14 @@ func (m *MassPaymentServiceOp) Update(id string, status MassPaymentStatus) (*Mas
 // ListItems returns a collection of items for the mass payment
 //
 // see: https://docsv2.dwolla.com/#list-items-for-a-mass-payment
-func (m *MassPayment) ListItems(params *url.Values) (*MassPaymentItems, error) {
+func (m *MassPayment) ListItems(ctx context.Context, params *url.Values) (*MassPaymentItems, error) {
 	var items MassPaymentItems
 
 	if _, ok := m.Links["items"]; !ok {
 		return nil, errors.New("No items resource link")
 	}
 
-	if err := m.client.Get(m.Links["items"].Href, params, nil, &items); err != nil {
+	if err := m.client.Get(ctx, m.Links["items"].Href, params, nil, &items); err != nil {
 		return nil, err
 	}
 
@@ -159,10 +160,10 @@ func (m *MassPayment) ListItems(params *url.Values) (*MassPaymentItems, error) {
 // RetrieveItem returns a mass payment item matching id
 //
 // see: https://docsv2.dwolla.com/#retrieve-a-mass-payment-item
-func (m *MassPayment) RetrieveItem(id string) (*MassPaymentItem, error) {
+func (m *MassPayment) RetrieveItem(ctx context.Context, id string) (*MassPaymentItem, error) {
 	var item MassPaymentItem
 
-	if err := m.client.Get(fmt.Sprintf("mass-payment-items/%s", id), nil, nil, &item); err != nil {
+	if err := m.client.Get(ctx, fmt.Sprintf("mass-payment-items/%s", id), nil, nil, &item); err != nil {
 		return nil, err
 	}
 
@@ -172,37 +173,37 @@ func (m *MassPayment) RetrieveItem(id string) (*MassPaymentItem, error) {
 }
 
 // RetrieveSource retrieves the mass payment funding source
-func (m *MassPayment) RetrieveSource() (*FundingSource, error) {
+func (m *MassPayment) RetrieveSource(ctx context.Context) (*FundingSource, error) {
 	if _, ok := m.Links["source"]; !ok {
 		return nil, errors.New("No source resource link")
 	}
 
-	return m.client.FundingSource.Retrieve(m.Links["source"].Href)
+	return m.client.FundingSource.Retrieve(ctx, m.Links["source"].Href)
 }
 
 // RetrieveDestination retrieves the destination for the item
-func (m *MassPaymentItem) RetrieveDestination() (*Customer, error) {
+func (m *MassPaymentItem) RetrieveDestination(ctx context.Context) (*Customer, error) {
 	if _, ok := m.Links["destination"]; !ok {
 		return nil, errors.New("No destination resource link")
 	}
 
-	return m.client.Customer.Retrieve(m.Links["destination"].Href)
+	return m.client.Customer.Retrieve(ctx, m.Links["destination"].Href)
 }
 
 // RetrieveMassPayment retrieves the mass payment for the item
-func (m *MassPaymentItem) RetrieveMassPayment() (*MassPayment, error) {
+func (m *MassPaymentItem) RetrieveMassPayment(ctx context.Context) (*MassPayment, error) {
 	if _, ok := m.Links["mass-payment"]; !ok {
 		return nil, errors.New("No mass payment resource link")
 	}
 
-	return m.client.MassPayment.Retrieve(m.Links["mass-payment"].Href)
+	return m.client.MassPayment.Retrieve(ctx, m.Links["mass-payment"].Href)
 }
 
 // RetrieveTransfer retrieves the transfer for the item
-func (m *MassPaymentItem) RetrieveTransfer() (*Transfer, error) {
+func (m *MassPaymentItem) RetrieveTransfer(ctx context.Context) (*Transfer, error) {
 	if _, ok := m.Links["transfer"]; !ok {
 		return nil, errors.New("No transfer resource link")
 	}
 
-	return m.client.Transfer.Retrieve(m.Links["transfer"].Href)
+	return m.client.Transfer.Retrieve(ctx, m.Links["transfer"].Href)
 }

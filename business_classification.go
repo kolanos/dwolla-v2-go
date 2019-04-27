@@ -1,14 +1,15 @@
 package dwolla
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 )
 
 // BusinessClassificationService is the business classification interface
 type BusinessClassificationService interface {
-	Retrieve(string) (*BusinessClassification, error)
-	List(*url.Values) (*BusinessClassifications, error)
+	Retrieve(context.Context, string) (*BusinessClassification, error)
+	List(context.Context, *url.Values) (*BusinessClassifications, error)
 }
 
 // BusinessClassificationServiceOp is an implementation of the business
@@ -40,10 +41,10 @@ type IndustryClassification struct {
 // Retrieve retrieves a business classification matching the id
 //
 // see: https://docsv2.dwolla.com/#retrieve-a-business-classification
-func (b *BusinessClassificationServiceOp) Retrieve(id string) (*BusinessClassification, error) {
+func (b *BusinessClassificationServiceOp) Retrieve(ctx context.Context, id string) (*BusinessClassification, error) {
 	var classification BusinessClassification
 
-	if err := b.client.Get(fmt.Sprintf("business-classifications/%s", id), nil, nil, &classification); err != nil {
+	if err := b.client.Get(ctx, fmt.Sprintf("business-classifications/%s", id), nil, nil, &classification); err != nil {
 		return nil, err
 	}
 
@@ -55,10 +56,10 @@ func (b *BusinessClassificationServiceOp) Retrieve(id string) (*BusinessClassifi
 // List returns a collection of business classifications
 //
 // see: https://docsv2.dwolla.com/#list-business-classifications
-func (b *BusinessClassificationServiceOp) List(params *url.Values) (*BusinessClassifications, error) {
+func (b *BusinessClassificationServiceOp) List(ctx context.Context, params *url.Values) (*BusinessClassifications, error) {
 	var classifications BusinessClassifications
 
-	if err := b.client.Get("business-classifications", params, nil, &classifications); err != nil {
+	if err := b.client.Get(ctx, "business-classifications", params, nil, &classifications); err != nil {
 		return nil, err
 	}
 

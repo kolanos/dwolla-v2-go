@@ -1,6 +1,7 @@
 package dwolla
 
 import (
+	"context"
 	"errors"
 	"fmt"
 )
@@ -9,10 +10,10 @@ import (
 //
 // see: https://docsv2.dwolla.com/#webhook-subscriptions
 type WebhookSubscriptionService interface {
-	Create(*WebhookSubscriptionRequest) (*WebhookSubscription, error)
-	Retrieve(string) (*WebhookSubscription, error)
-	List() (*WebhookSubscriptions, error)
-	Remove(string) error
+	Create(context.Context, *WebhookSubscriptionRequest) (*WebhookSubscription, error)
+	Retrieve(context.Context, string) (*WebhookSubscription, error)
+	List(context.Context) (*WebhookSubscriptions, error)
+	Remove(context.Context, string) error
 }
 
 // WebhookSubscriptionServiceOp is an implementation of the webhook
@@ -44,10 +45,10 @@ type WebhookSubscriptionRequest struct {
 }
 
 // Create creates a webhook subscription
-func (w *WebhookSubscriptionServiceOp) Create(body *WebhookSubscriptionRequest) (*WebhookSubscription, error) {
+func (w *WebhookSubscriptionServiceOp) Create(ctx context.Context, body *WebhookSubscriptionRequest) (*WebhookSubscription, error) {
 	var subscription WebhookSubscription
 
-	if err := w.client.Post("webhook-subscriptions", body, nil, &subscription); err != nil {
+	if err := w.client.Post(ctx, "webhook-subscriptions", body, nil, &subscription); err != nil {
 		return nil, err
 	}
 
@@ -57,10 +58,10 @@ func (w *WebhookSubscriptionServiceOp) Create(body *WebhookSubscriptionRequest) 
 }
 
 // Retrieve retrieves the webhook subscription matching id
-func (w *WebhookSubscriptionServiceOp) Retrieve(id string) (*WebhookSubscription, error) {
+func (w *WebhookSubscriptionServiceOp) Retrieve(ctx context.Context, id string) (*WebhookSubscription, error) {
 	var subscription WebhookSubscription
 
-	if err := w.client.Get(fmt.Sprintf("webhook-subscriptions/%s", id), nil, nil, &subscription); err != nil {
+	if err := w.client.Get(ctx, fmt.Sprintf("webhook-subscriptions/%s", id), nil, nil, &subscription); err != nil {
 		return nil, err
 	}
 
@@ -70,10 +71,10 @@ func (w *WebhookSubscriptionServiceOp) Retrieve(id string) (*WebhookSubscription
 }
 
 // List returns a list of webhook subscriptions
-func (w *WebhookSubscriptionServiceOp) List() (*WebhookSubscriptions, error) {
+func (w *WebhookSubscriptionServiceOp) List(ctx context.Context) (*WebhookSubscriptions, error) {
 	var subscriptions WebhookSubscriptions
 
-	if err := w.client.Get("webhook-subscriptions", nil, nil, &subscriptions); err != nil {
+	if err := w.client.Get(ctx, "webhook-subscriptions", nil, nil, &subscriptions); err != nil {
 		return nil, err
 	}
 
@@ -86,50 +87,50 @@ func (w *WebhookSubscriptionServiceOp) List() (*WebhookSubscriptions, error) {
 }
 
 // Remove removes the webhook subscription matching the id
-func (w *WebhookSubscriptionServiceOp) Remove(id string) error {
-	return w.client.Delete(fmt.Sprintf("webhook-subscriptions/%s", id), nil, nil)
+func (w *WebhookSubscriptionServiceOp) Remove(ctx context.Context, id string) error {
+	return w.client.Delete(ctx, fmt.Sprintf("webhook-subscriptions/%s", id), nil, nil)
 }
 
 // Pause pauses the webhook subscription
-func (w *WebhookSubscription) Pause() error {
+func (w *WebhookSubscription) Pause(ctx context.Context) error {
 	if _, ok := w.Links["self"]; !ok {
 		return errors.New("No self resource link")
 	}
 
 	body := &WebhookSubscriptionRequest{Paused: true}
 
-	return w.client.Post(w.Links["self"].Href, body, nil, w)
+	return w.client.Post(ctx, w.Links["self"].Href, body, nil, w)
 }
 
 // Remove removes the webhook subscription
-func (w *WebhookSubscription) Remove() error {
+func (w *WebhookSubscription) Remove(ctx context.Context) error {
 	if _, ok := w.Links["self"]; !ok {
 		return errors.New("No self resource link")
 	}
 
-	return w.client.Delete(w.Links["self"].Href, nil, nil)
+	return w.client.Delete(ctx, w.Links["self"].Href, nil, nil)
 }
 
 // Unpause unpauses the webhook subscription
-func (w *WebhookSubscription) Unpause() error {
+func (w *WebhookSubscription) Unpause(ctx context.Context) error {
 	if _, ok := w.Links["self"]; !ok {
 		return errors.New("No self resource link")
 	}
 
 	body := &WebhookSubscriptionRequest{Paused: false}
 
-	return w.client.Post(w.Links["self"].Href, body, nil, w)
+	return w.client.Post(ctx, w.Links["self"].Href, body, nil, w)
 }
 
 // RetrieveWebhooks returns webhooks for this webhook subscription
-func (w *Webhook) RetrieveWebhooks() (*Webhooks, error) {
+func (w *Webhook) RetrieveWebhooks(ctx context.Context) (*Webhooks, error) {
 	var webhooks Webhooks
 
 	if _, ok := w.Links["webhooks"]; !ok {
 		return nil, errors.New("No webhooks resource link")
 	}
 
-	if err := w.client.Get(w.Links["webhooks"].Href, nil, nil, &webhooks); err != nil {
+	if err := w.client.Get(ctx, w.Links["webhooks"].Href, nil, nil, &webhooks); err != nil {
 		return nil, err
 	}
 
