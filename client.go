@@ -197,11 +197,12 @@ func (c *Client) RequestToken(ctx context.Context) error {
 	req = req.WithContext(ctx)
 
 	res, err := c.HTTPClient.Do(req)
-	defer res.Body.Close()
 
 	if err != nil {
 		return err
 	}
+
+	defer res.Body.Close()
 
 	resBody, err := ioutil.ReadAll(res.Body)
 
@@ -274,11 +275,12 @@ func (c *Client) Get(ctx context.Context, path string, params *url.Values, heade
 	req = req.WithContext(ctx)
 
 	res, err := c.HTTPClient.Do(req)
-	defer res.Body.Close()
 
 	if err != nil {
 		return err
 	}
+
+	defer res.Body.Close()
 
 	resBody, err := ioutil.ReadAll(res.Body)
 
@@ -353,11 +355,12 @@ func (c *Client) Post(ctx context.Context, path string, body interface{}, header
 	req = req.WithContext(ctx)
 
 	res, err := c.HTTPClient.Do(req)
-	defer res.Body.Close()
 
 	if err != nil {
 		return err
 	}
+
+	defer res.Body.Close()
 
 	// When creating a resource, Dwolla will return a 201 and a "Location"
 	// header. This just cuts to the chase and retrieves the resource.
@@ -457,12 +460,15 @@ func (c *Client) Upload(ctx context.Context, path string, documentType DocumentT
 	req = req.WithContext(ctx)
 
 	res, err := c.HTTPClient.Do(req)
-	defer res.Body.Close()
 
 	if err != nil {
 		return err
 	}
 
+	defer res.Body.Close()
+
+	// When creating a resource, Dwolla will return a 201 and a "Location"
+	// header. This just cuts to the chase and retrieves the resource.
 	if res.Header.Get("Location") != "" {
 		return c.Get(ctx, res.Header.Get("Location"), nil, nil, container)
 	}
@@ -531,11 +537,12 @@ func (c *Client) Delete(ctx context.Context, path string, params *url.Values, he
 	req = req.WithContext(ctx)
 
 	res, err := c.HTTPClient.Do(req)
-	defer res.Body.Close()
 
 	if err != nil {
 		return err
 	}
+
+	defer res.Body.Close()
 
 	if res.StatusCode > 299 {
 		resBody, err := ioutil.ReadAll(res.Body)
