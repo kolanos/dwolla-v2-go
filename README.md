@@ -1,4 +1,4 @@
-# dwolla-v2-go
+m# dwolla-v2-go
 
 [![Build Status][1]][2] [![Code Coverage][3]][4] [![GoDoc][5]][6] [![MIT][7]][8] [![Go Report Card][9]][10]
 
@@ -14,3 +14,53 @@
 [10]: https://goreportcard.com/report/github.com/kolanos/dwolla-v2-go
 
 A Go wrapper for the Dwolla API V2
+
+## Requirements
+
+* Go v1.11+ (uses modules)
+
+## Install
+
+```bash
+go get -u github.com/kolanos/dwolla-v2-go
+```
+
+## Usage
+
+To instantiate the client:
+
+```go
+package main
+
+import (
+	"context"
+    "fmt"
+
+	"github.com/kolanos/dwolla-v2-go"
+)
+
+var ctx = context.Background()
+
+func main() {
+	client := dwolla.New("<your dwolla key here>", "<your dwolla secret here>", dwolla.Production)
+
+    # Or if using the Dwolla sandbox
+	#client := dwolla.New("<your dwolla key here>", "<your dwolla secret here>", dwolla.Sandbox)
+}
+```
+
+To retrieve dwolla account information:
+
+```go
+res, err := client.Account.Retrieve(ctx)
+
+if err != nil {
+	fmt.Printf("Error: %s\n", err)
+    return err
+}
+
+fmt.Printf("Account ID: %s\n", res.ID)
+fmt.Printf("Account Name: %s\n", res.Name)
+```
+
+See the [GoDoc](https://godoc.org/github.com/kolanos/dwolla-v2-go) for the full API.
