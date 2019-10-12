@@ -84,6 +84,7 @@ type Customer struct {
 	City         string         `json:"city"`
 	State        string         `json:"state"`
 	PostalCode   string         `json:"postalCode"`
+	Phone        string         `json:"phone"`
 	BusinessName string         `json:"businessName"`
 	Controller   Controller     `json:"controller"`
 }

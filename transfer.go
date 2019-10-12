@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 )
 
@@ -99,13 +100,14 @@ type TransferFees struct {
 // TransferRequest is a transfer request
 type TransferRequest struct {
 	Resource
-	Status        TransferStatus      `json:"status,omitempty"`
-	Amount        Amount              `json:"amount,omitempty"`
-	MetaData      MetaData            `json:"metadata,omitempty"`
-	Fees          []TransferFee       `json:"fees,omitempty"`
-	Clearing      TransferClearing    `json:"clearing,omitempty"`
-	CorrelationID string              `json:"correlationId,omitempty"`
-	ACHDetails    *TransferACHDetails `json:"achDetails,omitempty"`
+	Status         TransferStatus      `json:"status,omitempty"`
+	Amount         Amount              `json:"amount,omitempty"`
+	MetaData       MetaData            `json:"metadata,omitempty"`
+	Fees           []TransferFee       `json:"fees,omitempty"`
+	Clearing       TransferClearing    `json:"clearing,omitempty"`
+	CorrelationID  string              `json:"correlationId,omitempty"`
+	ACHDetails     *TransferACHDetails `json:"achDetails,omitempty"`
+	IdempotencyKey string              `json:"-"`
 }
 
 // Create initiates a transfer
@@ -114,7 +116,12 @@ type TransferRequest struct {
 func (t *TransferServiceOp) Create(ctx context.Context, body *TransferRequest) (*Transfer, error) {
 	var transfer Transfer
 
-	if err := t.client.Post(ctx, "transfers", body, nil, &transfer); err != nil {
+	headers := &http.Header{}
+	if body.IdempotencyKey != "" {
+		headers.Set("Idempotency-Key", body.IdempotencyKey)
+	}
+
+	if err := t.client.Post(ctx, "transfers", body, headers, &transfer); err != nil {
 		return nil, err
 	}
 
