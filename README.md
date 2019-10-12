@@ -1,4 +1,4 @@
-m# dwolla-v2-go
+# dwolla-v2-go
 
 [![Build Status][1]][2] [![Code Coverage][3]][4] [![GoDoc][5]][6] [![MIT][7]][8] [![Go Report Card][9]][10]
 
@@ -34,7 +34,7 @@ package main
 
 import (
 	"context"
-    "fmt"
+	"fmt"
 
 	"github.com/kolanos/dwolla-v2-go"
 )
@@ -44,7 +44,7 @@ var ctx = context.Background()
 func main() {
 	client := dwolla.New("<your dwolla key here>", "<your dwolla secret here>", dwolla.Production)
 
-    # Or if using the Dwolla sandbox
+	# Or if using the Dwolla sandbox
 	#client := dwolla.New("<your dwolla key here>", "<your dwolla secret here>", dwolla.Sandbox)
 }
 ```
@@ -55,12 +55,16 @@ To retrieve dwolla account information:
 res, err := client.Account.Retrieve(ctx)
 
 if err != nil {
-	fmt.Printf("Error: %s\n", err)
-    return err
+	fmt.Println("Error:", err)
+	return err
 }
 
-fmt.Printf("Account ID: %s\n", res.ID)
-fmt.Printf("Account Name: %s\n", res.Name)
+fmt.Println("Account ID:", res.ID)
+fmt.Println("Account Name:", res.Name)
 ```
 
 See the [GoDoc](https://godoc.org/github.com/kolanos/dwolla-v2-go) for the full API.
+
+## License
+
+MIT License
