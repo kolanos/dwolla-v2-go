@@ -80,6 +80,7 @@ type Client struct {
 	MassPayment            MassPaymentService
 	OnDemandAuthorization  OnDemandAuthorizationService
 	Transfer               TransferService
+	TransferFailure        *TransferFailureServiceOp
 	Webhook                WebhookService
 	WebhookSubscription    WebhookSubscriptionService
 }
@@ -112,6 +113,7 @@ func NewWithHTTPClient(key, secret string, environment Environment, httpClient H
 	c.MassPayment = &MassPaymentServiceOp{c}
 	c.OnDemandAuthorization = &OnDemandAuthorizationServiceOp{c}
 	c.Transfer = &TransferServiceOp{c}
+	c.TransferFailure = &TransferFailureServiceOp{client: c}
 	c.Webhook = &WebhookServiceOp{c}
 	c.WebhookSubscription = &WebhookSubscriptionServiceOp{c}
 
