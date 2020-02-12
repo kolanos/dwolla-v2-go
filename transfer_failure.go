@@ -39,9 +39,9 @@ type TransferFailureServiceOp struct {
 // TransferFailure is a dwolla transfer
 type TransferFailure struct {
 	Resource
-	Code        TransferFailureCode
-	Description string
-	Explanation string
+	Code        TransferFailureCode `json:"code"`
+	Description string              `json:"description"`
+	Explanation string              `json:"explanation"`
 }
 
 func (t TransferFailureServiceOp) Retrieve(ctx context.Context, transferID string) (*TransferFailure, error) {
