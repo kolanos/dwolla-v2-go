@@ -1,11 +1,15 @@
 package dwolla
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
+
+var ErrNoID = errors.New("unable to extract ID")
 
 // Address represents a street address
 type Address struct {
@@ -44,6 +48,21 @@ type MetaData map[string]interface{}
 type Passport struct {
 	Number  string `json:"number"`
 	Country string `json:"country"`
+}
+
+// IDFromHREF takes an HREF link and returns the ID at the end of the HREF.
+// This is useful for processing webhooks where you have an HREF, but need
+// to make calls using this SDK, which expects bare IDs.
+//
+// If the input HREF is malformed, or this function is unable to extract the ID,
+// ErrNoID will be returned.
+func IDFromHREF(href string) (string, error) {
+	lastIDX := strings.LastIndex(href, "/")
+	if lastIDX < 0 {
+		return "", ErrNoID
+	}
+
+	return href[lastIDX:], nil
 }
 
 type mockHTTPClient struct {
