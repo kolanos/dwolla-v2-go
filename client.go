@@ -30,11 +30,17 @@ const (
 	ProductionAPIURL = "https://api.dwolla.com"
 	// ProductionAuthURL is the production auth url
 	ProductionAuthURL = "https://www.dwolla.com/oauth/v2/authenticate"
+	// ProductionTokenURL is the production token url
+	// Deprecated - use APIURL moving forward
+	ProductionTokenURL = "https://accounts.dwolla.com/token"
 
 	// SandboxAPIURL is the sandbox api url
 	SandboxAPIURL = "https://api-sandbox.dwolla.com"
 	// SandboxAuthURL is the sandbox auth url
 	SandboxAuthURL = "https://sandbox.dwolla.com/oauth/v2/authenticate"
+	// SandboxTokenURL is the sandbox token url
+	// Deprecated - use SandboxAPIURL moving forward
+	SandboxTokenURL = "https://accounts-sandbox.dwolla.com/token"
 )
 
 // Token is a dwolla auth token
@@ -154,6 +160,20 @@ func (c Client) AuthURL() string {
 		url = ProductionAuthURL
 	case Sandbox:
 		url = SandboxAuthURL
+	}
+
+	return url
+}
+
+// TokenURL returns the token url for the environment
+func (c Client) TokenURL() string {
+	var url string
+
+	switch c.Environment {
+	case Production:
+		url = ProductionTokenURL
+	case Sandbox:
+		url = SandboxTokenURL
 	}
 
 	return url
