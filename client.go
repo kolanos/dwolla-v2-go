@@ -31,7 +31,7 @@ const (
 	// ProductionAuthURL is the production auth url
 	ProductionAuthURL = "https://www.dwolla.com/oauth/v2/authenticate"
 	// ProductionTokenURL is the production token url
-	// Deprecated - use APIURL moving forward
+	// Deprecated - use https://api.dwolla.com/token moving forward
 	ProductionTokenURL = "https://accounts.dwolla.com/token"
 
 	// SandboxAPIURL is the sandbox api url
@@ -39,7 +39,7 @@ const (
 	// SandboxAuthURL is the sandbox auth url
 	SandboxAuthURL = "https://sandbox.dwolla.com/oauth/v2/authenticate"
 	// SandboxTokenURL is the sandbox token url
-	// Deprecated - use SandboxAPIURL moving forward
+	// Deprecated - use https://api-sandbox.dwolla.com moving forward
 	SandboxTokenURL = "https://accounts-sandbox.dwolla.com/token"
 )
 
