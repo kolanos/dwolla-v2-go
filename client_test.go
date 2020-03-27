@@ -17,11 +17,13 @@ func TestClientEnvironment(t *testing.T) {
 
 	assert.Equal(t, productionClient.APIURL(), ProductionAPIURL)
 	assert.Equal(t, productionClient.AuthURL(), ProductionAuthURL)
+	assert.Equal(t, productionClient.TokenURL(), ProductionTokenURL)
 
 	sandboxClient := New("foobar", "barbaz", Sandbox)
 
 	assert.Equal(t, sandboxClient.APIURL(), SandboxAPIURL)
 	assert.Equal(t, sandboxClient.AuthURL(), SandboxAuthURL)
+	assert.Equal(t, sandboxClient.TokenURL(), SandboxTokenURL)
 }
 
 func TestClientRequestToken(t *testing.T) {
