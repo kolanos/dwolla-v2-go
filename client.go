@@ -30,15 +30,11 @@ const (
 	ProductionAPIURL = "https://api.dwolla.com"
 	// ProductionAuthURL is the production auth url
 	ProductionAuthURL = "https://www.dwolla.com/oauth/v2/authenticate"
-	// ProductionTokenURL is the production token url
-	ProductionTokenURL = "https://accounts.dwolla.com/token"
 
 	// SandboxAPIURL is the sandbox api url
 	SandboxAPIURL = "https://api-sandbox.dwolla.com"
 	// SandboxAuthURL is the sandbox auth url
 	SandboxAuthURL = "https://sandbox.dwolla.com/oauth/v2/authenticate"
-	// SandboxTokenURL is the sandbox token url
-	SandboxTokenURL = "https://accounts-sandbox.dwolla.com/token"
 )
 
 // Token is a dwolla auth token
@@ -163,20 +159,6 @@ func (c Client) AuthURL() string {
 	return url
 }
 
-// TokenURL returns the token url for the environment
-func (c Client) TokenURL() string {
-	var url string
-
-	switch c.Environment {
-	case Production:
-		url = ProductionTokenURL
-	case Sandbox:
-		url = SandboxTokenURL
-	}
-
-	return url
-}
-
 // RequestToken requests a new auth token using client credentials
 func (c *Client) RequestToken(ctx context.Context) error {
 	var (
@@ -186,7 +168,7 @@ func (c *Client) RequestToken(ctx context.Context) error {
 
 	buf := bytes.NewBuffer([]byte("grant_type=client_credentials"))
 
-	req, err := http.NewRequest("POST", c.TokenURL(), buf)
+	req, err := http.NewRequest("POST", c.BuildAPIURL("token"), buf)
 	if err != nil {
 		return err
 	}
