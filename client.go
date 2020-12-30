@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -85,6 +86,17 @@ type Client struct {
 	TransferFailure        *TransferFailureServiceOp
 	Webhook                WebhookService
 	WebhookSubscription    WebhookSubscriptionService
+}
+
+// ClientTokenRequest is a client token request
+type ClientTokenRequest struct {
+	Resource
+	Action string `json:"action"`
+}
+
+// ClientToken is a general use client token
+type ClientToken struct {
+	Token string `json:"token"`
 }
 
 // New initializes a new dwolla client
@@ -597,4 +609,27 @@ func (c *Client) Root(ctx context.Context) (*Resource, error) {
 // see: https://developers.dwolla.com/resources/testing.html#simulate-bank-transfer-processing
 func (c *Client) SandboxSimulations(ctx context.Context) error {
 	return c.Post(ctx, "sandbox-simulations", nil, nil, nil)
+}
+
+// CreateClientToken creates a general use client token
+//
+// see: https://docsv2.dwolla.com/#create-a-client-token
+func (c *Client) CreateClientToken(ctx context.Context, action string, customer *Customer) (*ClientToken, error) {
+	body := ClientTokenRequest{Action: action}
+
+	if customer != nil {
+		if _, ok := customer.Links["self"]; !ok {
+			return nil, errors.New("No self resource link")
+		}
+
+		body.Resource = *NewResource(Links{"customer": Link{Href: customer.Links["self"].Href}}, nil)
+	}
+
+	var token ClientToken
+
+	if err := c.Post(ctx, "client-tokens", body, nil, token); err != nil {
+		return nil, err
+	}
+
+	return &token, nil
 }

@@ -36,8 +36,8 @@ func (v ValidationError) Error() string {
 // Link is a hal resource link
 type Link struct {
 	Href         string `json:"href"`
-	ResourceType string `json:"resource-type"`
-	Type         string `json:"type"`
+	ResourceType string `json:"resource-type,omitempty"`
+	Type         string `json:"type,omitempty"`
 }
 
 // Links is a group of resource links
