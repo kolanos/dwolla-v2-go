@@ -72,21 +72,22 @@ type CustomerType string
 // Customer is a dwolla customer
 type Customer struct {
 	Resource
-	ID           string         `json:"id"`
-	FirstName    string         `json:"firstName"`
-	LastName     string         `json:"lastName"`
-	Email        string         `json:"email"`
-	Type         CustomerType   `json:"type"`
-	Status       CustomerStatus `json:"status"`
-	Created      string         `json:"created"`
-	Address1     string         `json:"address1"`
-	Address2     string         `json:"address2"`
-	City         string         `json:"city"`
-	State        string         `json:"state"`
-	PostalCode   string         `json:"postalCode"`
-	Phone        string         `json:"phone"`
-	BusinessName string         `json:"businessName"`
-	Controller   Controller     `json:"controller"`
+	ID            string         `json:"id"`
+	FirstName     string         `json:"firstName"`
+	LastName      string         `json:"lastName"`
+	Email         string         `json:"email"`
+	Type          CustomerType   `json:"type"`
+	Status        CustomerStatus `json:"status"`
+	Created       string         `json:"created"`
+	Address1      string         `json:"address1"`
+	Address2      string         `json:"address2"`
+	City          string         `json:"city"`
+	State         string         `json:"state"`
+	PostalCode    string         `json:"postalCode"`
+	Phone         string         `json:"phone"`
+	BusinessName  string         `json:"businessName"`
+	Controller    Controller     `json:"controller"`
+	CorrelationID string         `json:"correlationId"`
 }
 
 // Customers is a collection of customers
@@ -122,6 +123,7 @@ type CustomerRequest struct {
 	EIN                    string             `json:"ein,omitempty"`
 	Website                string             `json:"website,omitempty"`
 	Controller             *ControllerRequest `json:"controller,omitempty"`
+	CorrelationID          string             `json:"correlationId,omitempty"`
 }
 
 // ControllerRequest is a controller of a business create/update request
