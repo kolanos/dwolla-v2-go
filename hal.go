@@ -30,7 +30,11 @@ type ValidationError struct {
 
 // Error implements the error interface
 func (v ValidationError) Error() string {
-	return fmt.Sprintf("[%s] %s", v.Code, v.Message)
+	errorMessage := fmt.Sprintf("[%s] %s", v.Code, v.Message)
+	if len(v.Embedded) != 0 && len(v.Embedded["errors"]) != 0 {
+		errorMessage += v.Embedded["errors"][0].Message
+	}
+	return errorMessage
 }
 
 // Link is a hal resource link
