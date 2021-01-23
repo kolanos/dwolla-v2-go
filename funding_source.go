@@ -91,6 +91,12 @@ type FundingSourceRequest struct {
 	PlaidToken      string                       `json:"plaidToken,omitempty"`
 }
 
+// FundingSourceToken is a funding source dwolla.js token
+type FundingSourceToken struct {
+	Resource
+	Token string `json:"token"`
+}
+
 // Retrieve retrieves a funding source with the matching id
 //
 // see: https://docsv2.dwolla.com/#retrieve-a-funding-source

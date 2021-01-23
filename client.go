@@ -80,6 +80,7 @@ type Client struct {
 	Document               DocumentService
 	Event                  EventService
 	FundingSource          FundingSourceService
+	KBA                    KBAService
 	MassPayment            MassPaymentService
 	OnDemandAuthorization  OnDemandAuthorizationService
 	Transfer               TransferService
@@ -124,6 +125,7 @@ func NewWithHTTPClient(key, secret string, environment Environment, httpClient H
 	c.Document = &DocumentServiceOp{c}
 	c.Event = &EventServiceOp{c}
 	c.FundingSource = &FundingSourceServiceOp{c}
+	c.KBA = &KBAServiceOp{c}
 	c.MassPayment = &MassPaymentServiceOp{c}
 	c.OnDemandAuthorization = &OnDemandAuthorizationServiceOp{c}
 	c.Transfer = &TransferServiceOp{c}
