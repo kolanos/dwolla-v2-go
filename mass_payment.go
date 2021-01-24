@@ -51,6 +51,8 @@ type MassPayment struct {
 	Resource
 	ID            string                       `json:"id,omitempty"`
 	Status        MassPaymentStatus            `json:"status,omitempty"`
+	ACHDetails    ACHDetails                   `json:"achDetails,omitempty"`
+	Clearing      Clearing                     `json:"clearing,omitempty"`
 	Items         []MassPaymentItem            `json:"items,omitempty"`
 	Embedded      map[string][]MassPaymentItem `json:"_embedded,omitempty"`
 	Created       string                       `json:"created,omitempty"`

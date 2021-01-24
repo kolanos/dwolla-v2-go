@@ -11,6 +11,31 @@ import (
 
 var ErrNoID = errors.New("unable to extract ID")
 
+// ACHDetails contains data sent to the bank account
+type ACHDetails struct {
+	Destination Addenda `json:"destination,omitempty"`
+	Source      Addenda `json:"source,omitempty"`
+}
+
+// TransferACHDetails is an alias of ACHDetails for backwards compatibility
+type TransferACHDetails = ACHDetails
+
+// Addenda is a transfer addenda
+type Addenda struct {
+	Addenda TransferAddendaValues `json:"addenda,omitempty"`
+}
+
+// TransferAddenda is an alias of Addenda for backwards compatibility
+type TransferAddenda = Addenda
+
+// AddendaValues is the addenda values
+type AddendaValues struct {
+	Values []string `json:"values,omitempty"`
+}
+
+// TransferAddendaValues is an alias of AddendaValues for backwards compatibility
+type TransferAddendaValues = AddendaValues
+
 // Address represents a street address
 type Address struct {
 	Address1            string `json:"address1"`
@@ -40,6 +65,15 @@ const (
 	// USD is U.S. dollars
 	USD Currency = "usd"
 )
+
+// Clearing is a transfer clearing schedule
+type Clearing struct {
+	Destination string `json:"destination,omitempty"`
+	Source      string `json:"source,omitempty"`
+}
+
+// TransferClearing is an alias of Clearing for backwards compatiblity
+type TransferClearing = Clearing
 
 // MetaData represents key/value meta data
 type MetaData map[string]interface{}

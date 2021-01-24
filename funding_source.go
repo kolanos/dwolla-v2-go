@@ -76,6 +76,7 @@ type FundingSourceBankAccountType string
 type FundingSourceBalance struct {
 	Resource
 	Balance     Amount `json:"balance"`
+	Total       Amount `json:"total"`
 	LastUpdated string `json:"lastUpdated"`
 }
 
