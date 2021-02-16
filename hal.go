@@ -32,7 +32,7 @@ type ValidationError struct {
 func (v ValidationError) Error() string {
 	errorMessage := fmt.Sprintf("[%s] %s", v.Code, v.Message)
 	if len(v.Embedded) != 0 && len(v.Embedded["errors"]) != 0 {
-		errorMessage += v.Embedded["errors"][0].Message
+		errorMessage = v.Embedded["errors"][0].Message
 	}
 	return errorMessage
 }
