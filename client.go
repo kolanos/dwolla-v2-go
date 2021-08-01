@@ -608,7 +608,7 @@ func (c *Client) CreateClientToken(ctx context.Context, action string, customer 
 
 	var token ClientToken
 
-	if err := c.Post(ctx, "client-tokens", body, nil, token); err != nil {
+	if err := c.Post(ctx, "client-tokens", body, nil, &token); err != nil {
 		return nil, err
 	}
 
