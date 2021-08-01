@@ -413,8 +413,9 @@ func (c *Client) Post(ctx context.Context, path string, body interface{}, header
 // Upload performs a multipart file upload to the Dwolla API
 func (c *Client) Upload(ctx context.Context, path string, documentType DocumentType, fileName string, file io.Reader, container interface{}) error {
 	var (
-		err      error
-		halError HALError
+		err             error
+		halError        HALError
+		validationError ValidationError
 	)
 
 	if err = c.EnsureToken(ctx); err != nil {
@@ -486,6 +487,14 @@ func (c *Client) Upload(ctx context.Context, path string, documentType DocumentT
 			}
 
 			return c.Upload(ctx, path, documentType, fileName, file, container)
+		}
+
+		if halError.Code == "ValidationError" {
+			if err := json.Unmarshal(resBody, &validationError); err != nil {
+				return err
+			}
+
+			return validationError
 		}
 
 		return halError
