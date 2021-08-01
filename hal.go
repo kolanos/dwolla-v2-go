@@ -14,7 +14,7 @@ type HALError struct {
 
 // HALError implements the error interface
 func (e HALError) Error() string {
-	return fmt.Sprintf("[%s] %s", e.Code, e.Message)
+	return fmt.Sprintf("[%s] %s (%s)", e.Code, e.Message, e.Path)
 }
 
 // HALErrors is an array of embedded hal errors
@@ -24,13 +24,12 @@ type HALErrors map[string][]HALError
 type ValidationError struct {
 	Code     string    `json:"code"`
 	Message  string    `json:"message"`
-	Path     string    `json:"path"`
 	Embedded HALErrors `json:"_embedded"`
 }
 
 // Error implements the error interface
 func (v ValidationError) Error() string {
-	return fmt.Sprintf("[%s] %s", v.Code, v.Message)
+	return fmt.Sprintf("[%s] %s (%v)", v.Code, v.Message, v.Embedded)
 }
 
 // Link is a hal resource link
