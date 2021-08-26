@@ -76,6 +76,7 @@ type FundingSourceBankAccountType string
 type FundingSourceBalance struct {
 	Resource
 	Balance     Amount `json:"balance"`
+	Total       Amount `json:"total"`
 	LastUpdated string `json:"lastUpdated"`
 }
 
@@ -89,6 +90,12 @@ type FundingSourceRequest struct {
 	Channels        []string                     `json:"channels,omitempty"`
 	Removed         bool                         `json:"removed,omitempty"`
 	PlaidToken      string                       `json:"plaidToken,omitempty"`
+}
+
+// FundingSourceToken is a funding source dwolla.js token
+type FundingSourceToken struct {
+	Resource
+	Token string `json:"token"`
 }
 
 // Retrieve retrieves a funding source with the matching id

@@ -40,42 +40,20 @@ type TransferStatus string
 // Transfer is a dwolla transfer
 type Transfer struct {
 	Resource
-	ID              string           `json:"id"`
-	Status          TransferStatus   `json:"status"`
-	Amount          Amount           `json:"amount"`
-	Created         string           `json:"created"`
-	MetaData        MetaData         `json:"metadata"`
-	Clearing        TransferClearing `json:"clearing"`
-	CorrelationID   string           `json:"correlationId"`
-	IndividualACHID string           `json:"individualAchId"`
+	ID              string         `json:"id"`
+	Status          TransferStatus `json:"status"`
+	Amount          Amount         `json:"amount"`
+	Created         string         `json:"created"`
+	MetaData        MetaData       `json:"metadata"`
+	Clearing        Clearing       `json:"clearing"`
+	CorrelationID   string         `json:"correlationId"`
+	IndividualACHID string         `json:"individualAchId"`
 }
 
 // Transfers is a collection of dwolla transfers
 type Transfers struct {
 	Collection
 	Embedded map[string][]Transfer `json:"_embedded"`
-}
-
-// TransferACHDetails contains data sent to the bank account
-type TransferACHDetails struct {
-	Destination TransferAddenda `json:"destination,omitempty"`
-	Source      TransferAddenda `json:"source,omitempty"`
-}
-
-// TransferAddenda is a transfer addenda
-type TransferAddenda struct {
-	Addenda TransferAddendaValues `json:"addenda,omitempty"`
-}
-
-// TransferAddendaValues is the addenda values
-type TransferAddendaValues struct {
-	Values []string `json:"values,omitempty"`
-}
-
-// TransferClearing is a transfer clearing schedule
-type TransferClearing struct {
-	Destination string `json:"destination,omitempty"`
-	Source      string `json:"source,omitempty"`
 }
 
 // TransferFailureReason contains details about a failed transfer
@@ -100,14 +78,14 @@ type TransferFees struct {
 // TransferRequest is a transfer request
 type TransferRequest struct {
 	Resource
-	Status         TransferStatus      `json:"status,omitempty"`
-	Amount         Amount              `json:"amount,omitempty"`
-	MetaData       MetaData            `json:"metadata,omitempty"`
-	Fees           []TransferFee       `json:"fees,omitempty"`
-	Clearing       TransferClearing    `json:"clearing,omitempty"`
-	CorrelationID  string              `json:"correlationId,omitempty"`
-	ACHDetails     *TransferACHDetails `json:"achDetails,omitempty"`
-	IdempotencyKey string              `json:"-"`
+	Status         TransferStatus `json:"status,omitempty"`
+	Amount         Amount         `json:"amount,omitempty"`
+	MetaData       MetaData       `json:"metadata,omitempty"`
+	Fees           []TransferFee  `json:"fees,omitempty"`
+	Clearing       Clearing       `json:"clearing,omitempty"`
+	CorrelationID  string         `json:"correlationId,omitempty"`
+	ACHDetails     *ACHDetails    `json:"achDetails,omitempty"`
+	IdempotencyKey string         `json:"-"`
 }
 
 // Create initiates a transfer
