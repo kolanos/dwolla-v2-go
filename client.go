@@ -80,6 +80,7 @@ type Client struct {
 	Document               DocumentService
 	Event                  EventService
 	FundingSource          FundingSourceService
+	KBA                    KBAService
 	MassPayment            MassPaymentService
 	OnDemandAuthorization  OnDemandAuthorizationService
 	Transfer               TransferService
@@ -124,6 +125,7 @@ func NewWithHTTPClient(key, secret string, environment Environment, httpClient H
 	c.Document = &DocumentServiceOp{c}
 	c.Event = &EventServiceOp{c}
 	c.FundingSource = &FundingSourceServiceOp{c}
+	c.KBA = &KBAServiceOp{c}
 	c.MassPayment = &MassPaymentServiceOp{c}
 	c.OnDemandAuthorization = &OnDemandAuthorizationServiceOp{c}
 	c.Transfer = &TransferServiceOp{c}
@@ -200,7 +202,7 @@ func (c *Client) RequestToken(ctx context.Context) error {
 
 	buf := bytes.NewBuffer([]byte("grant_type=client_credentials"))
 
-	req, err := http.NewRequest("POST", c.BuildAPIURL("token"), buf)
+	req, err := http.NewRequestWithContext(ctx, "POST", c.BuildAPIURL("token"), buf)
 	if err != nil {
 		return err
 	}
@@ -210,10 +212,7 @@ func (c *Client) RequestToken(ctx context.Context) error {
 
 	req.SetBasicAuth(c.Key, c.Secret)
 
-	req = req.WithContext(ctx)
-
 	res, err := c.HTTPClient.Do(req)
-
 	if err != nil {
 		return err
 	}
@@ -221,13 +220,11 @@ func (c *Client) RequestToken(ctx context.Context) error {
 	defer res.Body.Close()
 
 	resBody, err := ioutil.ReadAll(res.Body)
-
 	if err != nil {
 		return err
 	}
 
 	err = json.Unmarshal(resBody, &token)
-
 	if err != nil {
 		return err
 	}
@@ -270,8 +267,7 @@ func (c *Client) Get(ctx context.Context, path string, params *url.Values, heade
 		return err
 	}
 
-	req, err := http.NewRequest("GET", c.BuildAPIURL(path), nil)
-
+	req, err := http.NewRequestWithContext(ctx, "GET", c.BuildAPIURL(path), nil)
 	if err != nil {
 		return err
 	}
@@ -288,10 +284,7 @@ func (c *Client) Get(ctx context.Context, path string, params *url.Values, heade
 		req.URL.RawQuery = params.Encode()
 	}
 
-	req = req.WithContext(ctx)
-
 	res, err := c.HTTPClient.Do(req)
-
 	if err != nil {
 		return err
 	}
@@ -299,7 +292,6 @@ func (c *Client) Get(ctx context.Context, path string, params *url.Values, heade
 	defer res.Body.Close()
 
 	resBody, err := ioutil.ReadAll(res.Body)
-
 	if err != nil {
 		return err
 	}
@@ -345,7 +337,6 @@ func (c *Client) Post(ctx context.Context, path string, body interface{}, header
 
 	if body != nil {
 		bodyBytes, err := json.Marshal(body)
-
 		if err != nil {
 			return err
 		}
@@ -353,8 +344,7 @@ func (c *Client) Post(ctx context.Context, path string, body interface{}, header
 		bodyReader = bytes.NewReader(bodyBytes)
 	}
 
-	req, err := http.NewRequest("POST", c.BuildAPIURL(path), bodyReader)
-
+	req, err := http.NewRequestWithContext(ctx, "POST", c.BuildAPIURL(path), bodyReader)
 	if err != nil {
 		return err
 	}
@@ -368,10 +358,7 @@ func (c *Client) Post(ctx context.Context, path string, body interface{}, header
 	req.Header.Set("Content-Type", "application/vnd.dwolla.v1.hal+json")
 	req.Header.Set("User-Agent", "dwolla-v2-go")
 
-	req = req.WithContext(ctx)
-
 	res, err := c.HTTPClient.Do(req)
-
 	if err != nil {
 		return err
 	}
@@ -385,7 +372,6 @@ func (c *Client) Post(ctx context.Context, path string, body interface{}, header
 	}
 
 	resBody, err := ioutil.ReadAll(res.Body)
-
 	if err != nil {
 		return err
 	}
@@ -427,8 +413,9 @@ func (c *Client) Post(ctx context.Context, path string, body interface{}, header
 // Upload performs a multipart file upload to the Dwolla API
 func (c *Client) Upload(ctx context.Context, path string, documentType DocumentType, fileName string, file io.Reader, container interface{}) error {
 	var (
-		err      error
-		halError HALError
+		err             error
+		halError        HALError
+		validationError ValidationError
 	)
 
 	if err = c.EnsureToken(ctx); err != nil {
@@ -438,31 +425,26 @@ func (c *Client) Upload(ctx context.Context, path string, documentType DocumentT
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("file", fileName)
-
 	if err != nil {
 		return err
 	}
 
 	_, err = io.Copy(part, file)
-
 	if err != nil {
 		return err
 	}
 
 	err = writer.WriteField("documentType", string(documentType))
-
 	if err != nil {
 		return err
 	}
 
 	err = writer.Close()
-
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", c.BuildAPIURL(path), body)
-
+	req, err := http.NewRequestWithContext(ctx, "POST", c.BuildAPIURL(path), body)
 	if err != nil {
 		return err
 	}
@@ -473,10 +455,7 @@ func (c *Client) Upload(ctx context.Context, path string, documentType DocumentT
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	req.Header.Set("User-Agent", "dwolla-v2-go")
 
-	req = req.WithContext(ctx)
-
 	res, err := c.HTTPClient.Do(req)
-
 	if err != nil {
 		return err
 	}
@@ -490,7 +469,6 @@ func (c *Client) Upload(ctx context.Context, path string, documentType DocumentT
 	}
 
 	resBody, err := ioutil.ReadAll(res.Body)
-
 	if err != nil {
 		return err
 	}
@@ -509,6 +487,14 @@ func (c *Client) Upload(ctx context.Context, path string, documentType DocumentT
 			}
 
 			return c.Upload(ctx, path, documentType, fileName, file, container)
+		}
+
+		if halError.Code == "ValidationError" {
+			if err := json.Unmarshal(resBody, &validationError); err != nil {
+				return err
+			}
+
+			return validationError
 		}
 
 		return halError
@@ -532,8 +518,7 @@ func (c *Client) Delete(ctx context.Context, path string, params *url.Values, he
 		return err
 	}
 
-	req, err := http.NewRequest("DELETE", c.BuildAPIURL(path), nil)
-
+	req, err := http.NewRequestWithContext(ctx, "DELETE", c.BuildAPIURL(path), nil)
 	if err != nil {
 		return err
 	}
@@ -550,10 +535,7 @@ func (c *Client) Delete(ctx context.Context, path string, params *url.Values, he
 		req.URL.RawQuery = params.Encode()
 	}
 
-	req = req.WithContext(ctx)
-
 	res, err := c.HTTPClient.Do(req)
-
 	if err != nil {
 		return err
 	}
@@ -562,7 +544,6 @@ func (c *Client) Delete(ctx context.Context, path string, params *url.Values, he
 
 	if res.StatusCode > 299 {
 		resBody, err := ioutil.ReadAll(res.Body)
-
 		if err != nil {
 			return err
 		}
@@ -627,7 +608,7 @@ func (c *Client) CreateClientToken(ctx context.Context, action string, customer 
 
 	var token ClientToken
 
-	if err := c.Post(ctx, "client-tokens", body, nil, token); err != nil {
+	if err := c.Post(ctx, "client-tokens", body, nil, &token); err != nil {
 		return nil, err
 	}
 

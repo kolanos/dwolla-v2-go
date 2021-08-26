@@ -37,7 +37,7 @@ const (
 	CustomerTypeUnverified CustomerType = "unverified"
 )
 
-// CustomerService is the customerservice interface
+// CustomerService is the customer service interface
 //
 // see: https://docsv2.dwolla.com/#customers
 type CustomerService interface {
@@ -281,6 +281,25 @@ func (c *Customer) CreateFundingSource(ctx context.Context, body *FundingSourceR
 	return &source, nil
 }
 
+// CreateFundingSourceToken creates a funding source dwolla.js token
+//
+// see: https://docs.dwolla.com/#create-a-funding-sources-token-for-dwolla-js
+func (c *Customer) CreateFundingSourceToken(ctx context.Context) (*FundingSourceToken, error) {
+	var token FundingSourceToken
+
+	if _, ok := c.Links["self"]; !ok {
+		return nil, errors.New("No funding sources resource link")
+	}
+
+	if err := c.client.Post(ctx, fmt.Sprintf("%s/funding-source-token", c.Links["self"].Href), nil, nil, &token); err != nil {
+		return nil, err
+	}
+
+	token.client = c.client
+
+	return &token, nil
+}
+
 // Deactivate deactivates a dwolla customer
 func (c *Customer) Deactivate(ctx context.Context) error {
 	if _, ok := c.Links["deactivate"]; !ok {
@@ -290,6 +309,25 @@ func (c *Customer) Deactivate(ctx context.Context) error {
 	request := &CustomerRequest{Status: CustomerStatusDeactivated}
 
 	return c.client.Post(ctx, c.Links["deactivate"].Href, request, nil, c)
+}
+
+// InitiateKBA initiates a knowledge based authentication session
+//
+// see: https://docs.dwolla.com/#initiate-kba-session
+func (c *Customer) InitiateKBA(ctx context.Context) (*KBA, error) {
+	var kba KBA
+
+	if _, ok := c.Links["self"]; !ok {
+		return nil, errors.New("No self resource link")
+	}
+
+	if err := c.client.Post(ctx, fmt.Sprintf("%s/kba", c.Links["self"].Href), nil, nil, &kba); err != nil {
+		return nil, err
+	}
+
+	kba.client = c.client
+
+	return &kba, nil
 }
 
 // ListBeneficialOwners returns the customer's beneficial owners
