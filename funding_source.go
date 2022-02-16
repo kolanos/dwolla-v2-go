@@ -140,11 +140,19 @@ func (f *FundingSourceServiceOp) Remove(ctx context.Context, id string) error {
 
 // Customer returns the funding source's customer
 func (f *FundingSource) Customer(ctx context.Context) (*Customer, error) {
+	var customer Customer
+
 	if _, ok := f.Links["customer"]; !ok {
 		return nil, errors.New("No customer resource link")
 	}
 
-	return f.client.Customer.Retrieve(ctx, f.Links["customer"].Href)
+	if err := f.client.Get(ctx, f.Links["customer"].Href, nil, nil, &customer); err != nil {
+		return nil, err
+	}
+
+	customer.client = f.client
+
+	return &customer, nil
 }
 
 // FailedVerificationMicroDeposits returns true if micro deposit
