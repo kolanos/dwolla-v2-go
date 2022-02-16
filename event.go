@@ -19,9 +19,6 @@ type EventServiceOp struct {
 	client *Client
 }
 
-// EventTopic is an event topic
-type EventTopic string
-
 // Event is a dwolla event
 type Event struct {
 	Resource
