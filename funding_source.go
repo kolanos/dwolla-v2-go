@@ -34,7 +34,6 @@ type FundingSourceService interface {
 	Retrieve(context.Context, string) (*FundingSource, error)
 	Update(context.Context, string, *FundingSourceRequest) (*FundingSource, error)
 	Remove(context.Context, string) error
-	RetrieveBalance(ctx context.Context) (*FundingSourceBalance, error)
 }
 
 // FundingSourceServiceOp is an implementation of the funding source interface
