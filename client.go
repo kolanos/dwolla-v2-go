@@ -22,6 +22,8 @@ const (
 	// Version is the version of the client
 	Version string = "0.1.0"
 
+	HeaderIdempotency = "Idempotency-Key"
+
 	// Production is the production environment
 	Production Environment = "production"
 	// Sandbox is the sanbox environment

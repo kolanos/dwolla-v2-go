@@ -94,9 +94,10 @@ type TransferRequest struct {
 func (t *TransferServiceOp) Create(ctx context.Context, body *TransferRequest) (*Transfer, error) {
 	var transfer Transfer
 
-	headers := &http.Header{}
+	var headers *http.Header
 	if body.IdempotencyKey != "" {
-		headers.Set("Idempotency-Key", body.IdempotencyKey)
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
 	}
 
 	if err := t.client.Post(ctx, "transfers", body, headers, &transfer); err != nil {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 	"time"
@@ -125,6 +126,7 @@ type CustomerRequest struct {
 	EIN                    string             `json:"ein,omitempty"`
 	Website                string             `json:"website,omitempty"`
 	Controller             *ControllerRequest `json:"controller,omitempty"`
+	IdempotencyKey         string             `json:"-"`
 }
 
 // ControllerRequest is a controller of a business create/update request
@@ -148,7 +150,13 @@ type IAVToken struct {
 func (c *CustomerServiceOp) Create(ctx context.Context, body *CustomerRequest) (*Customer, error) {
 	var customer Customer
 
-	if err := c.client.Post(ctx, "customers", body, nil, &customer); err != nil {
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	if err := c.client.Post(ctx, "customers", body, headers, &customer); err != nil {
 		return nil, err
 	}
 
@@ -197,7 +205,13 @@ func (c *CustomerServiceOp) Retrieve(ctx context.Context, id string) (*Customer,
 func (c *CustomerServiceOp) Update(ctx context.Context, id string, body *CustomerRequest) (*Customer, error) {
 	var customer Customer
 
-	if err := c.client.Post(ctx, fmt.Sprintf("customers/%s", id), body, nil, &customer); err != nil {
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	if err := c.client.Post(ctx, fmt.Sprintf("customers/%s", id), body, headers, &customer); err != nil {
 		return nil, err
 	}
 
@@ -273,7 +287,13 @@ func (c *Customer) CreateFundingSource(ctx context.Context, body *FundingSourceR
 		return nil, errors.New("No funding sources resource link")
 	}
 
-	if err := c.client.Post(ctx, c.Links["funding-sources"].Href, body, nil, &source); err != nil {
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	if err := c.client.Post(ctx, c.Links["funding-sources"].Href, body, headers, &source); err != nil {
 		return nil, err
 	}
 
@@ -529,7 +549,13 @@ func (c *Customer) Update(ctx context.Context, body *CustomerRequest) error {
 		return errors.New("No self resource link")
 	}
 
-	return c.client.Post(ctx, c.Links["self"].Href, body, nil, c)
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	return c.client.Post(ctx, c.Links["self"].Href, body, headers, c)
 }
 
 // VerifyBeneficialOwners returns true if beneficial owners needed

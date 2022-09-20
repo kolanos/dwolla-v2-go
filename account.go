@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 )
@@ -60,7 +61,13 @@ func (a *AccountServiceOp) Retrieve(ctx context.Context) (*Account, error) {
 func (a *Account) CreateFundingSource(ctx context.Context, body *FundingSourceRequest) (*FundingSource, error) {
 	var source FundingSource
 
-	if err := a.client.Post(ctx, "funding-sources", body, nil, &source); err != nil {
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	if err := a.client.Post(ctx, "funding-sources", body, headers, &source); err != nil {
 		return nil, err
 	}
 

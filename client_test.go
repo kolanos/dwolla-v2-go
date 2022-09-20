@@ -118,7 +118,7 @@ func TestCreateCustomerAndFundingSource(t *testing.T) {
 	require.NotNil(t, fundingSourceCreated)
 
 	// Initiate Micro Deposits
-	microDeposit, err := fundingSourceCreated.InitiateMicroDeposits(ctx)
+	microDeposit, err := fundingSourceCreated.InitiateMicroDeposits(ctx, "")
 	require.NoError(t, err)
 	require.NotNil(t, microDeposit)
 	assert.Equal(t, MicroDepositStatusPending, microDeposit.Status)

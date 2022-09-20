@@ -25,8 +25,9 @@ type MicroDepositFailure struct {
 
 // MicroDepositRequest is a micro deposit verification request
 type MicroDepositRequest struct {
-	Amount1 Amount `json:"amount1,omitempty"`
-	Amount2 Amount `json:"amount2,omitempty"`
+	Amount1        Amount `json:"amount1,omitempty"`
+	Amount2        Amount `json:"amount2,omitempty"`
+	IdempotencyKey string `json:"-"`
 }
 
 // MicroDepositStatus is the status of the micro deposit
