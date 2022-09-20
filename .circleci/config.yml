@@ -1,7 +1,7 @@
 defaults: &defaults
   docker:
     - image: circleci/golang:1-stretch
-  working_directory: /go/src/github.com/kolanos/dwolla-v2-go
+  working_directory: /go/src/github.com/bluexlab/dwolla-v2-go
   environment:
     GO111MODULE: "on"
     GOARCH: amd64
