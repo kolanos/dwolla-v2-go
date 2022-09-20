@@ -323,6 +323,18 @@ func (c *Client) Get(ctx context.Context, path string, params *url.Values, heade
 		return halError
 	}
 
+	if res.StatusCode == 202 {
+		if err := json.Unmarshal(resBody, &halError); err != nil {
+			return err
+		}
+
+		if halError.Code == "TryAgainLater" {
+			// Get "TryAgainLater" code when Micro-deposits have not settled to destination bank.
+			// A Customer can verify these amounts after micro-deposits have processed to their bank.
+			return halError
+		}
+	}
+
 	if container != nil {
 		return json.Unmarshal(resBody, container)
 	}
