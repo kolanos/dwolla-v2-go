@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 )
 
 const (
@@ -29,7 +30,7 @@ const (
 
 // FundingSourceService is the funding source service interface
 //
-// see: https://docsv2.dwolla.com/#funding-sources
+// see: https://developers.dwolla.com/api-reference/funding-sources
 type FundingSourceService interface {
 	Retrieve(context.Context, string) (*FundingSource, error)
 	Update(context.Context, string, *FundingSourceRequest) (*FundingSource, error)
@@ -86,10 +87,11 @@ type FundingSourceRequest struct {
 	RoutingNumber   string                       `json:"routingNumber,omitempty"`
 	AccountNumber   string                       `json:"accountNumber,omitempty"`
 	BankAccountType FundingSourceBankAccountType `json:"bankAccountType,omitempty"`
-	Name            string                       `json:"name,omitempty"`
+	Name            string                       `json:"name,omitempty"` // Arbitrary nickname for the funding source. Must be 50 characters or less.
 	Channels        []string                     `json:"channels,omitempty"`
 	Removed         bool                         `json:"removed,omitempty"`
-	PlaidToken      string                       `json:"plaidToken,omitempty"`
+	PlaidToken      string                       `json:"plaidToken,omitempty"` // A processor token obtained from Plaid for adding and verifying a bank
+	IdempotencyKey  string                       `json:"-"`
 }
 
 // FundingSourceToken is a funding source dwolla.js token
@@ -119,7 +121,13 @@ func (f *FundingSourceServiceOp) Retrieve(ctx context.Context, id string) (*Fund
 func (f *FundingSourceServiceOp) Update(ctx context.Context, id string, body *FundingSourceRequest) (*FundingSource, error) {
 	var source FundingSource
 
-	if err := f.client.Post(ctx, fmt.Sprintf("funding-sources/%s", id), body, nil, &source); err != nil {
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	if err := f.client.Post(ctx, fmt.Sprintf("funding-sources/%s", id), body, headers, &source); err != nil {
 		return nil, err
 	}
 
@@ -164,14 +172,20 @@ func (f *FundingSource) FailedVerificationMicroDeposits() bool {
 // InitiateMicroDeposits initiates micro deposit verification
 //
 // see: https://docsv2.dwolla.com/#initiate-micro-deposits
-func (f *FundingSource) InitiateMicroDeposits(ctx context.Context) (*MicroDeposit, error) {
+func (f *FundingSource) InitiateMicroDeposits(ctx context.Context, idempotencyKey string) (*MicroDeposit, error) {
 	var deposit MicroDeposit
 
 	if _, ok := f.Links["initiate-micro-deposits"]; !ok {
 		return nil, errors.New("No initiate micro deposits resource link")
 	}
 
-	if err := f.client.Post(ctx, f.Links["initiate-micro-deposits"].Href, nil, nil, &deposit); err != nil {
+	var headers *http.Header
+	if idempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, idempotencyKey)
+	}
+
+	if err := f.client.Post(ctx, f.Links["initiate-micro-deposits"].Href, nil, headers, &deposit); err != nil {
 		return nil, err
 	}
 
@@ -263,7 +277,13 @@ func (f *FundingSource) Update(ctx context.Context, body *FundingSourceRequest) 
 		return errors.New("No self resource link")
 	}
 
-	return f.client.Post(ctx, f.Links["self"].Href, body, nil, f)
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	return f.client.Post(ctx, f.Links["self"].Href, body, headers, f)
 }
 
 // VerifyMicroDeposits verifies micro deposit amounts
@@ -274,5 +294,11 @@ func (f *FundingSource) VerifyMicroDeposits(ctx context.Context, body *MicroDepo
 		return errors.New("No verify micro deposits resource link")
 	}
 
-	return f.client.Post(ctx, f.Links["verify-micro-deposits"].Href, body, nil, nil)
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	return f.client.Post(ctx, f.Links["verify-micro-deposits"].Href, body, headers, nil)
 }

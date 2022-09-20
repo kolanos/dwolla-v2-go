@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 )
 
 // AccountService is the account service interface
 //
-// see: https://docsv2.dwolla.com/#accounts
+// see: https://developers.dwolla.com/api-reference/accounts
 type AccountService interface {
 	Retrieve(context.Context) (*Account, error)
 }
@@ -60,7 +61,13 @@ func (a *AccountServiceOp) Retrieve(ctx context.Context) (*Account, error) {
 func (a *Account) CreateFundingSource(ctx context.Context, body *FundingSourceRequest) (*FundingSource, error) {
 	var source FundingSource
 
-	if err := a.client.Post(ctx, "funding-sources", body, nil, &source); err != nil {
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	if err := a.client.Post(ctx, "funding-sources", body, headers, &source); err != nil {
 		return nil, err
 	}
 

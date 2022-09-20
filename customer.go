@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 	"time"
@@ -39,7 +40,7 @@ const (
 
 // CustomerService is the customer service interface
 //
-// see: https://docsv2.dwolla.com/#customers
+// see: https://developers.dwolla.com/api-reference/customers
 type CustomerService interface {
 	Create(context.Context, *CustomerRequest) (*Customer, error)
 	List(context.Context, *url.Values) (*Customers, error)
@@ -72,22 +73,23 @@ type CustomerType string
 // Customer is a dwolla customer
 type Customer struct {
 	Resource
-	ID           string         `json:"id"`
-	FirstName    string         `json:"firstName"`
-	LastName     string         `json:"lastName"`
-	Email        string         `json:"email"`
-	Type         CustomerType   `json:"type"`
-	Status       CustomerStatus `json:"status"`
-	Created      string         `json:"created"`
-	Address1     string         `json:"address1"`
-	Address2     string         `json:"address2"`
-	City         string         `json:"city"`
-	State        string         `json:"state"`
-	PostalCode   string         `json:"postalCode"`
-	Phone        string         `json:"phone"`
-	BusinessName string         `json:"businessName"`
-	BusinessType string         `json:"businessType"`
-	Controller   Controller     `json:"controller"`
+	ID            string         `json:"id"`
+	FirstName     string         `json:"firstName"`
+	LastName      string         `json:"lastName"`
+	Email         string         `json:"email"`
+	Type          CustomerType   `json:"type"`
+	Status        CustomerStatus `json:"status"`
+	Created       string         `json:"created"` // ISO-8601
+	Address1      string         `json:"address1"`
+	Address2      string         `json:"address2"`
+	City          string         `json:"city"`
+	State         string         `json:"state"`
+	PostalCode    string         `json:"postalCode"`
+	Phone         string         `json:"phone"`
+	BusinessName  string         `json:"businessName"`
+	BusinessType  string         `json:"businessType"`
+	CorrelationID string         `json:"correlationId"`
+	Controller    Controller     `json:"controller"`
 }
 
 // Customers is a collection of customers
@@ -106,6 +108,7 @@ type CustomerRequest struct {
 	LastName               string             `json:"lastName,omitempty"`
 	Email                  string             `json:"email,omitempty"`
 	IPAddress              string             `json:"ipAddress,omitempty"`
+	CorrelationID          string             `json:"correlationId,omitempty"`
 	Type                   CustomerType       `json:"type,omitempty"`
 	Status                 CustomerStatus     `json:"status,omitempty"`
 	DateOfBirth            string             `json:"dateOfBirth,omitempty"`
@@ -123,6 +126,7 @@ type CustomerRequest struct {
 	EIN                    string             `json:"ein,omitempty"`
 	Website                string             `json:"website,omitempty"`
 	Controller             *ControllerRequest `json:"controller,omitempty"`
+	IdempotencyKey         string             `json:"-"`
 }
 
 // ControllerRequest is a controller of a business create/update request
@@ -146,7 +150,13 @@ type IAVToken struct {
 func (c *CustomerServiceOp) Create(ctx context.Context, body *CustomerRequest) (*Customer, error) {
 	var customer Customer
 
-	if err := c.client.Post(ctx, "customers", body, nil, &customer); err != nil {
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	if err := c.client.Post(ctx, "customers", body, headers, &customer); err != nil {
 		return nil, err
 	}
 
@@ -195,7 +205,13 @@ func (c *CustomerServiceOp) Retrieve(ctx context.Context, id string) (*Customer,
 func (c *CustomerServiceOp) Update(ctx context.Context, id string, body *CustomerRequest) (*Customer, error) {
 	var customer Customer
 
-	if err := c.client.Post(ctx, fmt.Sprintf("customers/%s", id), body, nil, &customer); err != nil {
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	if err := c.client.Post(ctx, fmt.Sprintf("customers/%s", id), body, headers, &customer); err != nil {
 		return nil, err
 	}
 
@@ -271,7 +287,13 @@ func (c *Customer) CreateFundingSource(ctx context.Context, body *FundingSourceR
 		return nil, errors.New("No funding sources resource link")
 	}
 
-	if err := c.client.Post(ctx, c.Links["funding-sources"].Href, body, nil, &source); err != nil {
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	if err := c.client.Post(ctx, c.Links["funding-sources"].Href, body, headers, &source); err != nil {
 		return nil, err
 	}
 
@@ -527,7 +549,13 @@ func (c *Customer) Update(ctx context.Context, body *CustomerRequest) error {
 		return errors.New("No self resource link")
 	}
 
-	return c.client.Post(ctx, c.Links["self"].Href, body, nil, c)
+	var headers *http.Header
+	if body.IdempotencyKey != "" {
+		headers = &http.Header{}
+		headers.Set(HeaderIdempotency, body.IdempotencyKey)
+	}
+
+	return c.client.Post(ctx, c.Links["self"].Href, body, headers, c)
 }
 
 // VerifyBeneficialOwners returns true if beneficial owners needed

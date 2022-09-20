@@ -12,7 +12,7 @@ func TestAccountServiceRetrieve(t *testing.T) {
 	c.root = &Resource{Links: Links{"account": Link{Href: "foobar"}}}
 	res, err := c.Account.Retrieve(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, res.ID, "ca32853c-48fa-40be-ae75-77b37504581b")
 	assert.Equal(t, res.Name, "Jane Doe")
@@ -54,7 +54,7 @@ func TestAccountCreateFundingSource(t *testing.T) {
 
 	res, err := a.CreateFundingSource(ctx, fs)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -78,7 +78,7 @@ func TestAccountListFundingSources(t *testing.T) {
 	a := &Account{Resource: Resource{client: c, Links: Links{"funding-sources": Link{Href: "foobar"}}}}
 	res, err := a.ListFundingSources(ctx, false)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 
 	fs := res.Embedded["funding-sources"][0]
@@ -117,7 +117,7 @@ func TestAccountListMassPayments(t *testing.T) {
 	a := &Account{Resource: Resource{client: c, Links: Links{"self": Link{Href: "foobar"}}}}
 	res, err := a.ListMassPayments(ctx, nil)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, res.Total, 1)
 
@@ -152,7 +152,7 @@ func TestAccountListTransfers(t *testing.T) {
 	a := &Account{Resource: Resource{client: c, Links: Links{"transfers": Link{Href: "foobar"}}}}
 	res, err := a.ListTransfers(ctx, nil)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
