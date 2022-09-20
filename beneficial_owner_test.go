@@ -12,7 +12,7 @@ func TestBeneficialOwnerServiceRetrieve(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "beneficial-owner.json"))
 	res, err := c.BeneficialOwner.Retrieve(ctx, "00cb67f2-768c-4ee3-ac81-73bc4faf9c2b")
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, res.ID, "00cb67f2-768c-4ee3-ac81-73bc4faf9c2b")
 }
@@ -29,7 +29,7 @@ func TestBeneficialOwnerServiceRemove(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "beneficial-owner.json"))
 	err := c.BeneficialOwner.Remove(ctx, "00cb67f2-768c-4ee3-ac81-73bc4faf9c2b")
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestBeneficialOwnerServiceUpdate(t *testing.T) {
@@ -39,7 +39,7 @@ func TestBeneficialOwnerServiceUpdate(t *testing.T) {
 		LastName:  "Doe",
 	})
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, res.ID, "00cb67f2-768c-4ee3-ac81-73bc4faf9c2b")
 }
@@ -67,7 +67,7 @@ func TestBeneficialOwnerCreateDocument(t *testing.T) {
 		File:     f,
 	})
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -104,7 +104,7 @@ func TestBeneficialOwnerListDocuments(t *testing.T) {
 	owner := &BeneficialOwner{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8"}}}}
 	res, err := owner.ListDocuments(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -128,7 +128,7 @@ func TestBeneficialOwnerRemove(t *testing.T) {
 	owner := &BeneficialOwner{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8"}}}}
 	err := owner.Remove(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestBeneficialOwnerRemoveError(t *testing.T) {
@@ -152,7 +152,7 @@ func TestBeneficialOwnerUpdate(t *testing.T) {
 		LastName:  "Doe",
 	})
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestBeneficialOwnerUpdateError(t *testing.T) {
@@ -179,7 +179,7 @@ func TestBeneficialOwnershipCertify(t *testing.T) {
 	ownership := &BeneficialOwnership{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/beneficial-owners/07d59716-ef22-4fe6-98e8-f3190233dfb8"}}}}
 	err := ownership.Certify(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestBeneficialOwnershipCertifyError(t *testing.T) {

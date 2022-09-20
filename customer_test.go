@@ -18,7 +18,7 @@ func TestCustomerServiceCreate(t *testing.T) {
 		Type:      CustomerTypeUnverified,
 	})
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, res.ID, "FC451A7A-AE30-4404-AB95-E3553FCD733F")
 	assert.Equal(t, res.FirstName, "Jane")
@@ -27,6 +27,8 @@ func TestCustomerServiceCreate(t *testing.T) {
 	assert.Equal(t, res.Type, CustomerTypeUnverified)
 	assert.Equal(t, res.Status, CustomerStatusUnverified)
 	assert.Equal(t, res.Created, "2015-09-03T23:56:10.023Z")
+	assert.Equal(t, res.BusinessName, "Stratapro")
+	assert.Equal(t, res.CorrelationID, "777")
 }
 
 func TestCustomerServiceCreateError(t *testing.T) {
@@ -48,7 +50,7 @@ func TestCustomerServiceRetrieve(t *testing.T) {
 
 	res, err := c.Customer.Retrieve(ctx, "FC451A7A-AE30-4404-AB95-E3553FCD733F")
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, res.ID, "FC451A7A-AE30-4404-AB95-E3553FCD733F")
 	assert.Equal(t, res.FirstName, "Jane")
@@ -57,6 +59,8 @@ func TestCustomerServiceRetrieve(t *testing.T) {
 	assert.Equal(t, res.Type, CustomerTypeUnverified)
 	assert.Equal(t, res.Status, CustomerStatusUnverified)
 	assert.Equal(t, res.Created, "2015-09-03T23:56:10.023Z")
+	assert.Equal(t, res.BusinessName, "Stratapro")
+	assert.Equal(t, res.CorrelationID, "777")
 }
 
 func TestCustomerServiceRetrieveError(t *testing.T) {
@@ -71,7 +75,7 @@ func TestCustomerServiceList(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customers.json"))
 	res, err := c.Customer.List(ctx, nil)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, res.Total, 1)
 
@@ -104,7 +108,7 @@ func TestCustomerServiceUpdate(t *testing.T) {
 		Type:      CustomerTypeUnverified,
 	})
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, res.ID, "FC451A7A-AE30-4404-AB95-E3553FCD733F")
 	assert.Equal(t, res.FirstName, "Jane")
@@ -113,6 +117,8 @@ func TestCustomerServiceUpdate(t *testing.T) {
 	assert.Equal(t, res.Type, CustomerTypeUnverified)
 	assert.Equal(t, res.Status, CustomerStatusUnverified)
 	assert.Equal(t, res.Created, "2015-09-03T23:56:10.023Z")
+	assert.Equal(t, res.BusinessName, "Stratapro")
+	assert.Equal(t, res.CorrelationID, "777")
 }
 
 func TestCustomerServiceUpdateError(t *testing.T) {
@@ -134,7 +140,7 @@ func TestCustomerCertifyBeneficialOwnership(t *testing.T) {
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"certify-beneficial-ownership": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-ownership"}}}}
 	err := customer.CertifyBeneficialOwnership(ctx)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestCustomerCertifyBeneficialOwnershipError(t *testing.T) {
@@ -161,7 +167,7 @@ func TestCustomerCreateDocument(t *testing.T) {
 		File:     f,
 	})
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -217,7 +223,7 @@ func TestCustomerCreateBeneficialOwner(t *testing.T) {
 		},
 	})
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, owner)
 }
 
@@ -275,7 +281,7 @@ func TestCustomerCreateFundingSource(t *testing.T) {
 		Name:            "Test Checking Account",
 	})
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, source)
 }
 
@@ -312,7 +318,7 @@ func TestCustomerDeactivate(t *testing.T) {
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"deactivate": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
 	err := customer.Deactivate(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestCustomerDeactivateError(t *testing.T) {
@@ -336,7 +342,7 @@ func TestCustomerListBeneficialOwners(t *testing.T) {
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"beneficial-owners": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-owners"}}}}
 	res, err := customer.ListBeneficialOwners(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -362,7 +368,7 @@ func TestCustomerListDocuments(t *testing.T) {
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
 	res, err := customer.ListDocuments(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -388,7 +394,7 @@ func TestCustomerListFundingSources(t *testing.T) {
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"funding-sources": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/funding-sources"}}}}
 	res, err := customer.ListFundingSources(ctx, true)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -414,7 +420,7 @@ func TestCustomerListMassPayments(t *testing.T) {
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"mass-payments": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/mass-payments"}}}}
 	res, err := customer.ListMassPayments(ctx, nil)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -440,7 +446,7 @@ func TestCustomerListTransfers(t *testing.T) {
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"transfers": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/transfers"}}}}
 	res, err := customer.ListTransfers(ctx, nil)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -471,7 +477,7 @@ func TestCustomerReactivate(t *testing.T) {
 	customer.Links = Links{"reactivate": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}
 	err = customer.Reactivate(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestCustomerReactivateError(t *testing.T) {
@@ -508,7 +514,7 @@ func TestCustomerRetrieveBeneficialOwnership(t *testing.T) {
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"beneficial-owners": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/beneficial-owners"}}}}
 	res, err := customer.RetrieveBeneficialOwnership(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -534,7 +540,7 @@ func TestCustomerRetrieveIAVToken(t *testing.T) {
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"self": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}}}
 	res, err := customer.RetrieveIAVToken(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -591,7 +597,7 @@ func TestCustomerSuspend(t *testing.T) {
 	customer.Links = Links{"suspend": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F"}}
 	err = customer.Suspend(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestCustomerSuspendError(t *testing.T) {
@@ -618,7 +624,7 @@ func TestCustomerUpdate(t *testing.T) {
 		LastName:  "Bar",
 	})
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestCustomerUpdateError(t *testing.T) {

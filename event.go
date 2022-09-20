@@ -8,7 +8,7 @@ import (
 
 // EventService is the event service interface
 //
-// see: https://docsv2.dwolla.com/#events
+// see: https://developers.dwolla.com/api-reference/events
 type EventService interface {
 	List(context.Context, *url.Values) (*Events, error)
 	Retrieve(context.Context, string) (*Event, error)

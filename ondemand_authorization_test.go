@@ -11,7 +11,7 @@ func TestOnDemandAuthorizationServiceCreate(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "on-demand-authorization.json"))
 	res, err := c.OnDemandAuthorization.Create(ctx)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -27,7 +27,7 @@ func TestOnDemandAuthorizationServiceRetrieve(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "on-demand-authorization.json"))
 	res, err := c.OnDemandAuthorization.Retrieve(ctx, "30e7c028-0bdf-e511-80de-0aa34a9b2388")
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 
 	assert.Equal(t, res.BodyText, "I agree that future payments to Company ABC inc. will be processed by the Dwolla payment system from the selected account above. In order to cancel this authorization, I will change my payment settings within my Company ABC inc. account.")

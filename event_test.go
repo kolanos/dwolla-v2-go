@@ -11,7 +11,7 @@ func TestEventServiceRetrieve(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "event.json"))
 	res, err := c.Event.Retrieve(ctx, "9ed3cf58-7d6f-11e3-81a4-5404a6144203")
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, res.ID, "81f6e13c-557c-4449-9331-da5c65e61095")
 }
@@ -28,7 +28,7 @@ func TestEventServiceList(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "events.json"))
 	res, err := c.Event.List(ctx, nil)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 
 	assert.Equal(t, res.Total, 3)

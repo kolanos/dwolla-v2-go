@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-// Environment is a supported dwolla environment
+// Environment is a supported dwolla environment. e.g. sandbox, production, https://api-sandbox.dwolla.com
 type Environment string
 
 const (
@@ -33,7 +33,7 @@ const (
 	ProductionAuthURL = "https://www.dwolla.com/oauth/v2/authenticate"
 	// ProductionTokenURL is the production token url
 	// Deprecated - use https://api.dwolla.com/token moving forward
-	ProductionTokenURL = "https://accounts.dwolla.com/token"
+	ProductionTokenURL = "https://accounts.dwolla.com/token" // #nosec G101
 
 	// SandboxAPIURL is the sandbox api url
 	SandboxAPIURL = "https://api-sandbox.dwolla.com"
@@ -41,7 +41,7 @@ const (
 	SandboxAuthURL = "https://sandbox.dwolla.com/oauth/v2/authenticate"
 	// SandboxTokenURL is the sandbox token url
 	// Deprecated - use https://api-sandbox.dwolla.com moving forward
-	SandboxTokenURL = "https://accounts-sandbox.dwolla.com/token"
+	SandboxTokenURL = "https://accounts-sandbox.dwolla.com/token" // #nosec G101
 )
 
 // Token is a dwolla auth token
@@ -145,6 +145,8 @@ func (c Client) APIURL() string {
 		url = ProductionAPIURL
 	case Sandbox:
 		url = SandboxAPIURL
+	default:
+		url = string(c.Environment)
 	}
 
 	return url
@@ -174,6 +176,8 @@ func (c Client) AuthURL() string {
 		url = ProductionAuthURL
 	case Sandbox:
 		url = SandboxAuthURL
+	default:
+		url = joinURL(string(c.Environment), "/oauth/v2/authenticate")
 	}
 
 	return url
@@ -188,12 +192,16 @@ func (c Client) TokenURL() string {
 		url = ProductionTokenURL
 	case Sandbox:
 		url = SandboxTokenURL
+	default:
+		url = joinURL(string(c.Environment), "/token")
 	}
 
 	return url
 }
 
 // RequestToken requests a new auth token using client credentials
+//
+// See: https://developers.dwolla.com/api-reference/authorization/application-authorization
 func (c *Client) RequestToken(ctx context.Context) error {
 	var (
 		err   error
@@ -208,7 +216,6 @@ func (c *Client) RequestToken(ctx context.Context) error {
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("User-Agent", fmt.Sprintf("dwolla-v2-go/%s", Version))
 
 	req.SetBasicAuth(c.Key, c.Secret)
 
@@ -278,7 +285,6 @@ func (c *Client) Get(ctx context.Context, path string, params *url.Values, heade
 
 	req.Header.Set("Accept", "application/vnd.dwolla.v1.hal+json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token.AccessToken))
-	req.Header.Set("User-Agent", fmt.Sprintf("dwolla-v2-go/%s", Version))
 
 	if params != nil {
 		req.URL.RawQuery = params.Encode()
@@ -356,7 +362,6 @@ func (c *Client) Post(ctx context.Context, path string, body interface{}, header
 	req.Header.Set("Accept", "application/vnd.dwolla.v1.hal+json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token.AccessToken))
 	req.Header.Set("Content-Type", "application/vnd.dwolla.v1.hal+json")
-	req.Header.Set("User-Agent", "dwolla-v2-go")
 
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -453,7 +458,6 @@ func (c *Client) Upload(ctx context.Context, path string, documentType DocumentT
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token.AccessToken))
 	req.Header.Set("Cache-Control", "no-cache")
 	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req.Header.Set("User-Agent", "dwolla-v2-go")
 
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -529,7 +533,6 @@ func (c *Client) Delete(ctx context.Context, path string, params *url.Values, he
 
 	req.Header.Set("Accept", "application/vnd.dwolla.v1.hal+json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token.AccessToken))
-	req.Header.Set("User-Agent", fmt.Sprintf("dwolla-v2-go/%s", Version))
 
 	if params != nil {
 		req.URL.RawQuery = params.Encode()

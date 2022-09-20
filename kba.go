@@ -8,7 +8,7 @@ import (
 
 // KBAService is the kba service interface
 //
-// see: https://docs.dwolla.com/#knowledge-based-authentication-kba
+// see: https://developers.dwolla.com/api-reference/kba
 type KBAService interface {
 	Retrieve(context.Context, string) (*KBA, error)
 }

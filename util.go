@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -123,11 +125,16 @@ func newRedirectResponse(url string) *http.Response {
 }
 
 func newMockClient(status int, file string) *Client {
-	f, _ := os.Open(file)
+	f, _ := os.Open(filepath.Clean(file))
 	mr := &http.Response{Body: f, StatusCode: status}
 	mc := &mockHTTPClient{err: nil, res: mr}
 
 	c := NewWithHTTPClient("foobar", "barbaz", Sandbox, mc)
 	c.Token = &Token{ExpiresIn: 3600, startTime: time.Now()}
 	return c
+}
+
+func joinURL(base string, paths ...string) string {
+	p := path.Join(paths...)
+	return fmt.Sprintf("%s/%s", strings.TrimRight(base, "/"), strings.TrimLeft(p, "/"))
 }

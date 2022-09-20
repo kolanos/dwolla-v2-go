@@ -29,7 +29,7 @@ const (
 
 // FundingSourceService is the funding source service interface
 //
-// see: https://docsv2.dwolla.com/#funding-sources
+// see: https://developers.dwolla.com/api-reference/funding-sources
 type FundingSourceService interface {
 	Retrieve(context.Context, string) (*FundingSource, error)
 	Update(context.Context, string, *FundingSourceRequest) (*FundingSource, error)
@@ -86,10 +86,10 @@ type FundingSourceRequest struct {
 	RoutingNumber   string                       `json:"routingNumber,omitempty"`
 	AccountNumber   string                       `json:"accountNumber,omitempty"`
 	BankAccountType FundingSourceBankAccountType `json:"bankAccountType,omitempty"`
-	Name            string                       `json:"name,omitempty"`
+	Name            string                       `json:"name,omitempty"` // Arbitrary nickname for the funding source. Must be 50 characters or less.
 	Channels        []string                     `json:"channels,omitempty"`
 	Removed         bool                         `json:"removed,omitempty"`
-	PlaidToken      string                       `json:"plaidToken,omitempty"`
+	PlaidToken      string                       `json:"plaidToken,omitempty"` // A processor token obtained from Plaid for adding and verifying a bank
 }
 
 // FundingSourceToken is a funding source dwolla.js token

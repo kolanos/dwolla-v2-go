@@ -10,5 +10,7 @@
   "email": "janedoe@nomail.com",
   "type": "unverified",
   "status": "unverified",
-  "created": "2015-09-03T23:56:10.023Z"
+  "created": "2015-09-03T23:56:10.023Z",
+  "businessName": "Stratapro",
+  "correlationId": "777"
 }

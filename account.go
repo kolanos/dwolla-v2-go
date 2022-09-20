@@ -10,7 +10,7 @@ import (
 
 // AccountService is the account service interface
 //
-// see: https://docsv2.dwolla.com/#accounts
+// see: https://developers.dwolla.com/api-reference/accounts
 type AccountService interface {
 	Retrieve(context.Context) (*Account, error)
 }
