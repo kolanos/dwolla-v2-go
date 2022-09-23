@@ -1,0 +1,20 @@
+{
+  "code": "ValidationError",
+  "message": "Validation error(s) present. See embedded errors list for more details.",
+  "_embedded": {
+    "errors": [
+      {
+        "code": "Duplicate",
+        "message": "A customer with the specified email already exists.",
+        "path": "/email",
+        "_links": {
+          "about": {
+            "href": "https://api-sandbox.dwolla.com/customers/8a1187aa-05f3-4425-a62b-9ec72d1a0c6a",
+            "type": "application/vnd.dwolla.v1.hal+json",
+            "resource-type": "customer"
+          }
+        }
+      }
+    ]
+  }
+}
