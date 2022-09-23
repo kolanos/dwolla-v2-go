@@ -45,6 +45,42 @@ func TestCustomerServiceCreateError(t *testing.T) {
 	assert.Nil(t, res)
 }
 
+func TestCustomerServiceCreateError_DuplicateEmail(t *testing.T) {
+	c := newMockClient(400, filepath.Join("testdata", "customer-create-duplicate-error.json"))
+
+	res, err := c.Customer.Create(ctx, &CustomerRequest{
+		FirstName: "Jane",
+		LastName:  "Doe",
+		Email:     "janedoe@nomail.com",
+		Type:      CustomerTypeUnverified,
+	})
+
+	expectedErr := ValidationError{
+		Code:    "ValidationError",
+		Message: "Validation error(s) present. See embedded errors list for more details.",
+		Embedded: HALErrors{
+			"errors": []HALError{
+				{
+					Code:    "Duplicate",
+					Message: "A customer with the specified email already exists.",
+					Path:    "/email",
+					Links: Links{
+						"about": Link{
+							Href:         "https://api-sandbox.dwolla.com/customers/8a1187aa-05f3-4425-a62b-9ec72d1a0c6a",
+							Type:         "application/vnd.dwolla.v1.hal+json",
+							ResourceType: "customer",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	assert.Error(t, err)
+	assert.Equal(t, expectedErr, err)
+	assert.Nil(t, res)
+}
+
 func TestCustomerServiceRetrieve(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "customer.json"))
 

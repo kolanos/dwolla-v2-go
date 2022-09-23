@@ -10,6 +10,7 @@ type HALError struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
 	Path    string `json:"path"`
+	Links   Links  `json:"_links"`
 }
 
 // HALError implements the error interface
