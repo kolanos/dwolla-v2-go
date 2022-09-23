@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 const (
@@ -301,4 +302,10 @@ func (f *FundingSource) VerifyMicroDeposits(ctx context.Context, body *MicroDepo
 	}
 
 	return f.client.Post(ctx, f.Links["verify-micro-deposits"].Href, body, headers, nil)
+}
+
+// CreatedTime returns the created value as time.Time
+func (f *FundingSource) CreatedTime() time.Time {
+	t, _ := time.Parse(time.RFC3339, f.Created)
+	return t
 }
