@@ -209,7 +209,7 @@ func TestCustomerCreateDocument(t *testing.T) {
 
 func TestCustomerCreatedTime(t *testing.T) {
 	customer := &Customer{Created: "2015-09-03T23:56:10.023Z"}
-	assert.NotNil(t, customer.CreatedTime())
+	assert.Equal(t, int64(1441324570023), customer.CreatedTime().UnixMilli())
 }
 
 func TestCustomerCreateDocumentError(t *testing.T) {
