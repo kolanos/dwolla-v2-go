@@ -1,5 +1,7 @@
 package dwolla
 
+import "time"
+
 const (
 	// MicroDepositStatusPending is when micro-deposits initiated and are en route to their destination
 	MicroDepositStatusPending MicroDepositStatus = "pending"
@@ -32,3 +34,9 @@ type MicroDepositRequest struct {
 
 // MicroDepositStatus is the status of the micro deposit
 type MicroDepositStatus string
+
+// CreatedTime returns the created value as time.Time
+func (m *MicroDeposit) CreatedTime() time.Time {
+	t, _ := time.Parse(time.RFC3339, m.Created)
+	return t
+}
