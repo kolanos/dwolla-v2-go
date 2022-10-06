@@ -399,16 +399,19 @@ func (c *Customer) ListDocuments(ctx context.Context) (*Documents, error) {
 
 // ListFundingSources returns the customer's funding sources
 //
-// see: https://docsv2.dwolla.com/#list-funding-sources-for-a-customer
-func (c *Customer) ListFundingSources(ctx context.Context, removed bool) (*FundingSources, error) {
+// see: https://developers.dwolla.com/api-reference/funding-sources/list-funding-sources-for-a-customer
+func (c *Customer) ListFundingSources(ctx context.Context, removed *bool) (*FundingSources, error) {
 	var sources FundingSources
 
 	if _, ok := c.Links["funding-sources"]; !ok {
 		return nil, errors.New("No funding sources resource link")
 	}
 
-	params := &url.Values{}
-	params.Add("removed", strconv.FormatBool(removed))
+	var params *url.Values
+	if removed != nil {
+		params = &url.Values{}
+		params.Add("removed", strconv.FormatBool(*removed))
+	}
 
 	if err := c.client.Get(ctx, c.Links["funding-sources"].Href, params, nil, &sources); err != nil {
 		return nil, err

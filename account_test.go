@@ -76,7 +76,8 @@ func TestAccountCreateFundingSourceError(t *testing.T) {
 func TestAccountListFundingSources(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "funding-sources.json"))
 	a := &Account{Resource: Resource{client: c, Links: Links{"funding-sources": Link{Href: "foobar"}}}}
-	res, err := a.ListFundingSources(ctx, false)
+	removed := false
+	res, err := a.ListFundingSources(ctx, &removed)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, res)
@@ -97,7 +98,8 @@ func TestAccountListFundingSources(t *testing.T) {
 func TestAccountListFundingSourcesError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 	a := &Account{Resource: Resource{client: c, Links: Links{"funding-sources": Link{Href: "foobar"}}}}
-	res, err := a.ListFundingSources(ctx, false)
+	removed := false
+	res, err := a.ListFundingSources(ctx, &removed)
 
 	assert.Equal(t, err.Error(), "[NotFound] Resource Not Found")
 	assert.Error(t, err)
@@ -105,7 +107,7 @@ func TestAccountListFundingSourcesError(t *testing.T) {
 
 	c = newMockClient(200, filepath.Join("testdata", "funding-sources.json"))
 	a = &Account{Resource: Resource{client: c}}
-	res, err = a.ListFundingSources(ctx, false)
+	res, err = a.ListFundingSources(ctx, &removed)
 
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "No funding sources resource link")

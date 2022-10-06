@@ -428,7 +428,8 @@ func TestCustomerListFundingSources(t *testing.T) {
 	c := newMockClient(200, filepath.Join("testdata", "funding-sources.json"))
 
 	customer := &Customer{Resource: Resource{client: c, Links: Links{"funding-sources": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/funding-sources"}}}}
-	res, err := customer.ListFundingSources(ctx, true)
+	removed := true
+	res, err := customer.ListFundingSources(ctx, &removed)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, res)
@@ -438,13 +439,14 @@ func TestCustomerListFundingSourcesError(t *testing.T) {
 	c := newMockClient(404, filepath.Join("testdata", "resource-not-found.json"))
 
 	customer := &Customer{Resource: Resource{client: c}}
-	res, err := customer.ListFundingSources(ctx, true)
+	removed := true
+	res, err := customer.ListFundingSources(ctx, &removed)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
 
 	customer = &Customer{Resource: Resource{client: c, Links: Links{"funding-sources": Link{Href: "https://api-sandbox.dwolla.com/customers/FC451A7A-AE30-4404-AB95-E3553FCD733F/funding-sources"}}}}
-	res, err = customer.ListFundingSources(ctx, true)
+	res, err = customer.ListFundingSources(ctx, &removed)
 
 	assert.Error(t, err)
 	assert.Nil(t, res)
