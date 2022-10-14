@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const (
@@ -54,13 +55,6 @@ type Transfer struct {
 type Transfers struct {
 	Collection
 	Embedded map[string][]Transfer `json:"_embedded"`
-}
-
-// TransferFailureReason contains details about a failed transfer
-type TransferFailureReason struct {
-	Resource
-	Code        string `json:"code"`
-	Description string `json:"description"`
 }
 
 // TransferFee is a transfer fee
@@ -240,17 +234,23 @@ func (t Transfer) SourceFundingSourceString() string {
 
 // RetrieveFailureReason returns the transfer's failure reason
 //
-// see: https://docsv2.dwolla.com/#retrieve-a-transfer-failure-reason
-func (t *Transfer) RetrieveFailureReason(ctx context.Context) (*TransferFailureReason, error) {
-	var reason TransferFailureReason
+// see: https://developers.dwolla.com/api-reference/transfers/retrieve-a-transfer-failure-reason
+func (t *Transfer) RetrieveFailureReason(ctx context.Context) (*TransferFailure, error) {
+	var transferFailure TransferFailure
 
 	if _, ok := t.Links["failure"]; !ok {
 		return nil, errors.New("No failure resource link")
 	}
 
-	if err := t.client.Get(ctx, t.Links["failure"].Href, nil, nil, &reason); err != nil {
+	if err := t.client.Get(ctx, t.Links["failure"].Href, nil, nil, &transferFailure); err != nil {
 		return nil, err
 	}
 
-	return &reason, nil
+	return &transferFailure, nil
+}
+
+// CreatedTime returns the created value as time.Time
+func (t *Transfer) CreatedTime() time.Time {
+	createdTime, _ := time.Parse(time.RFC3339, t.Created)
+	return createdTime
 }

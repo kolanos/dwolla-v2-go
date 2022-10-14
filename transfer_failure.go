@@ -3,6 +3,7 @@ package dwolla
 import (
 	"context"
 	"fmt"
+	"time"
 )
 
 type TransferFailureCode string
@@ -42,6 +43,7 @@ type TransferFailure struct {
 	Code        TransferFailureCode `json:"code"`
 	Description string              `json:"description"`
 	Explanation string              `json:"explanation"`
+	Created     string              `json:"created"`
 }
 
 func (t TransferFailureServiceOp) Retrieve(ctx context.Context, transferID string) (*TransferFailure, error) {
@@ -54,4 +56,10 @@ func (t TransferFailureServiceOp) Retrieve(ctx context.Context, transferID strin
 	transferFailure.client = t.client
 
 	return &transferFailure, nil
+}
+
+// CreatedTime returns the created value as time.Time
+func (tf *TransferFailure) CreatedTime() time.Time {
+	t, _ := time.Parse(time.RFC3339, tf.Created)
+	return t
 }
